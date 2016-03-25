@@ -1,0 +1,146 @@
+.float-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px
+}
+.block {
+  display: block;
+}
+.flex {
+  display: flex;
+}
+
+.tabbar {
+  display: flex;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.tabbar .tabbar-item {
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 16px
+}
+
+.tabbar .tabbar-item-active {
+  border-bottom: 3px solid #3F51B5;
+}
+
+.block {
+  display: block;
+}
+select {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #DADADA;
+  width: 200px;
+  padding: 5px;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 0;
+  height: 34px;
+  -webkit-appearance: none;
+}
+
+.qcollection {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+  height: 100%;
+  cursor: pointer;
+}
+
+.qc-subject {
+  background-color: #2196F3;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 14px;
+  display: inline-block;
+  margin-top: 3px;
+}
+.qc-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  padding-left: 12px;
+  border-left: 4px solid #3F51B5;
+}
+.qc-public {
+  color: #E91E63;
+  float: right;
+  padding: 2px 4px;
+  margin-top: 5px;
+  border: 1px solid #E92266;
+}
+.qc-createdby {
+  font-size: 14px;
+  font-weight: normal;
+  color: #616161;
+  margin-top: 16px;
+  margin-bottom: 0;
+  padding-left: 12px;
+  border-left: 4px solid #3F51B5;
+}
+
+.qc-d-average-difficulty {
+  margin: 20px 0 0 0;
+  text-align: center;
+  font-size: 20px;
+  color: #9E9E9E;
+}
+
+#secondary-panel {
+  padding: 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+.question {
+  background-color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+  height: 100%;
+}
+.question-wrapper {
+  padding: 16px;
+}
+.q-subject {
+  background-color: #2196F3;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 14px;
+  display: inline-block;
+  margin-top: 3px;
+}
+.q-type {
+  border-bottom: 2px solid #2196F3;
+}
+.q-context {
+  margin: 0;
+  font-size: 16px;
+  padding-left: 12px;
+  border-left: 4px solid #3F51B5;
+  margin-top: 20px;
+  margin-bottom: 20px
+}
+.q-difficulty {
+  float: right;
+}
+.q-difficulty i {
+  width: 24px;
+  color: #FFC107
+}
+.q-tag {
+  color: #E91E63;
+  margin: 0 5px;
+  padding: 2px 4px;
+  border: 1px solid #e91e63;
+}
+.question-tools {
+  padding: 4px 0;
+  border-top: 1px solid #EEEEEE;
+}
+.question-tools button {
+  color: #616161
+}

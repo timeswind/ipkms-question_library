@@ -1,0 +1,149 @@
+<style>
+#my-qcollection .sheet-pannel {
+  background-color: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.35)
+}
+
+#my-qcollection .expand-transition {
+  max-height: 400px;
+  transition: all .3s ease;
+  padding: 16px 32px;
+  padding-bottom: 32px;
+  overflow: hidden;
+}
+
+#my-qcollection .expand-enter, #my-qcollection .expand-leave {
+  max-height: 0;
+  padding: 0;
+  opacity: 0;
+}
+</style>
+
+<template>
+  <div id="my-qcollection">
+    <div class="sheet-pannel">
+      <div class="sheet-zone" v-show="showCreatSheet" transition="expand">
+        <div class="block">
+          <mdl-textfield floating-label="題集名字" :value.sync="newQcollection.name"></mdl-textfield>
+        </div>
+        <div class="block">
+          科目：
+          <select v-model="newQcollection.subject">
+            <option v-for="subject in subjects" v-bind:value="subject.id">
+              {{ subject.name }}
+            </option>
+          </select>
+        </div>
+        <div class="block" style="padding:20px 0">
+          <mdl-checkbox :checked.sync="newQcollection.public">公開</mdl-checkbox>
+        </div>
+        <mdl-button accent raised v-on:click="createNewQcollection">
+          創建
+        </mdl-button>
+        <mdl-button v-show="showCreatSheet" @click="showCreatSheet = false">
+          關閉
+        </mdl-button>
+      </div>
+    </div>
+    <div id="secondary-panel">
+      <div class="flex">
+        <div>
+          <mdl-button primary raised @click="showCreatSheet = true">
+            創建新題集
+          </mdl-button>
+        </div>
+        <div style="position: relative;top: 6px;left: 10px;">
+          <mdl-switch :checked.sync="onlyShowPrivate">只顯示私有題集</mdl-switch>
+
+        </div>
+      </div>
+    </div>
+    <div class="mdl-grid">
+      <div class="mdl-cell mdl-cell--4-col qcollection" v-for="qc in myQcollections" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+
+        <span class="qc-subject">{{idToName(qc.subject)}}</span>
+        <span class="qc-public">{{booleanToPublic(qc.public)}}</span>
+        <p class="qc-createdby"></p>
+        <p class="qc-title">{{qc.name}}</p>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import vmdl from 'vue-mdl'
+import Vue from 'vue'
+import Subject from './reuseable/Subject'
+
+vmdl.register(Vue, 'mdlCheckbox')
+vmdl.register(Vue, 'mdlButton')
+vmdl.register(Vue, 'mdlTextfield')
+vmdl.register(Vue, 'mdlSwitch')
+
+var checkbox = vmdl.components['mdlCheckbox']
+var button = vmdl.components['mdlButton']
+var textfield = vmdl.components['mdlTextfield']
+var mdlSwitch = vmdl.components['mdlSwitch']
+
+export default {
+  ready: function () {
+    this.getMyQcollections()
+  },
+  components: {
+    Subject,
+    mdlButton: button,
+    mdlCheckbox: checkbox,
+    mdlTextfield: textfield,
+    mdlSwitch: mdlSwitch
+  },
+  methods: {
+    getMyQcollections: function () {
+      this.$http.get('/api/manage-qcollection/mine').then(function (response) {
+        this.myQcollections = response.data
+      }, function (response) {
+        console.log(response)
+      })
+    },
+    createNewQcollection: function () {
+      if (this.newQcollection.name) {
+        this.$http.post('/api/manage-qcollection/add', this.newQcollection).then(function (response) {
+          this.showCreatSheet = false
+          this.getMyQcollections()
+        }, function (response) {
+          console.log(response)
+        })
+      }
+    },
+    idToName: function (id) {
+      var array = this.subjects
+      for (var i = 0; i < array.length; i++) {
+        if (array[i].id === id) {
+          return array[i].name
+        }
+      }
+    },
+    booleanToPublic: function (boolean) {
+      if (boolean) {
+        return '公開'
+      } else {
+        return '私有'
+      }
+    }
+  },
+  data () {
+    return {
+      onlyShowPrivate: false,
+      myQcollections: [],
+      showCreatSheet: false,
+      newQcollection: {
+        name: '',
+        subject: 'math',
+        public: true,
+        questions: []
+      },
+      subjects: Subject.subjects
+    }
+  }
+}
+</script>

@@ -1,0 +1,12 @@
+.fade-transition {
+  transition: opacity 0.3s ease;
+}
+.fade-enter, .fade-leave {
+  opacity: 0;
+}
+.toast-transition {
+  transition: margin-bottom 0.2s ease;
+}
+.toast-enter, .toast-leave {
+  margin-bottom: -40px
+}
