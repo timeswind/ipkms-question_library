@@ -174,6 +174,7 @@ import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Card from './reuseable/Card'
+import Subject from '../modules/Subjects'
 
 vmdl.register(Vue, 'mdlButton')
 vmdl.register(Vue, 'mdlTextfield')
@@ -260,7 +261,8 @@ export default {
         get: false,
         mc: undefined,
         long: undefined
-      }
+      },
+      subjects: Subject.subjects
     }
   }
 }

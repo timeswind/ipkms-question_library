@@ -91,6 +91,13 @@ router.map({
           require(['./components/All-question.vue'], resolve)
         },
         title: '所有題目'
+      },
+      '/search': {
+        name: 'search-question',
+        component: function (resolve) {
+          require(['./components/Search-question.vue'], resolve)
+        },
+        title: '搜索題目'
       }
     }
   },

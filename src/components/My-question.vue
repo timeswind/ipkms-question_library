@@ -76,7 +76,6 @@
 import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
-import topbar from './reuseable/Topbar.vue'
 
 vmdl.register(Vue, 'mdlCheckbox')
 vmdl.register(Vue, 'mdlButton')
@@ -97,8 +96,7 @@ export default {
     mdlCheckbox: checkbox,
     mdlTextfield: textfield,
     mdlSwitch: mdlSwitch,
-    qcollectionSelectorModal,
-    topbar
+    qcollectionSelectorModal
   },
   methods: {
     getMyQuestions: function () {
