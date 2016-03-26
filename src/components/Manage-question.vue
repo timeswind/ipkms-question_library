@@ -18,9 +18,6 @@
 <script>
 import topbar from './reuseable/Topbar.vue'
 
-import '../css/animation.css'
-import '../css/main.css'
-
 export default {
   components: {
     topbar

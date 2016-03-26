@@ -196,11 +196,10 @@ select {
 import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import renderQuill from 'quill-render'
-import Subject from './reuseable/Subject'
+import Subject from '../modules/Subjects'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Card from './reuseable/Card'
 
-import '../css/main.css'
 import 'quill/dist/quill.snow.css'
 
 vmdl.register(Vue, 'mdlButton')
@@ -312,21 +311,6 @@ export default {
           }
         )
       }, 0)
-    },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
-      }
-    },
-    booleanToPublic: function (boolean) {
-      if (boolean) {
-        return '公開'
-      } else {
-        return '私有'
-      }
     }
   },
   data () {

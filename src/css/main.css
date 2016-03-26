@@ -1,3 +1,6 @@
+.mdl-navigation__link.active {
+  background-color: #e0e0e0
+}
 .float-button {
   position: fixed;
   bottom: 30px;
@@ -59,6 +62,10 @@ select {
   border-radius: 14px;
   display: inline-block;
   margin-top: 3px;
+}
+.qc-difficulty {
+  color: #FF9800;
+  margin-left: 5px;
 }
 .qc-title {
   margin: 0;

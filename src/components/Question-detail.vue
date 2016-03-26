@@ -149,7 +149,7 @@
       <card>
         <div slot="in">
           <div class="q-d-info-wrapper">
-            <span class="q-d-subject">{{idToName(details.subject)}}</span>
+            <span class="q-d-subject">{{details.subject | subject}}</span>
             <div class="q-d-difficulty">
               <i class="material-icons" v-for="i in getNumberArray(details.difficulty)" track-by="$index">star_rate</i>
             </div>
@@ -157,7 +157,7 @@
           {{{details.context}}}
         </div>
       </card>
-      <mdl-button accent raised style="margin:8px 4px" @click="getQuestionAnswer()" v-show="!answer.get">顯示答案</mdl-button>
+      <mdl-button accent raised style="margin:8px 4px" @click="getQuestionAnswer()" v-show="!answer.get" :disabled="answer.buttonDisable">顯示答案</mdl-button>
 
       <div v-if="details.type === 'mc'" class="q-d-mc-wrapper">
         <card class="half" :class="{'hightlight-answer': answer.mc === 0, 'wrong': answer.mc !== 0 && choice === 0}" @click="checkMc(0)"><div slot="in"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
@@ -174,9 +174,6 @@ import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Card from './reuseable/Card'
-import Subject from './reuseable/Subject'
-
-import '../css/main.css'
 
 vmdl.register(Vue, 'mdlButton')
 vmdl.register(Vue, 'mdlTextfield')
@@ -191,7 +188,6 @@ export default {
     this.getQuestionDetail()
   },
   components: {
-    Subject,
     mdlButton: button,
     mdlTextfield: textfield,
     mdlSwitch: mdlSwitch,
@@ -212,6 +208,7 @@ export default {
       })
     },
     getQuestionAnswer: function (choice) {
+      this.answer.buttonDisable = true
       if (!this.answer.get) {
         let data = {
           question_id: this.$route.params.question_id
@@ -247,14 +244,6 @@ export default {
         )
       }, 0)
     },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
-      }
-    },
     getNumberArray: function (num) {
       return new Array(num)
     }
@@ -267,11 +256,11 @@ export default {
         tags: []
       },
       answer: {
+        buttonDisable: false,
         get: false,
         mc: undefined,
         long: undefined
-      },
-      subjects: Subject.subjects
+      }
     }
   }
 }

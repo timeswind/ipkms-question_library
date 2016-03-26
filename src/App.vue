@@ -23,9 +23,9 @@
 <div class="mdl-layout__drawer">
   <span class="mdl-layout-title">題庫</span>
   <nav class="mdl-navigation">
-    <a class="mdl-navigation__link" v-link="{name:'create-question'}">創建題目</a>
-    <a class="mdl-navigation__link" v-link="{name:'my-question'}">管理題目</a>
-    <a class="mdl-navigation__link" v-link="{name:'my-qcollection'}">管理題集</a>
+    <a class="mdl-navigation__link" v-link="{name:'create-question', activeClass:'active'}">創建題目</a>
+    <a class="mdl-navigation__link" v-link="{name:'my-question', activeClass:'active'}">管理題目</a>
+    <a class="mdl-navigation__link" v-link="{name:'my-qcollection', activeClass:'active'}">管理題集</a>
 
   </nav>
 </div>
@@ -44,6 +44,8 @@
 
 <script>
 import Toast from './components/reuseable/Toast'
+
+import './css/main.css'
 import './css/animation.css'
 
 export default {

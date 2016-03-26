@@ -55,7 +55,7 @@
     <div class="mdl-grid" id="questions-preview-container">
       <div class="mdl-cell mdl-cell--4-col question" v-for="q in allQuestions">
         <div class="question-wrapper">
-          <span class="q-subject">{{idToName(q.subject)}}</span>
+          <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
           <div class="q-difficulty">
             <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
@@ -77,8 +77,6 @@ import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
 import topbar from './reuseable/Topbar.vue'
-
-import '../css/main.css'
 
 vmdl.register(Vue, 'mdlCheckbox')
 vmdl.register(Vue, 'mdlButton')
@@ -128,14 +126,6 @@ export default {
       this.CollectionModal.show = true
       this.CollectionModal.qid = qid
     },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
-      }
-    },
     getNumberArray: function (num) {
       return new Array(num)
     }
@@ -146,11 +136,7 @@ export default {
         show: false,
         qid: '1234'
       },
-      allQuestions: {},
-      subjects: [
-        { name: '數學', id: 'math' },
-        { name: '物理', id: 'phy' }
-      ]
+      allQuestions: {}
     }
   }
 }

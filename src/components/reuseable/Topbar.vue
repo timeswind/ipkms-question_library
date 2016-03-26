@@ -16,7 +16,7 @@
     box-shadow: 0 1px 6px rgba(0,0,0,0.35);
     position: fixed;
     top: 64px;
-    left: 0;
+    left: 240px;
     right: 0;
     z-index: 99
   }

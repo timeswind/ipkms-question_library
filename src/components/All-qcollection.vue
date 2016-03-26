@@ -4,8 +4,9 @@
     <div class="mdl-grid">
       <div class="mdl-cell mdl-cell--4-col qcollection" v-for="qc in allQcollections" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
-        <span class="qc-subject">{{idToName(qc.subject)}}</span>
-        <span class="qc-public">{{booleanToPublic(qc.public)}}</span>
+        <span class="qc-subject">{{qc.subject | subject}}</span>
+        <span class="qc-difficulty">{{qc.aveDifficulty}}</span>
+        <span class="qc-public">{{qc.public | bTp}}</span>
         <p class="qc-createdby">作者：<i>{{qc.createdBy.local.name}}</i></p>
         <p class="qc-title">{{qc.name}}</p>
 
@@ -15,7 +16,7 @@
 </template>
 
 <script>
-import Subject from './reuseable/Subject'
+import Subject from '../modules/Subjects'
 
 export default {
   ready: function () {
@@ -31,27 +32,11 @@ export default {
       }, function (response) {
         console.log(response)
       })
-    },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
-      }
-    },
-    booleanToPublic: function (boolean) {
-      if (boolean) {
-        return '公開'
-      } else {
-        return '私有'
-      }
     }
   },
   data () {
     return {
-      allQcollections: {},
-      subjects: Subject.subjects
+      allQcollections: {}
     }
   }
 }

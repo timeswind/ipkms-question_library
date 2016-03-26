@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import VueQuill from './modules/vue-quill/vue-quill.js'
+import Filters from './filters/ipkms-filters.js'
 
 import 'material-design-lite/material.min.css'
 import 'material-design-lite/material.min.js'
@@ -11,6 +12,7 @@ import App from './App'
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(VueQuill)
+Vue.use(Filters)
 
 Vue.http.interceptors.push({
 
@@ -31,7 +33,7 @@ Vue.http.interceptors.push({
 var router = new VueRouter()
 
 router.map({
-  '/': {
+  '/create-question': {
     name: 'create-question',
     component: function (resolve) {
       require(['./components/Create-question.vue'], resolve)

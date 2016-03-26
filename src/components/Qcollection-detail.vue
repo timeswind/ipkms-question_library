@@ -97,7 +97,7 @@ select {
         </mdl-button>
         <mdl-button @click="sheetshow = false">
           關閉
-        </mdl-button>p
+        </mdl-button>
       </div>
     </sheet-pannel>
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
@@ -105,7 +105,7 @@ select {
     <div class="mdl-grid" id="questions-preview-container">
       <div class="mdl-cell mdl-cell--4-col question" v-for="q in details.questions">
         <div class="question-wrapper">
-          <span class="q-subject">{{idToName(q.subject)}}</span>
+          <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
           <div class="q-difficulty">
             <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
@@ -128,9 +128,7 @@ import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
-import Subject from './reuseable/Subject'
-
-import '../css/main.css'
+import Subject from '../modules/Subjects'
 
 vmdl.register(Vue, 'mdlButton')
 vmdl.register(Vue, 'mdlTextfield')
@@ -161,7 +159,7 @@ export default {
         }
         var apiURL = '/api/manage-qcollection/delete/single'
         this.$http.delete(apiURL, data).then(function (response) {
-          this.$router.go({ name: 'manage-qcollection' })
+          this.$router.go({ name: 'my-qcollection' })
         }, function (response) {
           console.log('fail to delete this qcollection')
         })
@@ -261,14 +259,6 @@ export default {
         return result
       } else {
         return 0
-      }
-    },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
       }
     },
     getNumberArray: function (num) {

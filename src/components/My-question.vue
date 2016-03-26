@@ -50,12 +50,11 @@
 </style>
 <template>
   <div id="my-question">
-
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <div class="mdl-grid" id="questions-preview-container">
       <div class="mdl-cell mdl-cell--4-col question" v-for="q in myQuestions">
         <div class="question-wrapper">
-          <span class="q-subject">{{idToName(q.subject)}}</span>
+          <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
           <div class="q-difficulty">
             <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
@@ -78,8 +77,6 @@ import vmdl from 'vue-mdl'
 import Vue from 'vue'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
 import topbar from './reuseable/Topbar.vue'
-
-import '../css/main.css'
 
 vmdl.register(Vue, 'mdlCheckbox')
 vmdl.register(Vue, 'mdlButton')
@@ -127,8 +124,11 @@ export default {
     deleteSingleQuestion: function (question_id, index) {
       let comfirmDelete = window.confirm('你確定要刪除這個題目？')
       if (comfirmDelete) {
-        var apiURL = '/api/manage-question/delete/single/' + question_id
-        this.$http.delete(apiURL).then(function (response) {
+        let data = {
+          question_id: question_id
+        }
+        var apiURL = '/api/manage-question/delete/single'
+        this.$http.delete(apiURL, data).then(function (response) {
           this.showToast('操作成功')
           this.myQuestions.splice(index, 1)
         }, function (response) {
@@ -140,14 +140,6 @@ export default {
       this.$broadcast('getMyQcollectionLists')
       this.CollectionModal.show = true
       this.CollectionModal.qid = qid
-    },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
-      }
     },
     getNumberArray: function (num) {
       return new Array(num)
@@ -162,11 +154,7 @@ export default {
         show: false,
         qid: '1234'
       },
-      myQuestions: [],
-      subjects: [
-        { name: '數學', id: 'math' },
-        { name: '物理', id: 'phy' }
-      ]
+      myQuestions: []
     }
   }
 }
