@@ -12,6 +12,26 @@
 .flex {
   display: flex;
 }
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  align-items: center;
+}
+
+.flex-baseline {
+  align-items: baseline;
+}
+
+.flex-50 {
+  flex: 50
+}
 
 .tabbar {
   display: flex;
@@ -33,6 +53,7 @@
 .block {
   display: block;
 }
+
 select {
   background: transparent;
   border: 0;
@@ -46,7 +67,7 @@ select {
   -webkit-appearance: none;
 }
 
-.qcollection {
+.qcollection-card {
   background-color: #fff;
   padding: 16px;
   border-radius: 3px;
@@ -103,11 +124,12 @@ select {
   border-bottom: 1px solid #ccc;
 }
 
-.question {
+.question-card {
   background-color: #fff;
   border-radius: 3px;
   box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
   height: 100%;
+  cursor: pointer;
 }
 .question-wrapper {
   padding: 16px;
@@ -150,4 +172,16 @@ select {
 }
 .question-tools button {
   color: #616161
+}
+.input-button-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  max-width: 300px
+}
+.input-button-group .mdl-textfield {
+  flex: 80
+}
+.input-button-group .mdl-button {
+  flex: 20
 }

@@ -21,8 +21,10 @@
 </style>
 <template>
   <div id="sheet-pannel">
-    <slot name="sheet-title" ></slot>
-    <slot name="sheet-button"></slot>
+    <div class="flex-row flex-center">
+      <slot name="sheet-title" ></slot>
+      <slot name="sheet-button"></slot>
+    </div>
     <div id="sheet-zone" v-show="sheetshow" transition="expand">
       <slot name="sheet-zone"></slot>
     </div>

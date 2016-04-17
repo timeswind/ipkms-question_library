@@ -59,7 +59,7 @@
       </div>
     </div>
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--4-col qcollection" v-for="qc in myQcollections" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in myQcollections" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-public">{{qc.public | bTp}}</span>
@@ -72,30 +72,14 @@
 </template>
 
 <script>
-import vmdl from 'vue-mdl'
-import Vue from 'vue'
 import Subject from '../modules/Subjects'
-
-vmdl.register(Vue, 'mdlCheckbox')
-vmdl.register(Vue, 'mdlButton')
-vmdl.register(Vue, 'mdlTextfield')
-vmdl.register(Vue, 'mdlSwitch')
-
-var checkbox = vmdl.components['mdlCheckbox']
-var button = vmdl.components['mdlButton']
-var textfield = vmdl.components['mdlTextfield']
-var mdlSwitch = vmdl.components['mdlSwitch']
 
 export default {
   ready: function () {
     this.getMyQcollections()
   },
   components: {
-    Subject,
-    mdlButton: button,
-    mdlCheckbox: checkbox,
-    mdlTextfield: textfield,
-    mdlSwitch: mdlSwitch
+    Subject
   },
   methods: {
     getMyQcollections: function () {

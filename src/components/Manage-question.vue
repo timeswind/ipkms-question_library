@@ -19,6 +19,11 @@
 import topbar from './reuseable/Topbar.vue'
 
 export default {
+  attached () {
+    if (this.$route.path === '/manage-question') {
+      this.$router.go({name: 'my-question'})
+    }
+  },
   components: {
     topbar
   }

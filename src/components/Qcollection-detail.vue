@@ -1,74 +1,10 @@
-<style>
-.block {
-  display: block;
-}
-select {
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid #DADADA;
-  width: 200px;
-  padding: 5px;
-  font-size: 16px;
-  line-height: 1;
-  border-radius: 0;
-  height: 34px;
-  -webkit-appearance: none;
-}
-
-.question {
-  background-color: #fff;
-  border-radius: 3px;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
-  height: 100%;
-}
-.question-wrapper {
-  padding: 16px;
-}
-.q-subject {
-  background-color: #2196F3;
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 14px;
-  display: inline-block;
-  margin-top: 3px;
-}
-.q-type {
-  border-bottom: 2px solid #2196F3;
-}
-
-.q-difficulty {
-  float: right;
-}
-.q-difficulty i {
-  width: 24px;
-  color: #FFC107
-}
-.q-tag {
-  color: #E91E63;
-  margin: 0 5px;
-  padding: 2px 4px;
-  border: 1px solid #e91e63;
-}
-.question-tools {
-  padding: 4px 0;
-  border-top: 1px solid #EEEEEE;
-}
-
-.question-tools button {
-  color: #616161
-}
-
-#secondary-panel {
-  padding: 16px;
-  border-bottom: 1px solid #ccc;
-}
-
-</style>
 <template>
   <div id="qcollection-detail">
     <sheet-pannel :sheetshow.sync="sheetshow">
-      <div slot="sheet-title" class="flex">
+      <div slot="sheet-title">
         <h4 style="margin:0;margin-right:10px">{{details.name}}</h4>
+      </div>
+      <div slot="sheet-button">
         <mdl-button primary raised v-on:click="showSheetZone()" class="sheet-button" v-show="!sheetshow">
           修改题集信息
         </mdl-button>
@@ -103,7 +39,7 @@ select {
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <p class="qc-d-average-difficulty">平均難度：{{averageDifficulty}}</p>
     <div class="mdl-grid" id="questions-preview-container">
-      <div class="mdl-cell mdl-cell--4-col question" v-for="q in details.questions">
+      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in details.questions" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
         <div class="question-wrapper">
           <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
@@ -115,7 +51,6 @@ select {
         </div>
         <div class="question-tools">
           <mdl-button v-on:click="showCollectionModal(q._id)"><i class="material-icons">add</i>加入其他題集</mdl-button>
-          <mdl-button v-link="{ name: 'question-detail', params: { question_id: q._id }}"><i class="material-icons">search</i>查看</mdl-button>
           <mdl-button v-on:click="removeOneQuestion(q._id, $index)"><i class="material-icons">close</i>移除</mdl-button>
         </div>
       </div>
@@ -124,19 +59,9 @@ select {
 </template>
 
 <script>
-import vmdl from 'vue-mdl'
-import Vue from 'vue'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Subject from '../modules/Subjects'
-
-vmdl.register(Vue, 'mdlButton')
-vmdl.register(Vue, 'mdlTextfield')
-vmdl.register(Vue, 'mdlSwitch')
-
-var button = vmdl.components['mdlButton']
-var textfield = vmdl.components['mdlTextfield']
-var mdlSwitch = vmdl.components['mdlSwitch']
 
 export default {
   ready: function () {
@@ -144,9 +69,6 @@ export default {
   },
   components: {
     Subject,
-    mdlButton: button,
-    mdlTextfield: textfield,
-    mdlSwitch: mdlSwitch,
     qcollectionSelectorModal,
     sheetPannel
   },

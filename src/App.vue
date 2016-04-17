@@ -4,6 +4,11 @@
     mdl-layout--fixed-header">
     <header class="mdl-layout__header">
       <div class="mdl-layout__header-row">
+        <span class="mdl-layout-title" v-show="$route.matched.length > 1">
+          {{$route.matched[0].handler.title}}
+        </span>
+        <i class="material-icons" v-show="$route.matched.length > 1">keyboard_arrow_right</i>
+
         <span class="mdl-layout-title">{{$route.title}}</span>
 
         <div class="mdl-layout-spacer"></div>
@@ -24,9 +29,9 @@
   <span class="mdl-layout-title">題庫</span>
   <nav class="mdl-navigation">
     <a class="mdl-navigation__link" v-link="{name:'create-question', activeClass:'active'}">創建題目</a>
-    <a class="mdl-navigation__link" v-link="{name:'my-question', activeClass:'active'}">管理題目</a>
-    <a class="mdl-navigation__link" v-link="{name:'my-qcollection', activeClass:'active'}">管理題集</a>
-
+    <a class="mdl-navigation__link" v-link="{name:'manage-question', activeClass:'active'}">管理題目</a>
+    <a class="mdl-navigation__link" v-link="{name:'manage-qcollection', activeClass:'active'}">管理題集</a>
+    <a class="mdl-navigation__link" v-link="{name:'quick-quiz', activeClass:'active'}">Quick Quiz</a>
   </nav>
 </div>
 <main class="mdl-layout__content">

@@ -18,6 +18,11 @@
 import topbar from './reuseable/Topbar.vue'
 
 export default {
+  attached () {
+    if (this.$route.path === '/manage-qcollection') {
+      this.$router.go({name: 'my-qcollection'})
+    }
+  },
   components: {
     topbar
   }

@@ -10,7 +10,6 @@
 #search-question .results-zone {
 
 }
-
 </style>
 <template>
   <div id="search-question">
@@ -27,7 +26,7 @@
     </div>
     <div class="results-zone">
       <div class="mdl-grid" id="questions-preview-container">
-        <div class="mdl-cell mdl-cell--4-col question" v-for="q in results">
+        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
           <div class="question-wrapper">
             <span class="q-subject">{{q.subject | subject}}</span>
             <span class="q-type">{{q.type}}</span>
@@ -39,7 +38,6 @@
           </div>
           <div class="question-tools">
             <mdl-button v-on:click="showCollectionModal(q._id)"><i class="material-icons">add</i>加入題集</mdl-button>
-            <mdl-button v-link="{ name: 'question-detail', params: { question_id: q._id }}"><i class="material-icons">search</i>查看</mdl-button>
           </div>
         </div>
       </div>
@@ -48,26 +46,10 @@
 </template>
 
 <script>
-import vmdl from 'vue-mdl'
-import Vue from 'vue'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
-
-vmdl.register(Vue, 'mdlCheckbox')
-vmdl.register(Vue, 'mdlButton')
-vmdl.register(Vue, 'mdlTextfield')
-vmdl.register(Vue, 'mdlSwitch')
-
-var checkbox = vmdl.components['mdlCheckbox']
-var button = vmdl.components['mdlButton']
-var textfield = vmdl.components['mdlTextfield']
-var mdlSwitch = vmdl.components['mdlSwitch']
 
 export default {
   components: {
-    mdlButton: button,
-    mdlCheckbox: checkbox,
-    mdlTextfield: textfield,
-    mdlSwitch: mdlSwitch,
     qcollectionSelectorModal
   },
   methods: {

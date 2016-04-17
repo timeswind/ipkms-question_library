@@ -170,35 +170,27 @@
 </template>
 
 <script>
-import vmdl from 'vue-mdl'
-import Vue from 'vue'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Card from './reuseable/Card'
 import Subject from '../modules/Subjects'
 
-vmdl.register(Vue, 'mdlButton')
-vmdl.register(Vue, 'mdlTextfield')
-vmdl.register(Vue, 'mdlSwitch')
-
-var button = vmdl.components['mdlButton']
-var textfield = vmdl.components['mdlTextfield']
-var mdlSwitch = vmdl.components['mdlSwitch']
-
 export default {
   ready: function () {
-    this.getQuestionDetail()
+    if (this.$route.params.question_id) {
+      this.validateURL = true
+      this.getQuestionDetail(this.$route.params.question_id)
+    } else {
+      this.answer.buttonDisable = true
+    }
   },
   components: {
-    mdlButton: button,
-    mdlTextfield: textfield,
-    mdlSwitch: mdlSwitch,
     sheetPannel,
     Card
   },
   methods: {
-    getQuestionDetail: function () {
+    getQuestionDetail: function (question_id) {
       let data = {
-        question_id: this.$route.params.question_id
+        question_id: question_id
       }
       let apiURL = '/api/manage-question/detail'
       this.$http.get(apiURL, data).then(function (response) {
@@ -210,7 +202,7 @@ export default {
     },
     getQuestionAnswer: function (choice) {
       this.answer.buttonDisable = true
-      if (!this.answer.get) {
+      if (!this.answer.get && this.validateURL) {
         let data = {
           question_id: this.$route.params.question_id
         }
@@ -251,6 +243,7 @@ export default {
   },
   data () {
     return {
+      validateURL: false,
       sheetshow: false,
       choice: Number,
       details: {

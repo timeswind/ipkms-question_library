@@ -57,7 +57,7 @@ export default {
     insertLatex: function (name) {
       switch (name) {
         case 'sqrt':
-          this.mathBox.content += '\\sqrt{}pi'
+          this.mathBox.content += '\\sqrt{}'
           break
         case 'frac':
           this.mathBox.content += '\\frac{}{}'
@@ -127,6 +127,7 @@ export default {
 
   ready () {
     this.editor = new Quill(this.$els.quill, {
+      formats: ['bold', 'italic', 'color'],
       modules: {
         toolbar: this.$els.toolbar
       },
@@ -142,6 +143,8 @@ export default {
     } else {
       this.editor.setContents(this.content)
     }
+
+    // this.editor.insertText(0, 'Hello', 'grey')
 
     this.editor.on('text-change', (delta, source) => {
       this.$dispatch('text-change', this.editor, delta, source)

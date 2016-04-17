@@ -19,8 +19,7 @@
 </template>
 
 <script>
-import '../../css/animation.css'
-
+// import '../../css/animation.css'
 export default {
   props: {
     show: false,

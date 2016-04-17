@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import VueQuill from './modules/vue-quill/vue-quill.js'
 import Filters from './filters/ipkms-filters.js'
+import VueMdl from 'vue-mdl'
 
 import 'material-design-lite/material.min.css'
 import 'material-design-lite/material.min.js'
@@ -13,6 +14,7 @@ Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(VueQuill)
 Vue.use(Filters)
+Vue.use(VueMdl)
 
 Vue.http.interceptors.push({
 
@@ -108,6 +110,29 @@ router.map({
     },
     title: '题目內容'
 
+  },
+  '/quick-quiz': {
+    name: 'quick-quiz',
+    component: function (resolve) {
+      require(['./components/quickquiz/Quick-quiz.vue'], resolve)
+    },
+    title: 'Quick Quiz',
+    subRoutes: {
+      '/prepare': {
+        name: 'prepare-quiz',
+        component: function (resolve) {
+          require(['./components/quickquiz/Prepare-quiz.vue'], resolve)
+        },
+        title: '準備小測'
+      },
+      '/results': {
+        name: 'quiz-results',
+        component: function (resolve) {
+          require(['./components/quickquiz/Quiz-results.vue'], resolve)
+        },
+        title: '數據統計'
+      }
+    }
   }
 })
 

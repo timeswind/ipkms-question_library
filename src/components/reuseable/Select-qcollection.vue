@@ -1,6 +1,16 @@
 <style>
-* {
-  box-sizing: border-box;
+
+@media screen and (max-width: 1024px) {
+  #select-qcollection {
+    box-sizing: border-box;
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  #select-qcollection {
+    box-sizing: border-box;
+    padding-left: 240px
+  }
 }
 
 .modal-mask {
@@ -14,9 +24,9 @@
   transition: opacity .3s ease;
 }
 
-.modal-container {
+#select-qcollection .modal-container {
   width: 300px;
-  margin: 100px auto 0;
+  margin: 130px auto 0;
   padding: 0;
   background-color: #fff;
   border-radius: 2px;
@@ -26,10 +36,11 @@
 
 .modal-header {
   padding: 20px 0px 0 20px;
+  align-items: center
 }
 
 .modal-header h4 {
-  margin-top: 0;
+  margin: 0;
   color: #2196F3;
 }
 
@@ -55,27 +66,6 @@
   padding-bottom: 10px
 }
 
-.text-right {
-  text-align: right;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 1em;
-}
-
-.form-label > .form-control {
-  margin-top: 0.5em;
-}
-
-.form-control {
-  display: block;
-  width: 100%;
-  padding: 0.5em 1em;
-  line-height: 1.5;
-  border: 1px solid #ddd;
-}
-
 .modal-enter, .modal-leave {
   opacity: 0;
 }
@@ -92,6 +82,7 @@
   margin:0
 }
 .list li {
+  align-items: center;
   padding: 15px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -104,75 +95,44 @@
   background-color: #eee
 }
 
-.list span {
+.list .subject-label {
   color: #E91E63;
   border: 1px solid #E91E63;
   padding: 2px 4px;
   font-size: 13px;
-}
-
-.close {
-  float: right;
+  margin-right: 8px
 }
 
 </style>
 <template>
-  <div class="modal-mask" v-show="show" transition="modal">
+  <div id="select-qcollection" class="modal-mask" v-show="show" transition="modal">
     <div class="modal-container">
-      <div class="modal-header">
-        <h4>
-          加入題集
-          <mdl-button class="close" @click="closeModal()">
-            <i class="material-icons">close</i>
-          </mdl-button>
-        </h4>
-
-        <!-- <p>id:{{qid}}</p> -->
+      <div class="modal-header flex-row">
+        <h4>加入題集</h4>
+        <span class="flex" style="flex: 1"></span>
+        <mdl-button class="close" @click="closeModal()">
+          <i class="material-icons">close</i>
+        </mdl-button>
       </div>
       <mdl-spinner :active="spinnerActive" v-show="spinnerActive"></mdl-spinner>
       <div class="modal-body">
         <ul class="list">
-          <li v-for="qc in myQcollections" @click="saveOneToCollection(qc._id)">
-            <span>{{idToName(qc.subject)}}</span> {{qc.name}}
+          <li class="flex-row" v-for="qc in myQcollections" @click="saveOneToCollection(qc._id)">
+            <span class="subject-label">{{qc.subject | subject}}</span>
+            <span>{{qc.name}}</span>
           </li>
         </ul>
       </div>
-
-      <!-- <div class="modal-footer text-right">
-      <mdl-button class="modal-default-button" @click="savePost()">
-      加入
-    </mdl-button>
-  </div> -->
-</div>
-</div>
+    </div>
+  </div>
 </template>
 
 <script>
-import vmdl from 'vue-mdl'
-import Vue from 'vue'
-
-vmdl.register(Vue, 'mdlCheckbox')
-vmdl.register(Vue, 'mdlButton')
-vmdl.register(Vue, 'mdlSpinner')
-
-var checkbox = vmdl.components['mdlCheckbox']
-var button = vmdl.components['mdlButton']
-var spinner = vmdl.components['mdlSpinner']
-
 export default {
-  components: {
-    mdlButton: button,
-    mdlCheckbox: checkbox,
-    mdlSpinner: spinner
-  },
   data () {
     return {
       spinnerActive: true,
-      myQcollections: [],
-      subjects: [
-        { name: '數學', id: 'math' },
-        { name: '物理', id: 'phy' }
-      ]
+      myQcollections: []
     }
   },
   props: ['show', 'qid'],
@@ -181,15 +141,21 @@ export default {
       this.show = false
     },
     saveOneToCollection: function (qcollection_id) {
-      let data = {
-        qcollection_id: qcollection_id,
-        question_id: this.qid
+      if (qcollection_id && this.qid) {
+        let data = {
+          qcollection_id: qcollection_id,
+          question_id: this.qid
+        }
+        this.$http.post('/api/manage-qcollection/add-question', data).then(function (response) {
+          this.show = false
+          this.showToast('添加成功')
+        }, function (response) {
+          this.showToast('失敗')
+          console.log(response)
+        })
+      } else {
+        this.showToast('發生錯誤')
       }
-      this.$http.post('/api/manage-qcollection/add-question', data).then(function (response) {
-        this.show = false
-      }, function (response) {
-        console.log(response)
-      })
     },
     getMyQcollectionLists: function () {
       if (this.myQcollections.length === 0) {
@@ -201,13 +167,8 @@ export default {
         })
       }
     },
-    idToName: function (id) {
-      var array = this.subjects
-      for (var i = 0; i < array.length; i++) {
-        if (array[i].id === id) {
-          return array[i].name
-        }
-      }
+    showToast: function (message) {
+      this.$dispatch('show-toast', message)
     }
   },
   events: {

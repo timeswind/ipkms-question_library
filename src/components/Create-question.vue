@@ -193,8 +193,6 @@ select {
 </template>
 
 <script>
-import vmdl from 'vue-mdl'
-import Vue from 'vue'
 import renderQuill from 'quill-render'
 import Subject from '../modules/Subjects'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
@@ -202,24 +200,13 @@ import Card from './reuseable/Card'
 
 import 'quill/dist/quill.snow.css'
 
-vmdl.register(Vue, 'mdlButton')
-vmdl.register(Vue, 'mdlTextfield')
-vmdl.register(Vue, 'mdlRadio')
-
-var button = vmdl.components['mdlButton']
-var textfield = vmdl.components['mdlTextfield']
-var mdlRadio = vmdl.components['mdlRadio']
-
 var delayTimer
 
 export default {
   components: {
     Subject,
     Card,
-    sheetPannel,
-    mdlButton: button,
-    mdlTextfield: textfield,
-    mdlRadio: mdlRadio
+    sheetPannel
   },
   methods: {
     publishQuestion: function () {
