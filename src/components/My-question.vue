@@ -2,8 +2,8 @@
   <div id="my-question">
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <div class="mdl-grid" id="questions-preview-container">
-      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in myQuestions" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
-        <div class="question-wrapper">
+      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in myQuestions">
+        <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
           <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
           <div class="q-difficulty">
@@ -17,6 +17,9 @@
           <mdl-button v-on:click="deleteSingleQuestion(q._id, $index)"><i class="material-icons">close</i>刪除</mdl-button>
         </div>
       </div>
+    </div>
+    <div class="flex-column flex-center" style="margin:16px 0 32px 0">
+      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
     </div>
   </div>
 </template>
@@ -34,9 +37,17 @@ export default {
   methods: {
     getMyQuestions: function () {
       this.$http.get('/api/manage-question/mine').then(function (response) {
-        this.myQuestions = response.data
-        this.renderQuestions()
+        if (response.data.length > 0) {
+          if (response.data.length < 9) {
+            this.loadMore = false
+          }
+          this.myQuestions = response.data
+          this.renderQuestions()
+        } else {
+          this.loadMore = false
+        }
       }, function (response) {
+        this.loadMore = false
         console.log(response)
       })
     },
@@ -72,6 +83,30 @@ export default {
       this.CollectionModal.show = true
       this.CollectionModal.qid = qid
     },
+    nextPage: function () {
+      if (this.myQuestions.length > 0) {
+        this.loadMore = false
+        let latest_id = this.myQuestions[this.myQuestions.length - 1]._id
+        console.log(latest_id)
+        let apiURL = '/api/manage-question/mine?page=' + latest_id
+        this.$http.get(apiURL).then(function (response) {
+          if (response.data.length > 0) {
+            this.myQuestions.push(response.data[0])
+            this.renderQuestions()
+            if (response.data.length < 9) {
+              this.loadMore = false
+            } else {
+              this.loadMore = true
+            }
+          } else {
+            this.loadMore = false
+          }
+        }, function (response) {
+          this.loadMore = true
+          console.log(response)
+        })
+      }
+    },
     getNumberArray: function (num) {
       return new Array(num)
     },
@@ -85,7 +120,8 @@ export default {
         show: false,
         qid: '1234'
       },
-      myQuestions: []
+      myQuestions: [],
+      loadMore: true
     }
   }
 }

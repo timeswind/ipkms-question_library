@@ -68,6 +68,11 @@
 
       </div>
     </div>
+
+    <div class="flex-column flex-center" style="margin:16px 0 32px 0">
+      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
+    </div>
+
   </div>
 </template>
 
@@ -84,8 +89,16 @@ export default {
   methods: {
     getMyQcollections: function () {
       this.$http.get('/api/manage-qcollection/mine').then(function (response) {
-        this.myQcollections = response.data
+        if (response.data.length > 0) {
+          this.myQcollections = response.data
+          if (response.data.length < 12) {
+            this.loadMore = false
+          }
+        } else {
+          this.loadMore = false
+        }
       }, function (response) {
+        this.loadMore = false
         console.log(response)
       })
     },
@@ -95,6 +108,29 @@ export default {
           this.showCreatSheet = false
           this.getMyQcollections()
         }, function (response) {
+          console.log(response)
+        })
+      }
+    },
+    nextPage: function () {
+      if (this.myQcollections.length > 0) {
+        this.loadMore = false
+        let latest_id = this.myQcollections[this.myQcollections.length - 1]._id
+        console.log(latest_id)
+        let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
+        this.$http.get(apiURL).then(function (response) {
+          if (response.data.length > 0) {
+            this.myQcollections.push(response.data[0])
+            if (response.data.length < 12) {
+              this.loadMore = false
+            } else {
+              this.loadMore = true
+            }
+          } else {
+            this.loadMore = false
+          }
+        }, function (response) {
+          this.loadMore = true
           console.log(response)
         })
       }
@@ -111,7 +147,8 @@ export default {
         public: true,
         questions: []
       },
-      subjects: Subject.subjects
+      subjects: Subject.subjects,
+      loadMore: true
     }
   }
 }

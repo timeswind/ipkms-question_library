@@ -129,11 +129,21 @@ select {
   border-radius: 3px;
   box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
   height: 100%;
-  cursor: pointer;
 }
 .question-wrapper {
   padding: 16px;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
+
+.question-wrapper:hover {
+  background: #f7f7f7
+}
+
+.question-wrapper:active {
+  background: #eee
+}
+
 .q-subject {
   background-color: #2196F3;
   color: #fff;

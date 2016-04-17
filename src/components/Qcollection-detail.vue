@@ -39,8 +39,8 @@
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <p class="qc-d-average-difficulty">平均難度：{{averageDifficulty}}</p>
     <div class="mdl-grid" id="questions-preview-container">
-      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in details.questions" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
-        <div class="question-wrapper">
+      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in details.questions">
+        <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
           <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
           <div class="q-difficulty">
