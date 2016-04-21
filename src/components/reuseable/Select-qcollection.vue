@@ -188,7 +188,9 @@ export default {
         let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
-            this.myQcollections.push(response.data[0])
+            for (var i = 0; i < response.data.length; i++) {
+              this.myQcollections.push(response.data[i])
+            }
             if (response.data.length < 12) {
               this.loadMore = false
             } else {

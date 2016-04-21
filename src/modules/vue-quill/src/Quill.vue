@@ -175,7 +175,7 @@ export default {
       this.editor.setContents(content)
     },
     'set-html': function (html) {
-      this.editor.setHtml(html)
+      this.editor.setHTML(html)
     },
     'focus-editor': function () {
       this.focusEditor()

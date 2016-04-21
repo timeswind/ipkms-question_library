@@ -1,23 +1,8 @@
 <style>
-#create-question p {
-  margin: 0
-}
-
-select {
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid #DADADA;
-  width: 200px;
-  padding: 5px;
-  font-size: 16px;
-  line-height: 1;
-  border-radius: 0;
-  height: 34px;
-  -webkit-appearance: none;
-}
 .newquestion-difficulty-box {
   padding: 10px 0
 }
+
 .newquestion-difficulty-box i {
   width: 24px;
   color: #aaa;
@@ -27,6 +12,7 @@ select {
 .difficulty-heighlight{
   color: #FFC107 !important
 }
+
 .q-tag {
   color: #E91E63;
   margin: 0 5px;
@@ -37,25 +23,7 @@ select {
 
 #create-question .body-wrapper {
   max-width: 800px;
-  margin:0 auto;
-  margin-top:20px
-}
-.editor-outter-wrapper {
-  box-sizing: border-box;
-  width: 50%;
-  float: left;
-}
-
-.editor-inner-wrapper {
-  background: #fff;
-  border: 1px solid #ccc;
-  margin:4px;
-  min-height: 100px
-}
-
-.editor-toolbar {
-  padding: 4px 16px;
-  border-bottom: 1px solid #ccc
+  margin:32px auto;
 }
 
 #question-preview-container {
@@ -65,6 +33,10 @@ select {
   box-sizing: border-box;
 }
 
+#question-preview-container p, #mc1 p, #mc2 p, #mc3 p, #mc4 p {
+  margin: 0
+}
+
 .toolbar-title {
   padding: 8px;
   margin: 0
@@ -72,10 +44,6 @@ select {
 .mc-input-wrapper,.mc-preview-wrapper {
   display: inline-block;
   width: 100%
-}
-.half {
-  width: 50%;
-  float: left;
 }
 .mc-preview-wrapper .hightlight-answer .card {
   background-color: #009688;
@@ -89,17 +57,17 @@ select {
   <div id="create-question">
     <sheet-pannel :sheetshow.sync="sheetshow">
       <div slot="sheet-zone">
-        <div class="block">
-          科目：
+        <div class="flex-row flex-center">
+          <span>科目：</span>
           <select v-model="newQuestion.subject">
             <option v-for="subject in subjects" v-bind:value="subject.id">
               {{ subject.name }}
             </option>
           </select>
         </div>
-        <div class="newquestion-difficulty-box flex">
-          <span style="line-height:26px">難度：</span>
-          <span>
+        <div class="newquestion-difficulty-box flex-row flex-center">
+          <span>難度：</span>
+          <span class="flex-row">
             <i class="material-icons" @click="newQuestion.difficulty = 1" :class="{'difficulty-heighlight': newQuestion.difficulty > 0}">star_rate</i>
             <i class="material-icons" @click="newQuestion.difficulty = 2" :class="{'difficulty-heighlight': newQuestion.difficulty > 1}">star_rate</i>
             <i class="material-icons" @click="newQuestion.difficulty = 3" :class="{'difficulty-heighlight': newQuestion.difficulty > 2}">star_rate</i>
@@ -108,12 +76,12 @@ select {
           </span>
         </div>
 
-        <div class="block">
-          類型：
-          <mdl-radio :checked.sync="newQuestion.type" value="mc">多項選擇</mdl-radio>
+        <div class="flex-row flex-center">
+          <span>類型：</span>
+          <mdl-radio :checked.sync="newQuestion.type" value="mc" style="margin-right: 8px">多項選擇</mdl-radio>
           <mdl-radio :checked.sync="newQuestion.type" value="long">長題目</mdl-radio>
         </div>
-        <div class="flex" style="position:relative;top:-10px">
+        <div class="flex-row" style="position:relative;top:-10px">
           <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
             <span>標籤：</span>
             <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
@@ -130,17 +98,17 @@ select {
     發佈
   </mdl-button>
   <div class="body-wrapper">
-    <h5>編輯題目</h5>
-    <div style="display: inline-block;width: 100%;">
+    <h5 style="margin-left:4px">編輯題目</h5>
+    <div class="flex-row">
 
-      <div class="half">
+      <div class="flex-50">
         <card>
           <div slot="out">
             <quill :content.sync="editorPreview.question"></quill>
           </div>
         </card>
       </div>
-      <div class="half">
+      <div class="flex-50">
         <card>
           <div slot="out">
             <p class="toolbar-title">預覽</p>
@@ -153,39 +121,40 @@ select {
     </div>
     <div v-if="newQuestion.type === 'mc'" class="mc-preview-wrapper" id="mc-preview-container">
       <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
-      <div class="half">
-        <card :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click="newQuestion.answer.mc = 0">
+      <div class="flex-row">
+        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click="newQuestion.answer.mc = 0">
           <div slot="out"><span class="mc-label">A</span></div>
           <div slot="in"><div id="mc1"></div></div>
         </card>
-        <card :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click="newQuestion.answer.mc = 2">
-          <div slot="out"><span class="mc-label">C</span></div>
-          <div slot="in"><div id="mc3"></div></div>
-        </card>
-      </div>
-      <div class="half">
-        <card :class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click="newQuestion.answer.mc = 1">
+        <card flex="true" class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click="newQuestion.answer.mc = 1">
           <div slot="out"><span class="mc-label">B</span></div>
           <div slot="in"><div id="mc2"></div></div>
         </card>
-        <card :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click="newQuestion.answer.mc = 3">
+
+      </div>
+      <div class="flex-row">
+        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click="newQuestion.answer.mc = 2">
+          <div slot="out"><span class="mc-label">C</span></div>
+          <div slot="in"><div id="mc3"></div></div>
+        </card>
+        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click="newQuestion.answer.mc = 3">
           <div slot="out"><span class="mc-label">D</span></div>
           <div slot="in"><div id="mc4"></div></div>
         </card>
       </div>
     </div>
-    <h5>編輯答案</h5>
+    <h5 style="margin-left:4px">編輯答案</h5>
 
     <div v-if="newQuestion.type === 'mc'">
 
       <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
-      <div class="half">
-        <card><div slot="out"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
-        <card><div slot="out"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
+      <div class="flex-row">
+        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
+        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
       </div>
-      <div class="half">
-        <card><div slot="out"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
-        <card><div slot="out"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+      <div class="flex-row">
+        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
+        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
       </div>
     </div>
   </div>
@@ -218,7 +187,7 @@ export default {
         this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
         this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
 
-        this.$http.post('/api/manage-question/add', this.newQuestion).then(function (response) {
+        this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
           this.showToast('發佈成功')
           this.publishButton.disabled = false
           this.newQuestion.context = ''

@@ -6,9 +6,6 @@
   background: #03A9F4;
   margin-right: 5px
 }
-.q-type {
-  border-bottom: 2px solid #2196F3;
-}
 .q-d-context {
   margin: 0;
   font-size: 20px;
@@ -34,11 +31,7 @@
   margin: 0 5px;
   padding: 2px 4px;
   border: 1px solid #e91e63;
-}
-
-#secondary-panel {
-  padding: 16px;
-  border-bottom: 1px solid #ccc;
+  cursor: pointer;
 }
 
 #question-detail #question-preview-container {
@@ -102,24 +95,27 @@
 </style>
 <template>
   <div id="question-detail">
-    <sheet-pannel :sheetshow.sync="sheetshow">
+    <sheet-pannel :sheetshow.sync="sheetshow" :center="true">
       <div slot="sheet-button">
-        <mdl-button primary raised slot="sheet-button" class="sheet-button" @click="sheetshow = true" v-show="!sheetshow">
-          修改
+        <mdl-button primary raised slot="sheet-button" class="sheet-button" @click="sheetshow = true" v-show="!sheetshow && edit.button" :disabled="!edit.button">
+          修改題目信息
         </mdl-button>
       </div>
+      <div slot="button-subtitle">
+        <p style="margin: 8px 0 0 0;color: #9E9E9E">最後更新于 {{ details.updated_at | date 'YYYY[年]M[月]DD[日] h:mm a'}}</p>
+      </div>
       <div slot="sheet-zone">
-        <div class="block">
-          科目：
+        <div class="flex-row flex-center">
+          <span>科目：</span>
           <select v-model="details.subject">
             <option v-for="subject in subjects" v-bind:value="subject.id">
               {{ subject.name }}
             </option>
           </select>
         </div>
-        <div class="difficulty-box flex">
+        <div class="difficulty-box flex-row flex-center">
           <span style="line-height:26px">難度：</span>
-          <span>
+          <span class="flex-row flex-baseline">
             <i class="material-icons" @click="details.difficulty = 1" :class="{'difficulty-heighlight': details.difficulty > 0}">star_rate</i>
             <i class="material-icons" @click="details.difficulty = 2" :class="{'difficulty-heighlight': details.difficulty > 1}">star_rate</i>
             <i class="material-icons" @click="details.difficulty = 3" :class="{'difficulty-heighlight': details.difficulty > 2}">star_rate</i>
@@ -129,17 +125,17 @@
         </div>
 
         <div class="flex" style="position:relative;top:-20px">
-          <div v-show="details.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
+          <div v-show="details.tags && details.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
             <span>標籤：</span>
-            <span class="q-tag" @click="removeTag($index)" v-for="tag in details.tags" track-by="$index">{{tag}}</span>
+            <span class="q-d-tag" @click="tags('remove', null, $index)" v-for="tag in details.tags" track-by="$index">{{tag}}</span>
           </div>
-          <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+          <mdl-textfield label="輸入標籤.回車" @keyup.enter="tags('add', edit.tag)" :value.sync="edit.tag" style="width:200px"></mdl-textfield>
         </div>
         <div style="position:relative;top:-15px;left:-10px">
-          <mdl-button primary accent raised class="sheet-button">
+          <mdl-button primary accent raised class="sheet-button" @click="updateInfo()">
             提交修改
           </mdl-button>
-          <mdl-button class="sheet-button" @click="sheetshow = false">
+          <mdl-button class="sheet-button" @click="cancelUpdate()">
             取消
           </mdl-button>
         </div>
@@ -189,12 +185,13 @@ export default {
   },
   methods: {
     getQuestionDetail: function (question_id) {
-      let data = {
-        question_id: question_id
-      }
-      let apiURL = '/api/manage-question/detail'
-      this.$http.get(apiURL, data).then(function (response) {
+      let apiURL = '/api/manage-question/question/' + question_id
+      this.$http.get(apiURL).then(function (response) {
         this.details = response.data
+        this.tempDetails = JSON.parse(JSON.stringify(response.data))
+        if (this.details.createdBy && this.details.createdBy === 'self') {
+          this.edit.button = true
+        }
         this.renderQuestions()
       }, function (response) {
         console.log(response)
@@ -214,12 +211,17 @@ export default {
             this.answer.long = response.data.long
           }
           this.answer.get = true
-          this.choice = choice
+
+          if (choice) {
+            this.choice = choice
+          }
         }, function (response) {
           console.log(response)
         })
       } else {
-        this.choice = choice
+        if (choice) {
+          this.choice = choice
+        }
       }
     },
     checkMc: function (choice) {
@@ -237,6 +239,38 @@ export default {
         )
       }, 0)
     },
+    tags: function (option, tag, index) {
+      if (option === 'add' && tag) {
+        if (tag.trim() !== '') {
+          this.details.tags.push(tag)
+          this.edit.tag = ''
+        }
+      } else if (option === 'remove' && index >= 0) {
+        this.details.tags.splice(index, 1)
+      }
+    },
+    updateInfo: function () {
+      if (this.details.subject !== this.tempDetails.subject || this.details.difficulty !== this.tempDetails.difficulty || JSON.stringify(this.details.tags) !== JSON.stringify(this.tempDetails.tags)) {
+        let data = {
+          subject: this.details.subject,
+          difficulty: this.details.difficulty,
+          tags: this.details.tags,
+          updated_at: new Date()
+        }
+        let apiURL = '/api/manage-question/question/' + this.$route.params.question_id
+        this.$http.put(apiURL, data).then(function (response) {
+          this.sheetshow = false
+          this.details.updated_at = new Date()
+          this.tempDetails.updated_at = new Date()
+        }, function (response) {
+          console.log(response)
+        })
+      }
+    },
+    cancelUpdate: function () {
+      this.sheetshow = false
+      this.details = JSON.parse(JSON.stringify(this.tempDetails))
+    },
     getNumberArray: function (num) {
       return new Array(num)
     }
@@ -246,16 +280,19 @@ export default {
       validateURL: false,
       sheetshow: false,
       choice: Number,
-      details: {
-        tags: []
-      },
+      details: {},
+      tempDetails: {},
       answer: {
         buttonDisable: false,
         get: false,
         mc: undefined,
         long: undefined
       },
-      subjects: Subject.subjects
+      subjects: Subject.subjects,
+      edit: {
+        button: false,
+        tag: ''
+      }
     }
   }
 }

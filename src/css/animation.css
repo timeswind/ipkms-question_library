@@ -4,6 +4,14 @@
 .fade-enter, .fade-leave {
   opacity: 0;
 }
+
+.height-transition {
+  transition: height 0.3s ease;
+}
+.height-enter, .height-leave {
+  height: 0;
+}
+
 .toast-transition {
   transition: margin-bottom 0.2s ease;
 }

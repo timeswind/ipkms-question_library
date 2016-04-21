@@ -35,6 +35,13 @@ Vue.http.interceptors.push({
 var router = new VueRouter()
 
 router.map({
+  '/': {
+    name: 'entry',
+    component: function (resolve) {
+      require(['./views/Entry.vue'], resolve)
+    },
+    title: '題庫'
+  },
   '/create-question': {
     name: 'create-question',
     component: function (resolve) {

@@ -19,93 +19,96 @@
     </div>
     <div class="flex-column flex-center" style="margin:16px 0 32px 0">
       <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
+      </div>
     </div>
-  </div>
-</template>
+  </template>
 
-<script>
-import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
-import topbar from './reuseable/Topbar.vue'
+  <script>
+  import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
+  import topbar from './reuseable/Topbar.vue'
 
-export default {
-  ready: function () {
-    this.getAllQuestions()
-  },
-  components: {
-    qcollectionSelectorModal,
-    topbar
-  },
-  methods: {
-    getAllQuestions: function () {
-      this.$http.get('/api/manage-question/all').then(function (response) {
-        if (response.data.length > 0) {
-          this.allQuestions = response.data
-          this.renderQuestions()
-          if (response.data.length < 9) {
-            this.loadMore = false
-          }
-        } else {
-          this.loadMore = false
-        }
-      }, function (response) {
-        this.loadMore = false
-        console.log(response)
-      })
+  export default {
+    ready: function () {
+      this.getAllQuestions()
     },
-    renderQuestions: function () {
-      setTimeout(function renderQuestions () {
-        window.renderMathInElement(
-          document.getElementById('questions-preview-container'),
-          {
-            delimiters: [
-              {left: '$$', right: '$$', display: false}
-            ]
-          }
-        )
-      }, 0)
+    components: {
+      qcollectionSelectorModal,
+      topbar
     },
-    showCollectionModal: function (qid) {
-      this.$broadcast('getMyQcollectionLists')
-      this.CollectionModal.show = true
-      this.CollectionModal.qid = qid
-    },
-    nextPage: function () {
-      if (this.allQuestions.length > 0) {
-        this.loadMore = false
-        let latest_id = this.allQuestions[this.allQuestions.length - 1]._id
-        console.log(latest_id)
-        let apiURL = '/api/manage-question/all?page=' + latest_id
-        this.$http.get(apiURL).then(function (response) {
+    methods: {
+      getAllQuestions: function () {
+        this.$http.get('/api/manage-question/all').then(function (response) {
           if (response.data.length > 0) {
-            this.allQuestions.push(response.data[0])
+            this.allQuestions = response.data
             this.renderQuestions()
             if (response.data.length < 9) {
               this.loadMore = false
-            } else {
-              this.loadMore = true
             }
           } else {
             this.loadMore = false
           }
         }, function (response) {
-          this.loadMore = true
+          this.loadMore = false
           console.log(response)
         })
+      },
+      renderQuestions: function () {
+        setTimeout(function renderQuestions () {
+          window.renderMathInElement(
+            document.getElementById('questions-preview-container'),
+            {
+              delimiters: [
+                {left: '$$', right: '$$', display: false}
+              ]
+            }
+          )
+        }, 0)
+      },
+      showCollectionModal: function (qid) {
+        this.$broadcast('getMyQcollectionLists')
+        this.CollectionModal.show = true
+        this.CollectionModal.qid = qid
+      },
+      nextPage: function () {
+        if (this.allQuestions.length > 0) {
+          this.loadMore = false
+          let latest_id = this.allQuestions[this.allQuestions.length - 1]._id
+          console.log(latest_id)
+          let apiURL = '/api/manage-question/all?page=' + latest_id
+          this.$http.get(apiURL).then(function (response) {
+            if (response.data.length > 0) {
+              console.log(response.data)
+              for (var i = 0; i < response.data.length; i++) {
+                this.allQuestions.push(response.data[i])
+              }
+              this.renderQuestions()
+              if (response.data.length < 9) {
+                this.loadMore = false
+              } else {
+                this.loadMore = true
+              }
+            } else {
+              this.loadMore = false
+            }
+          }, function (response) {
+            this.loadMore = true
+            console.log(response)
+          })
+        }
+      },
+      getNumberArray: function (num) {
+        return new Array(num)
       }
     },
-    getNumberArray: function (num) {
-      return new Array(num)
-    }
-  },
-  data () {
-    return {
-      CollectionModal: {
-        show: false,
-        qid: '1234'
-      },
-      allQuestions: [],
-      loadMore: true
+    data () {
+      return {
+        CollectionModal: {
+          show: false,
+          qid: '1234'
+        },
+        allQuestions: [],
+        loadMore: true
+      }
     }
   }
-}
-</script>
+  </script>

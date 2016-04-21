@@ -1,4 +1,6 @@
 import Subjects from '../modules/Subjects'
+import moment from 'moment'
+
 module.exports = {
   install: function (Vue, options) {
     Vue.filter('subject', function (id) {
@@ -16,6 +18,10 @@ module.exports = {
       } else {
         return '私有'
       }
+    })
+
+    Vue.filter('date', function (value, formate) {
+      return moment(value).format(formate)
     })
   }
 }

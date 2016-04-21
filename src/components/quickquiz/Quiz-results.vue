@@ -1,6 +1,6 @@
 <style>
 #quiz-results .main-wrapper {
-  margin:0 16px;
+  margin:16px auto;
   background: #fff;
   box-sizing: content-box;
   box-shadow: 0 1px 6px rgba(0,0,0,0.35);
@@ -51,6 +51,12 @@
               <h6 class="time flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px">timer</i>{{myQuickquizs[0].time | quiztime}}</h6>
               <h6 class="finished flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px">create</i>{{myQuickquizs[0].finished | finished}}</h6>
 
+              <div class="flex-column flex-start" style="padding-left: 16px;margin-top:16px">
+                <mdl-button accent raised style="margin-bottom:8px" @click="endLatestQuickQuiz()">結束測驗</mdl-button>
+                <mdl-button primary raised>查看詳情</mdl-button>
+              </div>
+
+
             </div>
           </div>
 
@@ -60,7 +66,7 @@
 
         </div>
 
-        <div class="all-quiz">
+        <div class="all-quiz" style="border-top:1px solid #eee">
           all
         </div>
       </div>
@@ -87,7 +93,6 @@ export default {
     getMyQuickQuizs: function () {
       this.$http.get('/api/manage-quickquiz/teacher/quickquizs').then(function (response) {
         if (response.data.length > 0) {
-          console.log(response.data)
           this.myQuickquizs = response.data
           this.generateLatestQuickQuizQrcode(response.data[0]._id)
         } else {
@@ -110,6 +115,26 @@ export default {
           return console.log('Error =( ', error)
         }
       })
+    },
+    endLatestQuickQuiz: function () {
+      if (this.myQuickquizs[0].finished === false) {
+        let data = {
+          quickquiz_id: this.myQuickquizs[0]._id
+        }
+
+        this.$http.post('/api/manage-quickquiz/teacher/finish', data).then(function (response) {
+          if (response.data.length > 0) {
+            console.log(response.data)
+            this.myQuickquizs = response.data
+            this.generateLatestQuickQuizQrcode(response.data[0]._id)
+          } else {
+            // handle 0 quick-quiz view
+          }
+        }, function (response) {
+          // handle errors
+          console.log(response)
+        })
+      }
     }
   },
   filters: {

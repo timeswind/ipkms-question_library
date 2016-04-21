@@ -31,7 +31,6 @@ export default {
   methods: {
     getAllQcollections: function () {
       this.$http.get('/api/manage-qcollection/all').then(function (response) {
-        console.log(response.data.length)
         if (response.data.length > 0) {
           this.allQcollections = response.data
           if (response.data.length < 12) {
@@ -53,7 +52,9 @@ export default {
         let apiURL = '/api/manage-qcollection/all?page=' + latest_id
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
-            this.allQcollections.push(response.data[0])
+            for (var i = 0; i < response.data.length; i++) {
+              this.allQcollections.push(response.data[i])
+            }
             if (response.data.length < 12) {
               this.loadMore = false
             } else {

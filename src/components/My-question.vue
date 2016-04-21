@@ -91,7 +91,9 @@ export default {
         let apiURL = '/api/manage-question/mine?page=' + latest_id
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
-            this.myQuestions.push(response.data[0])
+            for (var i = 0; i < response.data.length; i++) {
+              this.myQuestions.push(response.data[i])
+            }
             this.renderQuestions()
             if (response.data.length < 9) {
               this.loadMore = false

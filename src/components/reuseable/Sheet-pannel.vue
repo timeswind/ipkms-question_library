@@ -17,13 +17,19 @@
   padding: 0 10px;
   opacity: 0;
 }
+#sheet-pannel .justify-center {
+  justify-content: center;
+}
 
 </style>
 <template>
   <div id="sheet-pannel">
-    <div class="flex-row flex-center">
-      <slot name="sheet-title" ></slot>
-      <slot name="sheet-button"></slot>
+    <div class="flex-row flex-center" :class="{'justify-center': center}">
+      <slot name="sheet-title"></slot>
+      <div class="flex-column flex-center">
+        <slot name="sheet-button"></slot>
+        <slot name="button-subtitle"></slot>
+      </div>
     </div>
     <div id="sheet-zone" v-show="sheetshow" transition="expand">
       <slot name="sheet-zone"></slot>
@@ -33,6 +39,10 @@
 
 <script>
 export default {
-  props: ['title', 'sheetshow']
+  props: {
+    title: String,
+    sheetshow: Boolean,
+    center: Boolean
+  }
 }
 </script>

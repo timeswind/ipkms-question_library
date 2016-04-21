@@ -1,5 +1,4 @@
 <style>
-
 .card {
   background: #fff;
   box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
@@ -8,12 +7,13 @@
 
 .card-flex {
   display: flex;
+  align-items: baseline;
+  flex-direction: row;
 }
 
 .card .context-wrapper{
   padding: 16px;
 }
-
 </style>
 
 <template>

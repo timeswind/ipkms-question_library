@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "material-design-lite": "^1.1.2",
+    "moment": "^2.13.0",
     "qrcode-canvas": "0.0.1",
     "quill": "^0.20.1",
     "quill-render": "^1.0.5",

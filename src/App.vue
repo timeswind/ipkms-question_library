@@ -26,7 +26,7 @@
   </div>
 </header>
 <div class="mdl-layout__drawer">
-  <span class="mdl-layout-title">題庫</span>
+  <span class="mdl-layout-title" style="cursor: pointer" v-link="{name:'entry'}">題庫</span>
   <nav class="mdl-navigation">
     <a class="mdl-navigation__link" v-link="{name:'create-question', activeClass:'active'}">創建題目</a>
     <a class="mdl-navigation__link" v-link="{name:'manage-question', activeClass:'active'}">管理題目</a>

@@ -1,3 +1,7 @@
+.main-wrapper {
+  max-width: 800px;
+  margin: 0 auto
+}
 .mdl-navigation__link.active {
   background-color: #e0e0e0
 }
@@ -27,6 +31,10 @@
 
 .flex-baseline {
   align-items: baseline;
+}
+
+.flex-start {
+  align-items: flex-start;
 }
 
 .flex-50 {
