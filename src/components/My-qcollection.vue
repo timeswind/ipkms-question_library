@@ -59,7 +59,7 @@
       </div>
     </div>
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in myQcollections" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in myQcollections" track-by="_id" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-public">{{qc.public | bTp}}</span>

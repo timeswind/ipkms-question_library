@@ -19,6 +19,14 @@
   cursor: pointer;
 }
 
+#prepare-quiz .qcollection-mini-card:hover {
+  background-color: #f7f7f7
+}
+
+#prepare-quiz .qcollection-mini-card:active {
+  background-color: #eee
+}
+
 #prepare-quiz .qcollection-mini-card .name {
   font-weight: bold;
   margin-bottom: 8px;
@@ -62,27 +70,34 @@
               <mdl-radio style="margin-left:32px;" :checked.sync="queryQcollection.type" value="mine">我的題集</mdl-radio>
               <mdl-radio style="margin-left:16px;" :checked.sync="queryQcollection.type" value="all">公開題集</mdl-radio>
             </div>
-            <p v-show="queryQcollection.fail" style="margin: 0 0 0 32px;color:#F44336">未找到題集</p>
             <div class="flex-column" v-show="newQuickquiz.qcollection._id">
               <h6 style="margin:0 0 4px 0;color:#E91E63">已選題集</h6>
-              <div class="flex-column qcollection-mini-card"  style="max-width:300px;margin-bottom:16px">
+              <div class="flex-column qcollection-mini-card"  style="max-width:300px;margin-bottom:16px;border-color:#E91E63">
                 <span class="name">{{newQuickquiz.qcollection.name}}</span>
                 <div class="flex-row" style="align-items: baseline">
                   <span class="subject">{{newQuickquiz.qcollection.subject | subject}}</span>
-                  <span class="difficulty">难度{{newQuickquiz.qcollection.aveDifficulty}}</span>
+                  <span class="subject" style="background:#0277BD">{{newQuickquiz.qcollection.questions}} 題</span>
+                  <span class="difficulty">难度 {{newQuickquiz.qcollection.aveDifficulty}}</span>
                 </div>
               </div>
             </div>
 
           </div>
 
-          <div class="flex-column flex-50" style="margin-bottom:16px" v-show="!queryQcollection.fail">
-            <h4 class="display-1" style="margin-top: 0;margin-bottom:8px">選擇題集</h4>
-            <div class="flex-column qcollection-mini-card" v-for="qcollection in queryQcollection.results" @click="newQuickquiz.qcollection = qcollection">
-              <span class="name">{{qcollection.name}}</span>
-              <div class="flex-row" style="align-items: baseline">
-                <span class="subject">{{qcollection.subject | subject}}</span>
-                <span class="difficulty">难度{{qcollection.aveDifficulty}}</span>
+          <div class="flex-column flex-50" style="margin-bottom:16px">
+            <div class="flex-row flex-center">
+              <h4 v-show="queryQcollection.fail" class="display-1" style="margin-top: 0;margin-bottom:8px;color:#F44336">未找到題集</h4>
+              <h4 v-show="!queryQcollection.fail" class="display-1" style="margin-top: 0;margin-bottom:8px">選擇題集</h4>
+              <mdl-spinner v-show="queryQcollection.loading" :active="queryQcollection.loading"></mdl-spinner>
+            </div>
+            <div class="flex-column" v-show="!queryQcollection.fail">
+              <div class="flex-column qcollection-mini-card" v-for="qcollection in queryQcollection.results" @click="newQuickquiz.qcollection = qcollection">
+                <span class="name">{{qcollection.name}}</span>
+                <div class="flex-row" style="align-items: baseline">
+                  <span class="subject">{{qcollection.subject | subject}}</span>
+                  <span class="subject" style="background:#0277BD">{{qcollection.questions}} 題</span>
+                  <span class="difficulty">难度 {{qcollection.aveDifficulty}}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -115,6 +130,7 @@ export default {
       queryQcollection: {
         type: 'mine',
         keyword: '',
+        loading: false,
         button: true,
         fail: false,
         results: []
@@ -127,28 +143,28 @@ export default {
     queryQcollectionsByName: function () {
       this.queryQcollection.button = false
       if (this.queryQcollection.keyword.trim() !== '') {
+        this.queryQcollection.loading = true
         let data = {
           type: this.queryQcollection.type,
           name: this.queryQcollection.keyword
         }
         this.$http.post('/api/manage-qcollection/teacher/query/name', data).then(function (response) {
-          console.log(response.data)
+          this.queryQcollection.loading = false
+          this.queryQcollection.button = true
           if (response.data && response.data.length > 0) {
             // show qcollection result modal
             this.queryQcollection.results = response.data
-            this.queryQcollection.button = true
             this.queryQcollection.fail = false
           } else {
             // not found
             this.queryQcollection.fail = true
-            this.queryQcollection.button = true
           }
         }, function (response) {
           // err handleing
           console.log(response.data)
-          this.queryQcollection.button = true
         })
       } else {
+        this.queryQcollection.loading = false
         this.queryQcollection.button = true
       }
     },

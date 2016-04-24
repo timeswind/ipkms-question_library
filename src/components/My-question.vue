@@ -2,7 +2,7 @@
   <div id="my-question">
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <div class="mdl-grid" id="questions-preview-container">
-      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in myQuestions">
+      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in myQuestions" track-by="_id">
         <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
           <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
@@ -87,7 +87,6 @@ export default {
       if (this.myQuestions.length > 0) {
         this.loadMore = false
         let latest_id = this.myQuestions[this.myQuestions.length - 1]._id
-        console.log(latest_id)
         let apiURL = '/api/manage-question/mine?page=' + latest_id
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {

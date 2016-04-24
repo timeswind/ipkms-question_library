@@ -117,7 +117,7 @@
       <mdl-spinner :active="spinnerActive" v-show="spinnerActive"></mdl-spinner>
       <div class="modal-body">
         <ul class="list">
-          <li class="flex-row" v-for="qc in myQcollections" @click="saveOneToCollection(qc._id)">
+          <li class="flex-row" v-for="qc in myQcollections" track-by="_id" @click="saveOneToCollection(qc._id)">
             <span class="subject-label">{{qc.subject | subject}}</span>
             <span>{{qc.name}}</span>
           </li>

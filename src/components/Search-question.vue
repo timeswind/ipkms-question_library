@@ -26,7 +26,7 @@
     </div>
     <div class="results-zone">
       <div class="mdl-grid" id="questions-preview-container">
-        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results">
+        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results" track-by="_id">
           <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
             <span class="q-subject">{{q.subject | subject}}</span>
             <span class="q-type">{{q.type}}</span>

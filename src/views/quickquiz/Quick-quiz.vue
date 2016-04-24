@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import topbar from '../reuseable/Topbar.vue'
+import topbar from '../../components/reuseable/Topbar.vue'
 
 export default {
   attached () {

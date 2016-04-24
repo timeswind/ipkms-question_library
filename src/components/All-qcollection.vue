@@ -1,7 +1,7 @@
 <template>
   <div id="all-qcollection">
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in allQcollections" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in allQcollections" track-by="_id" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-difficulty" v-show="qc.aveDifficulty">難度: {{qc.aveDifficulty}}</span>

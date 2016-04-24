@@ -121,25 +121,32 @@ router.map({
   '/quick-quiz': {
     name: 'quick-quiz',
     component: function (resolve) {
-      require(['./components/quickquiz/Quick-quiz.vue'], resolve)
+      require(['./views/quickquiz/Quick-quiz.vue'], resolve)
     },
     title: 'Quick Quiz',
     subRoutes: {
       '/prepare': {
         name: 'prepare-quiz',
         component: function (resolve) {
-          require(['./components/quickquiz/Prepare-quiz.vue'], resolve)
+          require(['./views/quickquiz/Prepare-quiz.vue'], resolve)
         },
         title: '準備小測'
       },
       '/results': {
         name: 'quiz-results',
         component: function (resolve) {
-          require(['./components/quickquiz/Quiz-results.vue'], resolve)
+          require(['./views/quickquiz/Quiz-results.vue'], resolve)
         },
         title: '數據統計'
       }
     }
+  },
+  '/quick-quiz/detail/:quickquiz_id': {
+    name: 'quiz-detail',
+    component: function (resolve) {
+      require(['./views/quickquiz/Quiz-detail.vue'], resolve)
+    },
+    title: 'Quiz Detail'
   }
 })
 
