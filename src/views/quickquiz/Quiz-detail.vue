@@ -52,6 +52,8 @@
         <mdl-button class="icon-left-button" raised primary @click="goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
         <mdl-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mdl-button>
         <mdl-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mdl-button>
+        <mdl-button style="margin-left:16px" raised primary v-link="{'name': 'quiz-paper', params: { quickquiz_id: $route.params.quickquiz_id }}"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
+
       </div>
       <div class="flex-column second-wrapper mdl-shadow--2dp">
         <div class="flex-column" style="padding:16px">
@@ -67,7 +69,7 @@
 
         </div>
 
-        <div class="flex-column" v-show="quickquiz.students">
+        <div class="flex-column" v-if="quickquiz.students">
           <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">參與的學生</p>
           <div class="grids">
             <div class="grid-4" v-for="student in quickquiz.students" track-by="_id">
@@ -94,8 +96,6 @@ export default {
     if (this.$route.params.quickquiz_id) {
       this.validateURL = true
       this.getQuickquizDetail(this.$route.params.quickquiz_id)
-    } else {
-      this.answer.buttonDisable = true
     }
   },
   methods: {

@@ -1,8 +1,8 @@
 <style>
 .card {
   background: #fff;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
-  margin: 4px;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .card-flex {
@@ -23,6 +23,7 @@
       <div class="context-wrapper">
         <div><slot name="in"></slot></div>
       </div>
+      <slot name="out-below"></slot>
     </div>
   </div>
 

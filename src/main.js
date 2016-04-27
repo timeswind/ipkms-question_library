@@ -147,6 +147,13 @@ router.map({
       require(['./views/quickquiz/Quiz-detail.vue'], resolve)
     },
     title: 'Quiz Detail'
+  },
+  '/quick-quiz/paper/:quickquiz_id': {
+    name: 'quiz-paper',
+    component: function (resolve) {
+      require(['./views/quickquiz/Quiz-paper.vue'], resolve)
+    },
+    title: 'Quiz Paper'
   }
 })
 

@@ -34,13 +34,13 @@
   cursor: pointer;
 }
 
-#question-detail #question-preview-container {
+#question-detail #question-body {
   max-width: 800px;
   margin: 0 auto;
-  margin-top: 20px
+  margin-top: 8px
 }
 
-#question-detail #question-preview-container p {
+#question-detail #question-body p {
   margin: 0
 }
 
@@ -141,7 +141,8 @@
         </div>
       </div>
     </sheet-pannel>
-    <div id="question-preview-container">
+    <div id="question-body">
+      <mdl-button accent raised style="margin:0 0 8px 0" @click="getQuestionAnswer()" v-show="!answer.get" :disabled="answer.buttonDisable">顯示答案</mdl-button>
       <card>
         <div slot="in">
           <div class="q-d-info-wrapper">
@@ -153,8 +154,6 @@
           {{{details.context}}}
         </div>
       </card>
-      <mdl-button accent raised style="margin:8px 4px" @click="getQuestionAnswer()" v-show="!answer.get" :disabled="answer.buttonDisable">顯示答案</mdl-button>
-
       <div v-if="details.type === 'mc'" class="q-d-mc-wrapper">
         <card class="half" :class="{'hightlight-answer': answer.mc === 0, 'wrong': answer.mc !== 0 && choice === 0}" @click="checkMc(0)"><div slot="in"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
         <card class="half" :class="{'hightlight-answer': answer.mc === 1, 'wrong': answer.mc !== 1 && choice === 1}" @click="checkMc(1)"><div slot="in"><span class="mc-choice-label">B</span>{{{details.choices[1]}}}</div></card>
@@ -230,7 +229,7 @@ export default {
     renderQuestions: function () {
       setTimeout(function renderQuestions () {
         window.renderMathInElement(
-          document.getElementById('question-preview-container'),
+          document.getElementById('question-body'),
           {
             delimiters: [
               {left: '$$', right: '$$', display: false}
