@@ -178,7 +178,7 @@ export default {
   filters: {
     finished: function (value) {
       if (value === false) {
-        return '未收卷/進行中'
+        return '未收卷'
       } else {
         return '已結束'
       }

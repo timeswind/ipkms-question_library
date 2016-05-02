@@ -114,7 +114,9 @@
           <i class="material-icons">close</i>
         </mdl-button>
       </div>
-      <mdl-spinner :active="spinnerActive" v-show="spinnerActive"></mdl-spinner>
+      <p style="text-align:center;margin:16px 0">
+        <mdl-spinner :active="spinnerActive" v-show="spinnerActive"></mdl-spinner>
+      </p>
       <div class="modal-body">
         <ul class="list">
           <li class="flex-row" v-for="qc in myQcollections" track-by="_id" @click="saveOneToCollection(qc._id)">
@@ -122,7 +124,7 @@
             <span>{{qc.name}}</span>
           </li>
         </ul>
-        <div class="flex-column flex-center" style="margin:16px 0 32px 0">
+        <div class="flex-column flex-center" style="margin:16px 0">
           <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
         </div>
       </div>
@@ -136,7 +138,7 @@ export default {
     return {
       spinnerActive: true,
       myQcollections: [],
-      loadMore: true
+      loadMore: false
     }
   },
   props: ['show', 'qid'],
@@ -169,6 +171,8 @@ export default {
             this.myQcollections = response.data
             if (response.data.length < 12) {
               this.loadMore = false
+            } else {
+              this.loadMore = true
             }
           } else {
             this.loadMore = false

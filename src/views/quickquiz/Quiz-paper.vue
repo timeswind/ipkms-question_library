@@ -153,7 +153,7 @@
                   </div>
                 </div>
                 <div class="flex-row">
-                  <div class="choice choice-c flex-50 flex-row" class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2)}" @click="answerOnChoose($index, 2)">
+                  <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2)}" @click="answerOnChoose($index, 2)">
                     <span class="choice-label">C</span>
                     <div>{{{question.choices[2]}}}</div>
                   </div>
