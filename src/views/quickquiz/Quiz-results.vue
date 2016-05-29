@@ -1,9 +1,7 @@
 <style>
 #quiz-results .main-wrapper {
   margin:16px auto;
-  background: #fff;
   box-sizing: content-box;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
 #quiz-results .qrcode-wrapper {
   width: 300px;
@@ -42,7 +40,10 @@
 
 .quickquiz-card {
   cursor: pointer;
-  padding-left: 16px
+  padding: 16px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .quickquiz-card:active {
@@ -73,7 +74,7 @@
 <template>
   <div id="quiz-results">
     <div style="padding-top:16px">
-      <div class="main-wrapper flex-column">
+      <div class="main-wrapper flex-column" style="background-color:#fff;box-shadow: 0 1px 6px rgba(0,0,0,0.35);">
         <p style="border-bottom:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">最新小測</p>
 
         <div class="latest-quiz flex-row">
@@ -97,24 +98,22 @@
           </div>
 
         </div>
-        <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">所有小測</p>
+      </div>
+      <div>
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--4-col quickquiz-card flex-column" v-for="quickquiz in myQuickquizs" track-by="_id" v-link="{ name: 'quiz-detail', params: { quickquiz_id: quickquiz._id }}">
+            <div class="flex-row flex-baseline">
+              <span class="title">{{quickquiz.title}}</span>
+              <span class="finished">{{quickquiz.finished | finished}}</span>
 
-        <div class="grids">
-          <div>
-            <div class="grid-3 quickquiz-card flex-column" v-for="quickquiz in myQuickquizs" track-by="_id" v-link="{ name: 'quiz-detail', params: { quickquiz_id: quickquiz._id }}">
-              <div class="flex-row flex-baseline">
-                <span class="title">{{quickquiz.title}}</span>
-                <span class="finished">{{quickquiz.finished | finished}}</span>
-
-              </div>
-              <span class="time">{{quickquiz.time}}分鐘</span>
-
-              <span class="date">{{quickquiz.startTime | date 'YY[年]M[月]DD[日]'}}</span>
             </div>
-          </div>
+            <span class="time">{{quickquiz.time}}分鐘</span>
 
+            <span class="date">{{quickquiz.startTime | date 'YY[年]M[月]DD[日]'}}</span>
+          </div>
         </div>
       </div>
+
     </div>
 
   </div>

@@ -5,18 +5,6 @@
   box-shadow: 0 1px 6px rgba(0,0,0,0.35)
 }
 
-#sheet-pannel .expand-transition {
-  max-height: 500px;
-  transition: all .3s ease;
-  padding: 10px;
-  overflow: hidden;
-}
-
-#sheet-pannel .expand-enter, #sheet-pannel .expand-leave {
-  max-height: 0;
-  padding: 0 10px;
-  opacity: 0;
-}
 #sheet-pannel .justify-center {
   justify-content: center;
 }

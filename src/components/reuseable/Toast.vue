@@ -1,7 +1,7 @@
 <style>
 #toast {
   z-index: 9998;
-  position: fixed;
+  position: relative;
   bottom: 0;
   left: 50%;
   padding: 12px 24px;
@@ -19,11 +19,23 @@
 </template>
 
 <script>
-// import '../../css/animation.css'
 export default {
+  ready () {
+    let self = this
+    setTimeout(function () {
+      self.$remove().$destroy()
+    }, 5000)
+  },
+  beforeDestroy () {
+  },
   props: {
-    show: false,
-    message: ''
+    show: {
+      type: Boolean,
+      required: true
+    },
+    message: {
+      required: true
+    }
   }
 }
 </script>

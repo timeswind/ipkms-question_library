@@ -94,7 +94,7 @@
   <div id="quiz-detail">
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mdl-button class="icon-left-button" raised primary @click="goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
+        <mdl-button class="icon-left-button" raised primary @click="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
         <mdl-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mdl-button>
         <mdl-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mdl-button>
         <mdl-button style="margin-left:16px" raised primary v-link="{'name': 'quiz-paper', params: { quickquiz_id: $route.params.quickquiz_id }}"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
@@ -191,9 +191,6 @@ export default {
         }
       }
       return -1
-    },
-    goBack: function () {
-      window.history.back()
     },
     listenForSocket: function () {
       var self = this

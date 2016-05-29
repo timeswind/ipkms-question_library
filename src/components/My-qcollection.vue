@@ -70,7 +70,7 @@
     </div>
 
     <div class="flex-column flex-center" style="margin:16px 0 32px 0">
-      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
+      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
     </div>
 
   </div>
@@ -104,7 +104,7 @@ export default {
     },
     createNewQcollection: function () {
       if (this.newQcollection.name) {
-        this.$http.post('/api/manage-qcollection/add', this.newQcollection).then(function (response) {
+        this.$http.post('/api/manage-qcollection/qcollection', this.newQcollection).then(function (response) {
           this.showCreatSheet = false
           this.getMyQcollections()
         }, function (response) {
@@ -146,8 +146,7 @@ export default {
       newQcollection: {
         name: '',
         subject: 'math',
-        public: true,
-        questions: []
+        public: true
       },
       subjects: Subject.subjects,
       loadMore: true

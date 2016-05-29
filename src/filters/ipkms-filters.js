@@ -23,5 +23,10 @@ module.exports = {
     Vue.filter('date', function (value, formate) {
       return moment(value).format(formate)
     })
+
+    Vue.filter('calendar', function (value, formate) {
+      moment.locale('zh-tw')
+      return moment(value).calendar()
+    })
   }
 }

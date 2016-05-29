@@ -25,8 +25,7 @@
           </select>
         </div>
         <div class="block" style="padding:20px 0">
-          <input type="checkbox" id="public-checkbox" v-model="details.public">
-          <label for="public-checkbox">公開</label>
+          <mdl-switch :checked.sync="details.public">公開</mdl-switch>
         </div>
         <mdl-button accent raised @click="updateQcollectionInfo()">
           修改
@@ -46,7 +45,7 @@
           <div class="q-difficulty">
             <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
           </div>
-          <p class="qc-context">{{{q.context}}}</p>
+          <p class="q-context">{{{q.context}}}</p>
           <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
         </div>
         <div class="question-tools">
@@ -167,17 +166,23 @@ export default {
       if (this.details.questions.length !== 0) {
         for (var q of this.details.questions) {
           // truncate the sequence at 1000
-          sum += q.difficulty
+
+          if (!isNaN(q.difficulty)) {
+            sum += q.difficulty
+          }
         }
-        result = (sum / this.details.questions.length).toFixed(2)
+        result = sum / this.details.questions.length
+
+        result = Math.round(result * 1e2) / 1e2
+
+        console.log(result)
         if (this.details.aveDifficulty) {
-          if (this.details.aveDifficulty.toFixed(2) !== result) {
+          if (this.details.aveDifficulty !== result) {
             this.updateDifficulty(result)
           }
         } else {
           this.updateDifficulty(result)
         }
-
         return result
       } else {
         return 0
@@ -194,7 +199,9 @@ export default {
         show: false,
         qid: undefined
       },
-      details: {},
+      details: {
+        public: false
+      },
       averageDifficulty: 0,
       subjects: Subject.subjects
     }

@@ -4,29 +4,46 @@ import VueResource from 'vue-resource'
 import VueQuill from './modules/vue-quill/vue-quill.js'
 import Filters from './filters/ipkms-filters.js'
 import VueMdl from 'vue-mdl'
+import store from './vuex/store'
 
 import 'material-design-lite/material.min.css'
 import 'material-design-lite/material.min.js'
 
 import App from './App'
 
+import 'vue-toast/dist/vue-toast.min.css'
+import vueToast from 'vue-toast'
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(VueQuill)
 Vue.use(Filters)
 Vue.use(VueMdl)
+Vue.component('vue-toast', vueToast)
+
+Vue.prototype.$showToast = function (message) {
+  store.dispatch('showToast', message)
+}
+
+Vue.prototype.$goBack = function () {
+  window.history.back()
+}
+
+// var self = this
 
 Vue.http.interceptors.push({
 
   request: function (request) {
     if (window.sessionStorage.token) {
       request.headers['x-access-token'] = window.sessionStorage.token
-      return request
-    } else {
-      window.location = '/'
     }
+    return request
   },
   response: function (response) {
+    if (response.status === 401 && response.data.authorize === false) {
+      console.log('need relogin')
+      store.dispatch('showLoginModal')
+    }
     return response
   }
 
@@ -45,9 +62,32 @@ router.map({
   '/create-question': {
     name: 'create-question',
     component: function (resolve) {
-      require(['./components/Create-question.vue'], resolve)
+      require(['./views/create-question/Create-question.vue'], resolve)
     },
-    title: '創建題目'
+    title: '創建題目',
+    subRoutes: {
+      '/start': {
+        name: 'start-create-question',
+        component: function (resolve) {
+          require(['./views/create-question/Start.vue'], resolve)
+        },
+        title: 'Start'
+      },
+      '/mc': {
+        name: 'create-mc-question',
+        component: function (resolve) {
+          require(['./views/create-question/Create-mc-question.vue'], resolve)
+        },
+        title: '多項選擇題'
+      },
+      '/mc_question_set': {
+        name: 'create-mc-question-set',
+        component: function (resolve) {
+          require(['./views/create-question/Create-mc-question-set.vue'], resolve)
+        },
+        title: '多項選擇題 題集'
+      }
+    }
   },
   '/manage-qcollection': {
     name: 'manage-qcollection',

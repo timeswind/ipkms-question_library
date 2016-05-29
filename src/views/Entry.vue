@@ -26,34 +26,28 @@
     <div class="main-wrapper">
       <div class="flex-column">
         <div class="flex-row" style="border-bottom:1px solid #eee">
-            <div class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
-              <span>創建題目</span>
-            </div>
-            <div class="flex-column flex-50 flex-center nav-card">
-              <span>管理題目</span>
-            </div>
+          <div class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
+            <span>創建題目</span>
+          </div>
+          <div class="flex-column flex-50 flex-center nav-card">
+            <span>管理題目</span>
+          </div>
         </div>
         <div class="flex-row">
-            <div class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
-              <span>管理題集</span>
-            </div>
-            <div class="flex-column flex-50 flex-center nav-card">
-              <span>Quick Quiz</span>
-            </div>
+          <div class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
+            <span>管理題集</span>
+          </div>
+          <div class="flex-column flex-50 flex-center nav-card">
+            <span>Quick Quiz</span>
+          </div>
         </div>
         <div class="flex-row">
-            <div class="flex-column flex-50 flex-center nav-card" style="border-top:1px solid #eee">
-              <span>使用指南</span>
-            </div>
+          <div class="flex-column flex-50 flex-center nav-card" style="border-top:1px solid #eee">
+            <span>使用指南</span>
+          </div>
         </div>
 
       </div>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-
-}
-</script>

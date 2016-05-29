@@ -28,7 +28,7 @@
 <div class="mdl-layout__drawer">
   <span class="mdl-layout-title" style="cursor: pointer" v-link="{name:'entry'}">題庫</span>
   <nav class="mdl-navigation">
-    <a class="mdl-navigation__link" v-link="{name:'create-question', activeClass:'active'}">創建題目</a>
+    <a class="mdl-navigation__link" v-link="{name:'start-create-question', activeClass:'active'}">創建題目</a>
     <a class="mdl-navigation__link" v-link="{name:'manage-question', activeClass:'active'}">管理題目</a>
     <a class="mdl-navigation__link" v-link="{name:'manage-qcollection', activeClass:'active'}">管理題集</a>
     <a class="mdl-navigation__link" v-link="{name:'quick-quiz', activeClass:'active'}">Quick Quiz</a>
@@ -36,19 +36,32 @@
 </div>
 <main class="mdl-layout__content">
   <div class="page-content">
-
     <router-view :is="view" transition="fade" transition-mode="out-in"></router-view>
-
   </div>
 </main>
 </div>
 
-<toast :message="toast.message" :show="toast.show"></toast>
+<mdl-snackbar display-on="toastOn"></mdl-snackbar>
+
+<div v-show="loginModalShow" class="login-modal-mask" transition="modal">
+  <div class="login-modal-card flex-column">
+    <span style="color: #E91E63;
+    margin-top: 4px;
+    margin-bottom: 8px;">登入信息过期</span>
+    <h4 class="display-1" style="margin-top:0">重新登入</h4>
+    <mdl-textfield floating-label="郵箱" :value.sync="reLogin.email" type="email"></mdl-textfield>
+    <mdl-textfield floating-label="密碼" :value.sync="reLogin.password" type="password"></mdl-textfield>
+    <span style="color: #F44336;text-align: center;">{{reLogin.warn}}</span>
+    <mdl-button raised primary @click="login()" style="margin-top:16px">登入</mdl-button>
+  </div>
+</div>
 </div>
 </template>
 
 <script>
-import Toast from './components/reuseable/Toast'
+import store from './vuex/store'
+import { hideLoginModal } from './vuex/actions'
+import { getLoginModalState, getToastState } from './vuex/getters'
 
 import './css/main.css'
 import './css/animation.css'
@@ -56,25 +69,55 @@ import './css/animation.css'
 export default {
   data () {
     return {
-      toast: {
-        message: '',
-        show: false
+      reLogin: {
+        email: '',
+        password: '',
+        warn: ''
       }
     }
   },
-  components: {
-    Toast
-  },
-  events: {
-    'show-toast': function (message) {
-      if (!this.toast.show) {
-        let v = this
-        this.toast.message = message
-        this.toast.show = true
-        setTimeout(function hideToast () {
-          v.toast.show = false
-        }, 2000)
+  methods: {
+    login: function () {
+      var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+      if (re.test(this.reLogin.email)) {
+        let data = {
+          email: this.reLogin.email,
+          password: this.reLogin.password
+        }
+        this.$http.post('/login', data).then(function (response) {
+          console.log(response)
+          if (response.status === 200 && response.data && response.data.token) {
+            window.sessionStorage.token = response.data.token
+            this.reLogin.email = ''
+            this.reLogin.password = ''
+            this.reLogin.warn = ''
+            this.hideLoginModal()
+            window.location.reload()
+          }
+        }, function (response) {
+          if (response.status === 401 && response.data === 'fail') {
+            this.reLogin.password = ''
+            this.reLogin.warn = '登入失败'
+          }
+        })
+      } else {
+        this.reLogin.warn = '請輸入正確的郵箱地址'
       }
+    }
+  },
+  store,
+  vuex: {
+    actions: {
+      hideLoginModal: hideLoginModal
+    },
+    getters: {
+      loginModalShow: getLoginModalState,
+      toastState: getToastState
+    }
+  },
+  watch: {
+    'toastState': function (val) {
+      this.$broadcast('toastOn', { message: val })
     }
   }
 }
@@ -91,5 +134,22 @@ body {
   justify-content: center;
   height: 100%;
   margin:0
+}
+
+.login-modal-mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background: rgba(33, 33, 33, 0.43);
+}
+
+.login-modal-card {
+  background: #fff;
+  max-width: 300px;
+  margin: 80px auto 0 auto;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  padding: 16px;
+  border-radius: 3px;
 }
 </style>

@@ -74,7 +74,6 @@ export default {
       var range = this.editor.getLength()
       this.editor.insertText(range - 1, format, true)
       this.mathBox.content = ''
-      // this.$dispatch('render-q-preview', this.msg)
     },
     focusEditor (e) {
       if (e && e.srcElement) {
@@ -90,6 +89,22 @@ export default {
       }
       this.editor.focus()
       this.editor.setSelection(this.editor.getLength() - 1, this.editor.getLength())
+    },
+    getEditorContents () {
+      return this.output !== 'delta' ? this.editor.getHTML() : this.editor.getContents()
+    },
+    updateEditorContents () {
+      if (this.output !== 'delta') {
+        this.setEditorHtml(this.content)
+      } else {
+        this.setEditorOps(this.content)
+      }
+    },
+    setEditorOps (ops) {
+      this.editor.setContents(ops)
+    },
+    setEditorHtml (html) {
+      this.editor.setHTML(html)
     }
   },
   props: {
@@ -114,7 +129,6 @@ export default {
       default: null
     }
   },
-
   data () {
     return {
       editor: {},
@@ -124,10 +138,17 @@ export default {
       }
     }
   },
-
+  watch: {
+    // Whenever 'content' on this vm updates, communicate that down to Quill.
+    content (newValue) {
+      if (JSON.stringify(newValue) !== JSON.stringify(this.getEditorContents())) {
+        this.updateEditorContents()
+      }
+    }
+  },
   ready () {
     this.editor = new Quill(this.$els.quill, {
-      formats: ['bold', 'italic', 'color'],
+      formats: ['bold', 'italic', 'underline', 'list', 'bullet'],
       modules: {
         toolbar: this.$els.toolbar
       },
@@ -138,21 +159,17 @@ export default {
       this.editor.addFormat(format.name, format.options)
     })
 
-    if (this.output !== 'delta') {
-      this.editor.setHTML(this.content)
-    } else {
-      this.editor.setContents(this.content)
-    }
+    this.updateEditorContents()
 
     // this.editor.insertText(0, 'Hello', 'grey')
 
     this.editor.on('text-change', (delta, source) => {
-      this.$dispatch('text-change', this.editor, delta, source)
-      this.content = this.output !== 'delta' ? this.editor.getHTML() : this.editor.getContents()
+      this.$broadcast('text-change', this.editor, delta, source)
+      this.content = this.getEditorContents()
     })
 
     this.editor.on('selection-change', (range) => {
-      this.$dispatch('selection-change', this.editor, range)
+      this.$broadcast('selection-change', this.editor, range)
     })
 
     if (typeof this.author !== 'undefined') {
@@ -169,13 +186,12 @@ export default {
       })
     }
   },
-
   events: {
     'set-content': function (content) {
-      this.editor.setContents(content)
+      this.setEditorOps(content)
     },
     'set-html': function (html) {
-      this.editor.setHTML(html)
+      this.setEditorHtml(html)
     },
     'focus-editor': function () {
       this.focusEditor()

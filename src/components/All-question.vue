@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="flex-column flex-center" style="margin:16px 0 32px 0">
-      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
+      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
       </div>
     </div>
   </template>

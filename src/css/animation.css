@@ -18,3 +18,38 @@
 .toast-enter, .toast-leave {
   margin-bottom: -40px
 }
+
+.expand-transition {
+  max-height: 500px;
+  transition: all .3s ease;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.expand-enter, .expand-leave {
+  max-height: 0;
+  padding: 0 10px;
+  opacity: 0;
+}
+
+.modal-transition {
+  transition: all 0.2s ease;
+}
+
+.modal-enter, .modal-leave {
+  opacity: 0;
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+.drawdown-transition {
+  height: 100px;
+  overflow: auto;
+  transition: all .3s ease;
+}
+
+.drawdown-enter, .drawdown-leave {
+  height: 0;
+  overflow: auto;
+  transition: all .3s ease;
+}

@@ -47,10 +47,8 @@
 .q-d-info-wrapper {
   margin-bottom: 10px
 }
-.q-d-mc-wrapper .half {
-  width: 50%;
-  float: left;
-  cursor: pointer;
+.q-d-mc-wrapper .card {
+  padding: 16px
 }
 
 .q-d-mc-wrapper .hightlight-answer .card {
@@ -116,15 +114,11 @@
         <div class="difficulty-box flex-row flex-center">
           <span style="line-height:26px">難度：</span>
           <span class="flex-row flex-baseline">
-            <i class="material-icons" @click="details.difficulty = 1" :class="{'difficulty-heighlight': details.difficulty > 0}">star_rate</i>
-            <i class="material-icons" @click="details.difficulty = 2" :class="{'difficulty-heighlight': details.difficulty > 1}">star_rate</i>
-            <i class="material-icons" @click="details.difficulty = 3" :class="{'difficulty-heighlight': details.difficulty > 2}">star_rate</i>
-            <i class="material-icons" @click="details.difficulty = 4" :class="{'difficulty-heighlight': details.difficulty > 3}">star_rate</i>
-            <i class="material-icons" @click="details.difficulty = 5" :class="{'difficulty-heighlight': details.difficulty > 4}">star_rate</i>
+            <i class="material-icons" v-for="1 in 5" @click="details.difficulty = $index + 1" :class="{'difficulty-heighlight': details.difficulty > $index}">star_rate</i>
           </span>
         </div>
 
-        <div class="flex" style="position:relative;top:-20px">
+        <div class="flex-column" style="position:relative;top:-20px">
           <div v-show="details.tags && details.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
             <span>標籤：</span>
             <span class="q-d-tag" @click="tags('remove', null, $index)" v-for="tag in details.tags" track-by="$index">{{tag}}</span>
@@ -142,24 +136,31 @@
       </div>
     </sheet-pannel>
     <div id="question-body">
-      <mdl-button accent raised style="margin:0 0 8px 0" @click="getQuestionAnswer()" v-show="!answer.get" :disabled="answer.buttonDisable">顯示答案</mdl-button>
-      <card>
-        <div slot="in">
-          <div class="q-d-info-wrapper">
-            <span class="q-d-subject">{{details.subject | subject}}</span>
-            <div class="q-d-difficulty">
-              <i class="material-icons" v-for="i in getNumberArray(details.difficulty)" track-by="$index">star_rate</i>
+      <div v-if="details.type === 'mc'">
+        <mdl-button accent raised style="margin:0 0 8px 0" @click="getQuestionAnswer()" v-show="!answer.get" :disabled="answer.buttonDisable">顯示答案</mdl-button>
+        <card>
+          <div slot="content" style="padding:16px">
+            <div class="q-d-info-wrapper">
+              <span class="q-d-subject">{{details.subject | subject}}</span>
+              <div class="q-d-difficulty">
+                <i class="material-icons" v-for="i in getNumberArray(details.difficulty)" track-by="$index">star_rate</i>
+              </div>
             </div>
+            {{{details.context}}}
           </div>
-          {{{details.context}}}
+        </card>
+        <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
+          <div class="flex-row">
+            <card class="flex-50" :class="{'hightlight-answer': answer.results === 0, 'wrong': answer.results !== 0 && choice === 0}" @click="checkMc(0)"><div slot="content"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.results === 1, 'wrong': answer.results !== 1 && choice === 1}" @click="checkMc(1)"><div slot="content"><span class="mc-choice-label">B</span>{{{details.choices[1]}}}</div></card>
+          </div>
+          <div class="flex-row">
+            <card class="flex-50" :class="{'hightlight-answer': answer.results === 2, 'wrong': answer.results !== 2 && choice === 2}" @click="checkMc(2)"><div slot="content"><span class="mc-choice-label">C</span>{{{details.choices[2]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.results === 3, 'wrong': answer.results !== 3 && choice === 3}" @click="checkMc(3)"><div slot="content"><span class="mc-choice-label">D</span>{{{details.choices[3]}}}</div></card>
+          </div>
         </div>
-      </card>
-      <div v-if="details.type === 'mc'" class="q-d-mc-wrapper">
-        <card class="half" :class="{'hightlight-answer': answer.mc === 0, 'wrong': answer.mc !== 0 && choice === 0}" @click="checkMc(0)"><div slot="in"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
-        <card class="half" :class="{'hightlight-answer': answer.mc === 1, 'wrong': answer.mc !== 1 && choice === 1}" @click="checkMc(1)"><div slot="in"><span class="mc-choice-label">B</span>{{{details.choices[1]}}}</div></card>
-        <card class="half" :class="{'hightlight-answer': answer.mc === 2, 'wrong': answer.mc !== 2 && choice === 2}" @click="checkMc(2)"><div slot="in"><span class="mc-choice-label">C</span>{{{details.choices[2]}}}</div></card>
-        <card class="half" :class="{'hightlight-answer': answer.mc === 3, 'wrong': answer.mc !== 3 && choice === 3}" @click="checkMc(3)"><div slot="in"><span class="mc-choice-label">D</span>{{{details.choices[3]}}}</div></card>
       </div>
+
     </div>
   </div>
 </template>
@@ -205,20 +206,18 @@ export default {
         let apiURL = '/api/manage-question/answer'
         this.$http.get(apiURL, data).then(function (response) {
           if (this.details.type === 'mc') {
-            this.answer.mc = response.data.mc
-          } else {
-            this.answer.long = response.data.long
+            this.answer.results = response.data.mc
           }
           this.answer.get = true
 
-          if (choice) {
+          if (choice !== null) {
             this.choice = choice
           }
         }, function (response) {
           console.log(response)
         })
       } else {
-        if (choice) {
+        if (choice !== null) {
           this.choice = choice
         }
       }
@@ -284,8 +283,7 @@ export default {
       answer: {
         buttonDisable: false,
         get: false,
-        mc: undefined,
-        long: undefined
+        results: undefined
       },
       subjects: Subject.subjects,
       edit: {

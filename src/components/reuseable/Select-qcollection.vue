@@ -21,7 +21,6 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, .5);
-  transition: opacity .3s ease;
 }
 
 #select-qcollection .modal-container {
@@ -31,7 +30,6 @@
   background-color: #fff;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-  transition: all .3s ease;
 }
 
 .modal-header {
@@ -64,16 +62,6 @@
 .modal-footer{
   padding-right: 20px;
   padding-bottom: 10px
-}
-
-.modal-enter, .modal-leave {
-  opacity: 0;
-}
-
-.modal-enter .modal-container,
-.modal-leave .modal-container {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
 }
 
 .list {
@@ -125,98 +113,97 @@
           </li>
         </ul>
         <div class="flex-column flex-center" style="margin:16px 0">
-          <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</md-button>
+          <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</template>
+  </template>
 
-<script>
-export default {
-  data () {
-    return {
-      spinnerActive: true,
-      myQcollections: [],
-      loadMore: false
-    }
-  },
-  props: ['show', 'qid'],
-  methods: {
-    closeModal: function () {
-      this.show = false
+  <script>
+  export default {
+    data () {
+      return {
+        spinnerActive: true,
+        myQcollections: [],
+        loadMore: false
+      }
     },
-    saveOneToCollection: function (qcollection_id) {
-      if (qcollection_id && this.qid) {
-        let data = {
-          qcollection_id: qcollection_id,
-          question_id: this.qid
+    props: ['show', 'qid'],
+    methods: {
+      closeModal: function () {
+        this.show = false
+      },
+      saveOneToCollection: function (qcollection_id) {
+        if (qcollection_id && this.qid) {
+          let data = {
+            qcollection_id: qcollection_id,
+            question_id: this.qid
+          }
+          this.$http.post('/api/manage-qcollection/add-question', data).then(function (response) {
+            this.show = false
+            this.$showToast('添加成功')
+          }, function (response) {
+            this.$showToast('失敗')
+            console.log(response)
+          })
+        } else {
+          this.$showToast('發生錯誤')
         }
-        this.$http.post('/api/manage-qcollection/add-question', data).then(function (response) {
-          this.show = false
-          this.showToast('添加成功')
-        }, function (response) {
-          this.showToast('失敗')
-          console.log(response)
-        })
-      } else {
-        this.showToast('發生錯誤')
-      }
-    },
-    getMyQcollectionLists: function () {
-      if (this.myQcollections.length === 0) {
-        this.$http.get('/api/manage-qcollection/mine').then(function (response) {
-          this.spinnerActive = false
-          if (response.data.length > 0) {
-            this.myQcollections = response.data
-            if (response.data.length < 12) {
-              this.loadMore = false
+      },
+      getMyQcollectionLists: function () {
+        if (this.myQcollections.length === 0) {
+          this.$http.get('/api/manage-qcollection/mine').then(function (response) {
+            this.spinnerActive = false
+            if (response.data.length > 0) {
+              this.myQcollections = response.data
+              if (response.data.length < 12) {
+                this.loadMore = false
+              } else {
+                this.loadMore = true
+              }
             } else {
-              this.loadMore = true
+              this.loadMore = false
             }
-          } else {
+          }, function (response) {
+            this.spinnerActive = false
             this.loadMore = false
-          }
-        }, function (response) {
-          this.spinnerActive = false
+            console.log(response)
+          })
+        }
+      },
+      nextPage: function () {
+        if (this.myQcollections.length > 0) {
           this.loadMore = false
-          console.log(response)
-        })
-      }
-    },
-    nextPage: function () {
-      if (this.myQcollections.length > 0) {
-        this.loadMore = false
-        let latest_id = this.myQcollections[this.myQcollections.length - 1]._id
-        console.log(latest_id)
-        let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
-        this.$http.get(apiURL).then(function (response) {
-          if (response.data.length > 0) {
-            for (var i = 0; i < response.data.length; i++) {
-              this.myQcollections.push(response.data[i])
-            }
-            if (response.data.length < 12) {
-              this.loadMore = false
+          let latest_id = this.myQcollections[this.myQcollections.length - 1]._id
+          console.log(latest_id)
+          let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
+          this.$http.get(apiURL).then(function (response) {
+            if (response.data.length > 0) {
+              for (var i = 0; i < response.data.length; i++) {
+                this.myQcollections.push(response.data[i])
+              }
+              if (response.data.length < 12) {
+                this.loadMore = false
+              } else {
+                this.loadMore = true
+              }
             } else {
-              this.loadMore = true
+              this.loadMore = false
             }
-          } else {
-            this.loadMore = false
-          }
-        }, function (response) {
-          this.loadMore = true
-          console.log(response)
-        })
+          }, function (response) {
+            this.loadMore = true
+            console.log(response)
+          })
+        }
       }
     },
-    showToast: function (message) {
-      this.$dispatch('show-toast', message)
-    }
-  },
-  events: {
-    'getMyQcollectionLists': function () {
-      this.getMyQcollectionLists()
+    watch: {
+      'show': function (val, oldVal) {
+        if (val === true && oldVal === false) {
+          this.getMyQcollectionLists()
+        }
+      }
     }
   }
-}
-</script>
+  </script>

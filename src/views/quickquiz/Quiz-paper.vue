@@ -110,14 +110,14 @@
   <div id="quiz-paper">
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mdl-button class="icon-left-button" raised primary @click="goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
+        <mdl-button class="icon-left-button" raised primary @click="$$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
         <mdl-button class="icon-left-button" raised accent @click="showAnswers()" style="margin-left:16px"><i class="material-icons" style="margin-right: 8px">visibility</i>顯示 / 隱藏答案</mdl-button>
       </div>
 
       <div class="second-wrapper">
         <div class="third-wrapper" v-if="quickquiz.title">
           <card>
-            <div slot="in" class="flex-column">
+            <div slot="content" class="flex-column" style="padding:16px">
               <span class="flex-row flex-center">
                 <span class="title">{{quickquiz.title}}</span>
                 <span class="time flex-row" style="margin-left:auto"><i class="material-icons">timer</i>{{quickquiz.time}}分鐘</span>
@@ -127,42 +127,68 @@
           </card>
           <div id="question-body">
             <card v-for="question in quickquiz.questions" track-by="_id" class="question">
-              <div slot="in" class="flex-column">
-                <span class="flex-row flex-baseline">
+              <div slot="content" class="flex-column" v-if="typeof question === 'object'">
+                <span class="flex-row flex-baseline" style="padding:16px">
                   <div class="flex-column flex-center">
                     <span class="index-label">{{$index + 1}}</span>
                     <span class="accuracy">%</span>
                   </div>
 
                   <span class="question-body">{{{question.context}}}</span>
-                  <mdl-button accent style="margin-left:auto" @click="showAnswer($index)" v-if="quickquiz.correctAnswers[$index]">
-                    <span v-show="correctAnswers[$index]">隱藏答案</span>
-                    <span v-else="!correctAnswers[$index]">顯示答案</span>
+                  <mdl-button accent style="margin-left:auto" @click="showAnswer($index)" v-if="quickquiz.correctAnswers[$index] !== null">
+                    <span v-show="correctAnswers[$index] !== null">隱藏答案</span>
+                    <span v-else="correctAnswers[$index] === null">顯示答案</span>
                   </mdl-button>
+
+                  <mdl-button :id="menu-$index" icon>
+                    <i class="material-icons">more_vert</i>
+                  </mdl-button>
+                  <mdl-menu :for="menu-$index">
+                    <mdl-menu-item>Option 1</mdl-menu-item>
+                    <mdl-menu-item disabled="disabled">Disabled Action</mdl-menu-item>
+                    <mdl-menu-item>Other Action</mdl-menu-item>
+                  </mdl-menu>
                 </span>
-              </div>
-              <div slot="out-below" class="choices flex-column" style="width: 100%">
-                <div class="flex-row">
-                  <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0)}" @click="answerOnChoose($index, 0)">
-                    <span class="choice-label">A</span>
-                    <div>{{{question.choices[0]}}}</div>
+
+                <div class="choices flex-column" style="width: 100%">
+                  <div class="flex-row">
+                    <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0)}" @click="answerOnChoose($index, 0)">
+                      <span class="choice-label">A</span>
+                      <div>{{{question.choices[0]}}}</div>
+                    </div>
+                    <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1)}" @click="answerOnChoose($index, 1)">
+                      <span class="choice-label">B</span>
+                      <div>{{{question.choices[1]}}}</div>
+                    </div>
                   </div>
-                  <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1)}" @click="answerOnChoose($index, 1)">
-                    <span class="choice-label">B</span>
-                    <div>{{{question.choices[1]}}}</div>
+                  <div class="flex-row">
+                    <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2)}" @click="answerOnChoose($index, 2)">
+                      <span class="choice-label">C</span>
+                      <div>{{{question.choices[2]}}}</div>
+                    </div>
+                    <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3)}" @click="answerOnChoose($index, 3)">
+                      <span class="choice-label">D</span>
+                      <div>{{{question.choices[3]}}}</div>
+                    </div>
                   </div>
                 </div>
-                <div class="flex-row">
-                  <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2)}" @click="answerOnChoose($index, 2)">
-                    <span class="choice-label">C</span>
-                    <div>{{{question.choices[2]}}}</div>
-                  </div>
-                  <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3)}" @click="answerOnChoose($index, 3)">
-                    <span class="choice-label">D</span>
-                    <div>{{{question.choices[3]}}}</div>
-                  </div>
-                </div>
+
               </div>
+              <div slot="content" class="flex-column" v-else>
+                <span class="flex-row flex-baseline" style="padding:16px; color:#9E9E9E">
+                  <div class="flex-column flex-center">
+                    <span class="index-label">{{$index + 1}}</span>
+                  </div>
+
+                  <span class="question-body">
+                    <p>
+                      該題已從題庫中移除
+                    </p>
+                  </span>
+                </span>
+
+              </div>
+
             </card>
           </div>
         </div>
@@ -198,9 +224,6 @@ export default {
       }, function (response) {
         console.log(response.data)
       })
-    },
-    goBack: function () {
-      window.history.back()
     },
     renderQuestions: function () {
       setTimeout(function renderQuestions () {
@@ -246,8 +269,8 @@ export default {
       return this.checkWrong(index) && this.checkChoose(index, choose)
     },
     showAnswer: function (index) {
-      if (this.quickquiz.correctAnswers[index]) {
-        if (this.correctAnswers[index]) {
+      if (this.quickquiz.correctAnswers[index] !== null) {
+        if (this.correctAnswers[index] !== null) {
           this.correctAnswers.$set(index, null)
         } else {
           this.correctAnswers.$set(index, this.quickquiz.correctAnswers[index])
@@ -266,9 +289,6 @@ export default {
         }
       }
     }
-  },
-  filters: {
-
   },
   data () {
     return {

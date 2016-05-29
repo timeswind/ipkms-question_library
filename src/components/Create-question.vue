@@ -79,7 +79,7 @@
         <div class="flex-row flex-center">
           <span>類型：</span>
           <mdl-radio :checked.sync="newQuestion.type" value="mc" style="margin-right: 8px">多項選擇</mdl-radio>
-          <mdl-radio :checked.sync="newQuestion.type" value="long">長題目</mdl-radio>
+          <mdl-radio :checked.sync="newQuestion.type" value="reading">閱讀題</mdl-radio>
         </div>
         <div class="flex-row" style="position:relative;top:-10px">
           <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
@@ -188,7 +188,7 @@ export default {
         this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
 
         this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
-          this.showToast('發佈成功')
+          this.$showToast('發佈成功')
           this.publishButton.disabled = false
           this.newQuestion.context = ''
           this.newQuestion.choices = ['', '', '', '']
@@ -205,13 +205,13 @@ export default {
           }
           this.$broadcast('clear-editor')
         }, function (response) {
-          this.showToast('發佈失敗')
+          this.$showToast('發佈失敗')
           this.publishButton.disabled = false
           console.log(response)
         })
       } else {
         this.publishButton.disabled = false
-        this.showToast('信息不完整')
+        this.$showToast('信息不完整')
       }
     },
     checkComplete: function () {
@@ -236,7 +236,7 @@ export default {
       this.newQuestion.tags.splice(index, 1)
     },
     showToast: function (message) {
-      this.$dispatch('show-toast', message)
+      store.dispatch('showToast', message)
     },
     renderQuestionPreview: function () {
       window.document.getElementById('question-preview-container').innerHTML = renderQuill(this.editorPreview.question.ops)
