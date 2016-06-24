@@ -169,6 +169,8 @@ export default {
       }
     },
     startQuickQuiz: function () {
+      var self = this
+
       if (this.formCompletion) {
         this.submitButton = false
         let data = {
@@ -187,15 +189,10 @@ export default {
           this.queryQcollection.button = true
           this.queryQcollection.fail = false
 
-          let qrcodeData = {
-            type: 'quickquiz',
-            id: response.data
-          }
-
-          var self = this
+          let qrcodeData = 'quickquiz' + ':' + response.data
 
           var qrcodedraw = new qrcode.QRCodeDraw()
-          qrcodedraw.draw(document.getElementById('qrcode-canvas'), JSON.stringify(qrcodeData), {scale: 10}, function (error, canvas) {
+          qrcodedraw.draw(document.getElementById('qrcode-canvas'), qrcodeData, {scale: 10}, function (error, canvas) {
             if (error) {
               return console.log('Error =( ', error)
             } else {

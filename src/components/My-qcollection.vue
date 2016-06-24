@@ -34,6 +34,8 @@
             </option>
           </select>
         </div>
+        <mdl-textfield floating-label="描述" textarea rows="4" :value.sync="newQcollection.description"></mdl-textfield>
+
         <div class="block" style="padding:20px 0">
           <mdl-checkbox :checked.sync="newQcollection.public">公開</mdl-checkbox>
         </div>
@@ -45,21 +47,20 @@
         </mdl-button>
       </div>
     </div>
-    <div id="secondary-panel">
-      <div class="flex">
+    <div v-show="!showCreatSheet" style="padding: 16px 16px 0 16px">
+      <div class="flex-row">
         <div>
           <mdl-button primary raised @click="showCreatSheet = true">
             創建新題集
           </mdl-button>
         </div>
         <div style="position: relative;top: 6px;left: 10px;">
-          <mdl-switch :checked.sync="onlyShowPrivate">只顯示私有題集</mdl-switch>
-
+          <mdl-switch :checked.sync="options.private">只顯示私有題集</mdl-switch>
         </div>
       </div>
     </div>
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in myQcollections" track-by="_id" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in qcollections" track-by="_id" v-show="!(options.private && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-public">{{qc.public | bTp}}</span>
@@ -90,7 +91,7 @@ export default {
     getMyQcollections: function () {
       this.$http.get('/api/manage-qcollection/mine').then(function (response) {
         if (response.data.length > 0) {
-          this.myQcollections = response.data
+          this.qcollections = response.data
           if (response.data.length < 12) {
             this.loadMore = false
           }
@@ -113,15 +114,15 @@ export default {
       }
     },
     nextPage: function () {
-      if (this.myQcollections.length > 0) {
+      if (this.qcollections.length > 0) {
         this.loadMore = false
-        let latest_id = this.myQcollections[this.myQcollections.length - 1]._id
+        let latest_id = this.qcollections[this.qcollections.length - 1]._id
         console.log(latest_id)
         let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
             for (var i = 0; i < response.data.length; i++) {
-              this.myQcollections.push(response.data[i])
+              this.qcollections.push(response.data[i])
             }
             if (response.data.length < 12) {
               this.loadMore = false
@@ -140,12 +141,15 @@ export default {
   },
   data () {
     return {
-      onlyShowPrivate: false,
-      myQcollections: [],
+      options: {
+        private: false
+      },
+      qcollections: [],
       showCreatSheet: false,
       newQcollection: {
         name: '',
         subject: 'math',
+        description: '',
         public: true
       },
       subjects: Subject.subjects,

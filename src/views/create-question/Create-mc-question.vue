@@ -1,8 +1,4 @@
 <style>
-#create-mc-question .newquestion-difficulty-box {
-  padding: 10px 0
-}
-
 #create-mc-question .newquestion-difficulty-box i {
   width: 24px;
   color: #aaa;
@@ -15,7 +11,7 @@
 
 #create-mc-question .q-tag {
   color: #E91E63;
-  margin: 0 5px;
+  margin:8px 4px 0 0;
   padding: 2px 4px;
   border: 1px solid #e91e63;
   cursor: pointer;
@@ -88,36 +84,6 @@
 </style>
 <template>
   <div id="create-mc-question">
-    <sheet-pannel :sheetshow="true">
-      <div slot="sheet-zone">
-        <div class="flex-column">
-          <div class="flex-row flex-center">
-            <span>科目：</span>
-            <select v-model="newQuestion.subject">
-              <option v-for="subject in subjects" v-bind:value="subject.id">
-                {{ subject.name }}
-              </option>
-            </select>
-          </div>
-          <div class="newquestion-difficulty-box flex-row flex-center">
-            <span>難度：</span>
-            <span class="flex-row">
-              <i v-for="1 in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
-            </span>
-          </div>
-          <div class="flex-column" style="position:relative;top:-16px">
-            <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
-              <span>標籤：</span>
-              <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
-            </div>
-            <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
-          </div>
-
-        </div>
-
-
-      </div>
-    </sheet-pannel>
     <mdl-button primary raised class="float-button" style="bottom: 80px" @click="questionInbox.show = true" v-bind:disabled="publishButton.disabled">
       <i class="material-icons">inbox</i> {{questionInbox.questions.length}}
     </mdl-button>
@@ -125,6 +91,42 @@
       發佈
     </mdl-button>
     <div class="body-wrapper">
+      <card>
+        <div slot="content" style="padding: 16px 16px 0 16px">
+          <div class="flex-column">
+            <div class="flex-row">
+              <div class="flex-column flex-50">
+                <span class="field-title">科目</span>
+                <select v-model="newQuestion.subject">
+                  <option v-for="subject in subjects" v-bind:value="subject.id">
+                    {{ subject.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="newquestion-difficulty-box flex-column flex-50">
+                <span class="field-title" style="margin-bottom:4px">難度</span>
+                <span class="flex-row">
+                  <i v-for="1 in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+                </span>
+              </div>
+            </div>
+
+
+            <div class="flex-column">
+              <div style="padding-top: 25px;margin-right: 10px;">
+                <span class="field-title">標籤</span>
+              </div>
+              <div class="flex-row flex-center flex-wrap">
+                <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
+              </div>
+              <div style="position: relative;top: -12px">
+                <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </card>
       <h5 style="margin-left:4px">編輯題目</h5>
       <div class="flex-row">
 
@@ -211,7 +213,6 @@
 <script>
 import renderQuill from 'quill-render'
 import Subject from '../../modules/Subjects'
-import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
 import Card from '../../components/reuseable/Card'
 
 import 'quill/dist/quill.snow.css'
@@ -222,8 +223,7 @@ var delayTimer
 export default {
   components: {
     Subject,
-    Card,
-    sheetPannel
+    Card
   },
   methods: {
     publishQuestion: function () {

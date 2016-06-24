@@ -148,13 +148,10 @@ export default {
       })
     },
     generateLatestQuickQuizQrcode: function (quickquiz_id) {
-      let qrcodeData = {
-        type: 'quickquiz',
-        id: quickquiz_id
-      }
+      let qrcodeData = 'quickquiz' + ':' + quickquiz_id
 
       var qrcodedraw = new qrcode.QRCodeDraw()
-      qrcodedraw.draw(document.getElementById('qrcode-canvas'), JSON.stringify(qrcodeData), {scale: 10}, function (error, canvas) {
+      qrcodedraw.draw(document.getElementById('qrcode-canvas'), qrcodeData, {scale: 10}, function (error, canvas) {
         if (error) {
           return console.log('Error =( ', error)
         }

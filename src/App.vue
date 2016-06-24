@@ -50,7 +50,7 @@
     margin-bottom: 8px;">登入信息过期</span>
     <h4 class="display-1" style="margin-top:0">重新登入</h4>
     <mdl-textfield floating-label="郵箱" :value.sync="reLogin.email" type="email"></mdl-textfield>
-    <mdl-textfield floating-label="密碼" :value.sync="reLogin.password" type="password"></mdl-textfield>
+    <mdl-textfield floating-label="密碼" :value.sync="reLogin.password" type="password" @keyup.enter="login()"></mdl-textfield>
     <span style="color: #F44336;text-align: center;">{{reLogin.warn}}</span>
     <mdl-button raised primary @click="login()" style="margin-top:16px">登入</mdl-button>
   </div>

@@ -1,97 +1,149 @@
 <template>
   <div id="qcollection-detail">
-    <sheet-pannel :sheetshow.sync="sheetshow">
-      <div slot="sheet-title">
-        <h4 style="margin:0;margin-right:10px">{{details.name}}</h4>
-      </div>
-      <div slot="sheet-button">
-        <mdl-button primary raised v-on:click="showSheetZone()" class="sheet-button" v-show="!sheetshow">
-          修改题集信息
-        </mdl-button>
-        <mdl-button accent v-on:click="deleteCollection()" class="sheet-button" v-show="sheetshow">
-          刪除題集
-        </mdl-button>
-      </div>
-      <div slot="sheet-zone">
-        <div class="block">
-          <mdl-textfield :value.sync="details.name">{{details.name}}</mdl-textfield>
-        </div>
-        <div class="block">
-          科目：
-          <select v-model="details.subject">
-            <option v-for="subject in subjects" v-bind:value="subject.id">
-              {{ subject.name }}
-            </option>
-          </select>
-        </div>
-        <div class="block" style="padding:20px 0">
-          <mdl-switch :checked.sync="details.public">公開</mdl-switch>
-        </div>
-        <mdl-button accent raised @click="updateQcollectionInfo()">
-          修改
-        </mdl-button>
-        <mdl-button @click="sheetshow = false">
-          關閉
-        </mdl-button>
-      </div>
-    </sheet-pannel>
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
-    <p class="qc-d-average-difficulty">平均難度：{{averageDifficulty}}</p>
-    <div class="mdl-grid" id="questions-preview-container">
-      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in details.questions">
-        <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
-          <span class="q-subject">{{q.subject | subject}}</span>
-          <span class="q-type">{{q.type}}</span>
-          <div class="q-difficulty">
-            <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
+    <card style="margin: 16px auto 0 auto;max-width: 600px">
+      <div slot="content" style="padding: 16px" class="flex-column">
+        <div class="flex-row flex-center" style="padding-bottom: 8px; border-bottom: 1px solid #eee">
+          <span style="font-size: 20px">題集信息</span>
+          <div v-show="!editMode">
+            <mdl-button primary style="margin-left: 8px" @click="editMode = true">修改</mdl-button>
           </div>
-          <p class="q-context">{{{q.context}}}</p>
-          <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
+          <div v-else>
+            <mdl-button accent style="margin-left: 8px" @click="updateQcollectionInfo()">提交</mdl-button>
+            <mdl-button primary style="margin-left: 8px" @click="editMode = false">取消</mdl-button>
+          </div>
         </div>
-        <div class="question-tools">
-          <mdl-button v-on:click="showCollectionModal(q._id)"><i class="material-icons">add</i>加入其他題集</mdl-button>
-          <mdl-button v-on:click="removeOneQuestion(q._id, $index)"><i class="material-icons">close</i>移除</mdl-button>
+        <div class="flex-column" v-show="!editMode" style="margin-top: 16px">
+          <div class="flex-row">
+            <div class="flex-column flex-50">
+              <span class="field-title">題集名字</span>
+              <span class="field-content">{{qcinfo.name}}</span>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">科目</span>
+              <span class="field-content">{{qcinfo.subject | subject}}</span>
+            </div>
+          </div>
+          <div class="flex-row" style="margin-top: 16px">
+            <div class="flex-column flex-50">
+              <span class="field-title">是否公開</span>
+              <span class="field-content">{{qcinfo.public}}</span>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">平均難度</span>
+              <span class="field-content">{{averageDifficulty}}</span>
+            </div>
+          </div>
+          <div class="flex-column" style="margin-top: 16px">
+            <span class="field-title">描述</span>
+            <span class="field-content">{{qcinfo.description}}</span>
+          </div>
         </div>
+
+        <div class="flex-column" v-else style="margin-top: 16px">
+          <div class="flex-row">
+            <div class="flex-column flex-50">
+              <span class="field-title">題集名字</span>
+              <mdl-textfield :value.sync="qcinfo.name" style="position: relative;top: -13px;width: 90%;">{{qcinfo.name}}</mdl-textfield>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">科目</span>
+              <select v-model="qcinfo.subject">
+                <option v-for="subject in subjects" v-bind:value="subject.id">
+                  {{ subject.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="flex-row" style="margin-top: -16px">
+            <div class="flex-column flex-50">
+              <span class="field-title">描述</span>
+              <mdl-textfield label="" textarea rows="2" :value.sync="qcinfo.description" style="position: relative;top: -13px;width: 90%"></mdl-textfield>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">公開</span>
+              <mdl-switch :checked.sync="qcinfo.public"></mdl-switch>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </card>
+
+    <div class="mdl-grid" id="questions-preview-container">
+      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in questions">
+        <div v-if="typeof q === 'object'">
+          <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
+            <span class="q-subject">{{q.subject | subject}}</span>
+            <span class="q-type">{{q.type}}</span>
+            <div class="q-difficulty">
+              <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
+            </div>
+            <p class="q-context">{{{q.context}}}</p>
+            <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
+          </div>
+          <div class="question-tools">
+            <mdl-button v-on:click="showCollectionModal(q._id)"><i class="material-icons">add</i>加入其他題集</mdl-button>
+            <mdl-button v-on:click="removeOneQuestion(q._id, $index)"><i class="material-icons">close</i>移除</mdl-button>
+          </div>
+        </div>
+        <div class="flex-column" v-else>
+          <span style="color:#999999;font-size: 18px;padding: 16px">該題已從題庫中移除</span>
+          <div class="question-tools">
+            <mdl-button v-on:click="removeOneQuestion(q, $index)"><i class="material-icons">delete_forever</i>删除</mdl-button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
 import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Subject from '../modules/Subjects'
+import Card from './reuseable/Card.vue'
 
 export default {
   ready: function () {
-    this.getQuestions()
+    this.getQcollection()
   },
   components: {
     Subject,
     qcollectionSelectorModal,
-    sheetPannel
+    sheetPannel,
+    Card
   },
   methods: {
     deleteCollection: function () {
       let comfirmDelete = window.confirm('你確定要刪除這個題集？')
       if (comfirmDelete) {
         let data = {
-          qcollection_id: this.details._id
+          qcollection_id: this.qcinfo._id
         }
-        var apiURL = '/api/manage-qcollection/delete/single'
+        var apiURL = '/api/manage-qcollection/qcollection'
         this.$http.delete(apiURL, data).then(function (response) {
+          this.$showToast('操作成功')
           this.$router.go({ name: 'my-qcollection' })
         }, function (response) {
           console.log('fail to delete this qcollection')
         })
       }
     },
-    getQuestions: function () {
+    getQcollection: function () {
       let qcollection_id = this.$route.params.qcollection_id
-      let apiURL = '/api/manage-qcollection/detail/' + qcollection_id
+      let apiURL = '/api/manage-qcollection/qcollection' + '?id=' + qcollection_id
       this.$http.get(apiURL).then(function (response) {
-        this.details = response.data
-        this.averageDifficulty = this.calculateAverageDifficulty()
+        this.questions = response.data.questions
+        delete response.data.questions
+        this.qcinfo = response.data
+        if (!_.has(response.data, 'description')) {
+          this.qcinfo['description'] = ''
+        }
+        this.averageDifficulty = this.calculateAveDifficulty()
         this.renderQuestions()
       }, function (response) {
         console.log(response)
@@ -121,12 +173,13 @@ export default {
       let comfirmDelete = window.confirm('你確定要從題集里移除這個題目？')
       if (comfirmDelete) {
         let data = {
-          qcollection_id: this.details._id,
+          qcollection_id: this.qcinfo._id,
           question_id: question_id
         }
-        let apiURL = '/api/manage-qcollection/remove-question'
+        let apiURL = '/api/manage-qcollection/qcollection/question'
         this.$http.delete(apiURL, data).then(function (response) {
-          this.details.questions.splice(index, 1)
+          this.questions.splice(index, 1)
+          this.$showToast('操作成功')
         }, function (response) {
           console.log('fail to remove this question')
         })
@@ -134,22 +187,23 @@ export default {
     },
     updateQcollectionInfo: function () {
       let data = {
-        qcollection_id: this.details._id,
-        name: this.details.name,
-        subject: this.details.subject,
-        public: this.details.public
+        qcollection_id: this.qcinfo._id,
+        name: this.qcinfo.name,
+        subject: this.qcinfo.subject,
+        public: this.qcinfo.public,
+        description: this.qcinfo.description
       }
 
       let apiURL = '/api/manage-qcollection/update-info'
       this.$http.put(apiURL, data).then(function (response) {
-        this.sheetshow = false
+        this.editMode = false
       }, function (response) {
         console.log('fail to update this qcollection')
       })
     },
     updateDifficulty: function (newDifficulty) {
       let data = {
-        qcollection_id: this.details._id,
+        qcollection_id: this.qcinfo._id,
         aveDifficulty: newDifficulty
       }
 
@@ -160,24 +214,24 @@ export default {
         console.log('fail to update this qcollection')
       })
     },
-    calculateAverageDifficulty: function () {
+    calculateAveDifficulty: function () {
       var sum = 0
       var result = 0
-      if (this.details.questions.length !== 0) {
-        for (var q of this.details.questions) {
-          // truncate the sequence at 1000
-
-          if (!isNaN(q.difficulty)) {
-            sum += q.difficulty
+      if (this.questions.length !== 0) {
+        var question_count = 0
+        for (var q of this.questions) {
+          if (_.isObject(q)) {
+            question_count++
+            if (!isNaN(q.difficulty)) {
+              sum += q.difficulty
+            }
           }
         }
-        result = sum / this.details.questions.length
 
-        result = Math.round(result * 1e2) / 1e2
-
-        console.log(result)
-        if (this.details.aveDifficulty) {
-          if (this.details.aveDifficulty !== result) {
+        result = sum / question_count
+        result = Math.round(result * 1e2) / 1e2 // 精确到2位小数
+        if (this.qcinfo.aveDifficulty) {
+          if (this.qcinfo.aveDifficulty !== result) {
             this.updateDifficulty(result)
           }
         } else {
@@ -195,13 +249,15 @@ export default {
   data () {
     return {
       sheetshow: false,
+      editMode: false,
       CollectionModal: {
         show: false,
         qid: undefined
       },
-      details: {
+      qcinfo: {
         public: false
       },
+      questions: [],
       averageDifficulty: 0,
       subjects: Subject.subjects
     }

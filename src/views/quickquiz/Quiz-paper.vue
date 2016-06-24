@@ -57,10 +57,9 @@
 }
 
 #quiz-paper .accuracy {
+  cursor: pointer;
   margin-top: 4px;
   color: #FF9800;
-  padding: 0 4px;
-  border: 1px solid;
 }
 
 #quiz-paper .choices {
@@ -105,49 +104,208 @@
 #quiz-paper .choice-label {
   padding-right: 16px;
 }
+
+#quiz-paper .question-checkbox {
+  width: 20%
+}
+
+#quiz-paper .overlay {
+  background: #fff;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  top: 0;
+  left: 100px;
+  position: absolute;
+  padding: 0;
+  transition: all .5s;
+  z-index: -1;
+}
+#quiz-paper .card {
+  position: relative;
+}
+#quiz-paper .overlay_show {
+  opacity: 1;
+  left: 0;
+  z-index: 2
+}
+#quiz-paper .rightPeople_header {
+  font-size: 18px;
+  color: #009688;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #009688;
+  margin-bottom: 4px;
+}
+#quiz-paper .wrongPeople_header {
+  font-size: 18px;
+  color: #F44336;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #F44336;
+  margin-bottom: 4px;
+}
+
+#quiz-paper .obserMode_flag {
+  position: fixed;
+  top: 63px;
+  right: 32px;
+  z-index: 2;
+  box-shadow: 1px 1px 3px #aaa;
+  padding: 16px;
+  background-color: #FF9800;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
 </style>
 <template>
   <div id="quiz-paper">
+    <div class="flex-column" v-show="modalShow">
+      question analysis model
+    </div>
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mdl-button class="icon-left-button" raised primary @click="$$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
-        <mdl-button class="icon-left-button" raised accent @click="showAnswers()" style="margin-left:16px"><i class="material-icons" style="margin-right: 8px">visibility</i>顯示 / 隱藏答案</mdl-button>
+        <mdl-button class="icon-left-button" raised primary @click="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
+        <mdl-button class="icon-left-button" raised accent v-show="!sampleMode" @click="showAnswers()" style="margin-left:16px;">
+          <i class="material-icons" style="margin-right: 8px">visibility</i>
+          <span>顯示 / 隱藏答案</span>
+        </mdl-button>
+      </div>
+
+      <div v-if="observeMode" class="obserMode_flag flex-column flex-center">
+        <span style="font-size:18px;color:#FFFFFF" class="flex-row flex-center">
+          <i class="material-icons">visibility</i>
+          <span>&nbsp;觀察模式</span>
+        </span>
       </div>
 
       <div class="second-wrapper">
-        <div class="third-wrapper" v-if="quickquiz.title">
+        <div class="third-wrapper">
+          <card v-if="sampleMode && !quickquiz.finished">
+            <div slot="content" class="flex-column" style="padding:16px;text-align:center;font-size: 16px;color: #FF9800;">
+              測驗尚未結束，未統計數據
+            </div>
+          </card>
           <card>
-            <div slot="content" class="flex-column" style="padding:16px">
+            <div slot="content" class="flex-column" style="padding:16px" v-if="quickquiz.title">
               <span class="flex-row flex-center">
+                <span v-show="sampleMode" style="font-size:16px;padding: 4px 8px;margin-right:8px;background:#2196F3;color:#fff">答卷</span>
                 <span class="title">{{quickquiz.title}}</span>
                 <span class="time flex-row" style="margin-left:auto"><i class="material-icons">timer</i>{{quickquiz.time}}分鐘</span>
               </span>
               <span class="author">出卷人: {{quickquiz.createdBy.name}}</span>
+              <div v-if="sampleMode && quizsample.student" style=" border-top:1px solid #ddd;margin-top:16px;padding-top: 16px">
+                <span class="flex-row flex-center">
+                  <span class="flex-column" style="margin-right: 16px">
+                    <span class="field-title">姓名</span>
+                    <span class="field-content">{{quizsample.student.name}}</span>
+                  </span>
+                  <span class="flex-column" style="margin-right: 32px">
+                    <span class="field-title">學號</span>
+                    <span class="field-content">{{quizsample.student.schoolId}}</span>
+                  </span>
+                  <span class="flex-row" style="margin-left: auto" v-if="!observeMode">
+                    <span class="flex-column" style="margin-right: 32px">
+                      <span class="field-title">正確題數</span>
+                      <span class="field-content">{{getQuizScore()}}</span>
+                    </span>
+                    <span class="flex-column" style="margin-right: 32px">
+                      <span class="field-title">分數(100)</span>
+                      <span class="field-content">{{getQuizScore('percentage')}}</span>
+                    </span>
+                  </span>
+                </span>
+                <span class="flex-row flex-center" style="margin-top: 16px;padding-top:16px; border-top:1px solid #ddd">
+                  <span class="flex-column flex-33">
+                    <span class="field-title">开始于</span>
+                    <span class="field-content">{{quizsample.startTime | calendar}}</span>
+                  </span>
+                  <span class="flex-column flex-33" v-if="!observeMode">
+                    <span class="field-title">完成于</span>
+                    <span class="field-content">{{quizsample.finishTime | calendar}}</span>
+                  </span>
+                  <span class="flex-column flex-33" v-if="!observeMode">
+                    <span class="field-title">用時</span>
+                    <span class="field-content">{{timeDifference(quizsample.startTime, quizsample.finishTime)}}</span>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </card>
+
+          <card v-if="sampleMode && !observeMode && quizsample.finishTime">
+            <div slot="content" class="flex-row flex-wrap" style="padding:16px">
+              <div class="flex-row question-checkbox flex-center" v-for="i in quickquiz.questions.length">
+                <span style="margin-right: 8px; font-weight:bold; font-size: 16px">{{$index + 1}}.</span>
+
+                <span v-if="checks[$index] == null" style="color:#FFC107;cursor:pointer" id="{{'qchecks_' + $index}}"><i class="material-icons">report_problem</i></span>
+                <div class="flex-row flex-center" v-else>
+                  <span v-if="checks[$index] === true" style="color:#009688"><i class="material-icons">check_box</i></span>
+                  <span v-if="checks[$index] === false" style="color:#F44336"><i class="material-icons">cancel</i></span>
+                  <span style="margin-left: 8px; color: #009688;">{{accuracy[$index]}}</span>
+                </div>
+                <mdl-tooltip :for="'qchecks_' + $index" large class="flex-column">
+                  題目被刪除或者缺少答案
+                </mdl-tooltip>
+              </div>
+
             </div>
           </card>
           <div id="question-body">
-            <card v-for="question in quickquiz.questions" track-by="_id" class="question">
+            <card v-for="question in quickquiz.questions" track-by="_id" class="question" id="{{'question_' + $index}}">
               <div slot="content" class="flex-column" v-if="typeof question === 'object'">
+                <div class="overlay flex-column" :class="{'overlay_show': overlay.on === $index}">
+                  <div class="flex-row" style="justify-content: flex-end">
+                    <mdl-button icon @click="hideOverlay()">
+                      <i class="material-icons">close</i>
+                    </mdl-button>
+                  </div>
+                  <div v-show="overlay.type === 0">
+                    <div class="flex-row">
+                      <div class="flex-50 flex-column" style="padding: 0 16px 16px 16px">
+                        <span class="rightPeople_header">正確 {{accuracy[$index]}}</span>
+                        <p>{{question.rightPeople}}</p>
+                      </div>
+                      <div class="flex-50 flex-column" style="padding: 0 16px 16px 16px">
+                        <span class="wrongPeople_header">錯誤</span>
+                        <p>{{question.wrongPeople}}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <canvas id="{{'qaChart_' + $index}}"></canvas>
+                  </div>
+
+                </div>
                 <span class="flex-row flex-baseline" style="padding:16px">
                   <div class="flex-column flex-center">
                     <span class="index-label">{{$index + 1}}</span>
-                    <span class="accuracy">%</span>
+                    <span class="accuracy" id="{{'analysis_' + $index}}" @click="showOverlay($index, 1)">{{accuracy[$index]}}</span>
+                    <mdl-tooltip :for="'analysis_' + $index" large class="flex-column">
+                      <div class="flex-row" style="margin-bottom:8px">
+                        <span style="margin-right:4px">正確: {{quickquiz.analysis.questions[$index][0]}}</span>
+                        <span>錯誤: {{quickquiz.analysis.questions[$index][1]}}</span>
+                      </div>
+                      <div class="flex-row">
+                        <span style="margin-right:4px">留空: {{quickquiz.analysis.questions[$index][2]}}</span>
+                        <span>例外: {{quickquiz.analysis.questions[$index][3]}}</span>
+                      </div>
+                    </mdl-tooltip>
                   </div>
 
                   <span class="question-body">{{{question.context}}}</span>
-                  <mdl-button accent style="margin-left:auto" @click="showAnswer($index)" v-if="quickquiz.correctAnswers[$index] !== null">
-                    <span v-show="correctAnswers[$index] !== null">隱藏答案</span>
-                    <span v-else="correctAnswers[$index] === null">顯示答案</span>
-                  </mdl-button>
-
-                  <mdl-button :id="menu-$index" icon>
-                    <i class="material-icons">more_vert</i>
-                  </mdl-button>
-                  <mdl-menu :for="menu-$index">
-                    <mdl-menu-item>Option 1</mdl-menu-item>
-                    <mdl-menu-item disabled="disabled">Disabled Action</mdl-menu-item>
-                    <mdl-menu-item>Other Action</mdl-menu-item>
-                  </mdl-menu>
+                  <div class="flex-row" style="margin-left:auto;flex-shrink: 0" v-if="quickquiz.finished">
+                    <mdl-button accent @click="showAnswer($index)" v-show="quickquiz.correctAnswers[$index] !== null && !sampleMode">
+                      <span v-show="typeof correctAnswers[$index] === 'number'">隱藏答案</span>
+                      <span v-else="correctAnswers[$index] === undefined || correctAnswers[$index] === null">顯示答案</span>
+                    </mdl-button>
+                    <mdl-button id="{{'menu_' + $index}}" icon>
+                      <i class="material-icons">more_vert</i>
+                    </mdl-button>
+                    <mdl-menu :for="'menu_' + $index">
+                      <mdl-menu-item @click="showOverlay($index, 1)">數據分析</mdl-menu-item>
+                      <mdl-menu-item @click="showOverlay($index, 0)">學生表現</mdl-menu-item>
+                      <mdl-menu-item v-link="{ name: 'question-detail', params: { question_id: question._id }}">修正題目</mdl-menu-item>
+                    </mdl-menu>
+                  </div>
                 </span>
 
                 <div class="choices flex-column" style="width: 100%">
@@ -199,12 +357,27 @@
 </template>
 
 <script>
+import _ from 'lodash'
+import Chart from 'chart.js'
 import Card from '../../components/reuseable/Card'
+import store from '../../vuex/store'
+import { setQuickquizStudents, setQuickquizID } from '../../vuex/actions'
+import { getQuickquizID, getQuickquizStudents } from '../../vuex/getters'
+import { zipSampleToStudent } from '../../modules/quickquiz'
+import io from 'socket.io-client'
+
+var qaChart = null
+var socket = null
 export default {
   attached: function () {
     if (this.$route.params.quickquiz_id) {
+      let id = this.$route.params.quickquiz_id
       this.validateURL = true
-      this.getQuickquizQuestions(this.$route.params.quickquiz_id)
+      if (id === this.getQuickquizID) {
+        this.getQuickquizQuestions(id)
+      } else {
+        this.fetchExtraData(id)
+      }
     }
   },
   components: {
@@ -214,19 +387,85 @@ export default {
     getQuickquizQuestions: function (id) {
       var apiURL = '/api/manage-quickquiz/quickquiz' + '?id=' + id
       this.$http.get(apiURL).then(function (response) {
-        console.log(response.data)
         this.quickquiz = response.data
-        for (var i = 0; i < response.data.questions.length; i++) {
-          this.correctAnswers.push(null)
-          this.answers.push(null)
+        if (this.quickquiz.finished) {
+          this.quickquiz.questions = this.analysisSingleQuestionPerformance(this.quickquiz.questions, this.getQuickquizStudents)
+        }
+        if (this.$route.params.quizsample_id !== '0') {
+          this.getSampleDetail(this.$route.params.quizsample_id)
+        } else {
+          this.sampleMode = false
+          this.correctAnswers = _.times(response.data.questions.length, _.constant(null))
+          this.answers = _.times(response.data.questions.length, _.constant(null))
         }
         this.renderQuestions()
+        this.computeAccuracy()
       }, function (response) {
         console.log(response.data)
       })
     },
+    fetchExtraData: function (id) {
+      console.log('fetch missing data')
+      let apiURL = '/api/manage-quickquiz/teacher/quickquiz/' + '?id=' + id
+      this.$http.get(apiURL).then(function (response) {
+        let samples = _.get(response.data, 'samples', [])
+        var students = _.get(response.data, 'students', [])
+        students = zipSampleToStudent(samples, students)
+        this.setQuickquizID(id)
+        this.setQuickquizStudents(students)
+        this.getQuickquizQuestions(id)
+      })
+    },
+    getSampleDetail: function (id) {
+      var self = this
+      var apiURL = '/api/manage-quickquiz/teacher/quizsample' + '?id=' + id
+      this.$http.get(apiURL).then(function (response) {
+        console.log('receiving sample detail')
+        if (_.get(response.data, 'finishTime', false)) {
+          this.answers = response.data.answers
+          this.rights = response.data.results.right
+          this.wrongs = response.data.results.wrong
+          this.blanks = response.data.results.blank
+          delete response.data.answers
+          this.quizsample = response.data
+          this.showAnswers()
+        } else {
+          console.log('enable observeMode')
+          this.quizsample = response.data
+          this.observeMode = true
+          this.answers = _.times(self.quickquiz.questions.length, _.constant(null))
+          this.listenForSocket()
+          // this.showAnswers()
+        }
+      }, function (response) {
+        console.log(response.data)
+      })
+    },
+    analysisSingleQuestionPerformance: function (questions, students) {
+      _.forEach(questions, function (value, key) {
+        if (_.isObject(value)) {
+          var QPanalysis = {
+            rightPeople: [],
+            wrongPeople: []
+          }
+          _.forEach(students, function (student) {
+            if (_.indexOf(student.sample.results.right, key) > -1) {
+              QPanalysis.rightPeople.push(student.name)
+            } else if (_.indexOf(student.sample.results.wrong, key) > -1) {
+              QPanalysis.wrongPeople.push(student.name)
+            }
+          })
+
+          var question = questions[key]
+          question['rightPeople'] = QPanalysis.rightPeople
+          question['wrongPeople'] = QPanalysis.wrongPeople
+          questions[key] = question
+        }
+      })
+      return questions
+    },
     renderQuestions: function () {
-      setTimeout(function renderQuestions () {
+      setTimeout(function () {
         window.renderMathInElement(
           document.getElementById('question-body'),
           {
@@ -238,11 +477,13 @@ export default {
       }, 0)
     },
     answerOnChoose: function (index, pos) {
-      if (this.answers[index] === pos) {
-        this.answers[index] = null
-        this.answers.$set(index, null)
-      } else {
-        this.answers.$set(index, pos)
+      if (!this.sampleMode) {
+        if (this.answers[index] === pos) {
+          this.answers[index] = null
+          this.answers.$set(index, null)
+        } else {
+          this.answers.$set(index, pos)
+        }
       }
     },
     checkChoose: function (index, choose) {
@@ -270,7 +511,7 @@ export default {
     },
     showAnswer: function (index) {
       if (this.quickquiz.correctAnswers[index] !== null) {
-        if (this.correctAnswers[index] !== null) {
+        if (this.correctAnswers[index] !== null && this.correctAnswers[index] !== undefined) {
           this.correctAnswers.$set(index, null)
         } else {
           this.correctAnswers.$set(index, this.quickquiz.correctAnswers[index])
@@ -279,26 +520,177 @@ export default {
         window.alert('這題沒有設置答案')
       }
     },
+    showOverlay: function (index, type) {
+      this.overlay.on = index
+      this.overlay.type = type
+      if (type === 1) {
+        this.drawQAChart(index)
+      }
+    },
+    hideOverlay: function () {
+      this.overlay.on = -1
+      this.overlay.type = -1
+    },
     showAnswers: function () {
       if (this.correctAnswers !== this.quickquiz.correctAnswers) {
         this.correctAnswers = this.quickquiz.correctAnswers
       } else {
-        this.correctAnswers = []
-        for (var i = 0; i < this.quickquiz.question.length; i++) {
-          this.correctAnswers.push(null)
+        this.correctAnswers = _.times(this.quickquiz.questions.length, _.constant(null))
+      }
+
+      if (this.sampleMode) {
+        this.checkQuestions()
+      }
+    },
+    checkQuestions: function () {
+      var self = this
+      _(this.rights).forEach(function (value) {
+        self.checks[value] = true
+      })
+
+      _(this.wrongs).forEach(function (value) {
+        self.checks[value] = false
+      })
+    },
+    computeAccuracy: function () {
+      if (this.quickquiz.finished) {
+        var self = this
+        let data = this.quickquiz.analysis.questions
+        if (_.isArray(data)) {
+          _.forEach(data, function (data, key) {
+            self.accuracy[key] = (data[0] * 100 / (data[0] + data[1] + data[2] + data[3])).toFixed(2) + '%'
+          })
         }
       }
+    },
+    getQuizScore: function (option) {
+      let rightCount = this.rights.length
+      let total = this.rights.length + this.blanks.length + this.wrongs.length
+      if (option === 'percentage') {
+        return (rightCount * 100 / total).toFixed(0)
+      } else {
+        return rightCount + '/' + total
+      }
+    },
+    timeDifference: function (start, finish) {
+      var ms
+      if (_.isDate(start) && _.isDate(finish)) {
+        ms = Math.abs(start - finish)
+      } else {
+        ms = Math.abs(new Date(start) - new Date(finish))
+      }
+
+      var min = (ms / 1000 / 60) << 0
+      var sec = (ms / 1000) % 60 << 0
+
+      return (min + '分' + sec + '秒')
+    },
+    drawQAChart: function (index, option) {
+      if (qaChart !== null) {
+        qaChart.destroy()
+      }
+      let qaChart_id = 'qaChart_' + index
+      var ctx = document.getElementById(qaChart_id).getContext('2d')
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      var data = {
+        datasets: [{
+          data: this.quickquiz.analysis.questions[index],
+          backgroundColor: [
+            '#4BC0C0',
+            '#FF6384',
+            '#E7E9ED',
+            '#FFCE56'
+          ],
+          label: 'My dataset' // for legend
+        }],
+        labels: [
+          '正确',
+          '错误',
+          '留空',
+          '例外'
+        ]
+      }
+
+      qaChart = new Chart(ctx, {
+        data: data,
+        type: 'pie',
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      })
+      qaChart.render(500, false)
+    },
+    listenForSocket: function () {
+      console.log('listin for socket')
+      var self = this
+      socket = io.connect('/quickquiz')
+
+      socket.on('connect', function () {
+        console.log('on connect')
+        socket.emit('authenticate', {token: window.sessionStorage.token})
+      })
+
+      socket.on('authenticated', function () {
+        self.socket.authenticated = true
+        socket.emit('user join', {quickquizId: self.$route.params.quickquiz_id})
+        console.log('socket auth success')
+      })
+
+      socket.on('joined', function (data) {
+        self.socket.joined = true
+        socket.emit('request observe', {student_id: self.quizsample.student._id})
+      })
+
+      socket.on('response observe', function (data) {
+        if (_.has(data, 'answers')) {
+          console.log(data.answers)
+          self.answers = data.answers
+        }
+      })
+
+      socket.on('question on fill', function (data) {
+        if (_.has(data, 'answers')) {
+          console.log(data.answers)
+          self.answers = data.answers
+        }
+      })
     }
   },
   data () {
     return {
+      socket: {
+        joined: false,
+        authenticated: false
+      },
       correctAnswers: [],
+      accuracy: [],
+      checks: [],
       answers: [],
       rights: [],
       wrongs: [],
-      exceptions: [],
+      blanks: [],
+      SQPanalysis: [], // [question_id: {}]
       validateURL: false,
-      quickquiz: {}
+      quickquiz: {},
+      quizsample: {},
+      sampleMode: true,
+      observeMode: false,
+      overlay: {
+        on: -1,
+        type: -1
+      }
+    }
+  },
+  store,
+  vuex: {
+    actions: {
+      setQuickquizID: setQuickquizID,
+      setQuickquizStudents: setQuickquizStudents
+    },
+    getters: {
+      getQuickquizID: getQuickquizID,
+      getQuickquizStudents: getQuickquizStudents
     }
   }
 }

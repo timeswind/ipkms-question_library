@@ -14,6 +14,8 @@ import App from './App'
 import 'vue-toast/dist/vue-toast.min.css'
 import vueToast from 'vue-toast'
 
+Vue.config.debug = true
+
 Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(VueQuill)
@@ -22,7 +24,7 @@ Vue.use(VueMdl)
 Vue.component('vue-toast', vueToast)
 
 Vue.prototype.$showToast = function (message) {
-  store.dispatch('showToast', message)
+  store.dispatch('SHOW_TOAST', message)
 }
 
 Vue.prototype.$goBack = function () {
@@ -42,7 +44,7 @@ Vue.http.interceptors.push({
   response: function (response) {
     if (response.status === 401 && response.data.authorize === false) {
       console.log('need relogin')
-      store.dispatch('showLoginModal')
+      store.dispatch('SHOW_LOGIN_MODAL')
     }
     return response
   }
@@ -188,13 +190,14 @@ router.map({
     },
     title: 'Quiz Detail'
   },
-  '/quick-quiz/paper/:quickquiz_id': {
+  '/quick-quiz/paper/:quickquiz_id/:quizsample_id': {
     name: 'quiz-paper',
     component: function (resolve) {
       require(['./views/quickquiz/Quiz-paper.vue'], resolve)
     },
     title: 'Quiz Paper'
   }
+
 })
 
 router.start(App, '#app')

@@ -59,7 +59,7 @@ export default {
         let data = {
           tags: this.search.tags
         }
-        this.$http.post('/api/manage-question/query/tags', data).then(function (response) {
+        this.$http.post('/api/manage-question/query', data).then(function (response) {
           console.log(response.data)
           this.results = response.data
           if (response.data.length > 0) {

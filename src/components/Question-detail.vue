@@ -28,7 +28,7 @@
 }
 .q-d-tag {
   color: #E91E63;
-  margin: 0 5px;
+  margin: 0 8px 0 0;
   padding: 2px 4px;
   border: 1px solid #e91e63;
   cursor: pointer;
@@ -93,51 +93,48 @@
 </style>
 <template>
   <div id="question-detail">
-    <sheet-pannel :sheetshow.sync="sheetshow" :center="true">
-      <div slot="sheet-button">
-        <mdl-button primary raised slot="sheet-button" class="sheet-button" @click="sheetshow = true" v-show="!sheetshow && edit.button" :disabled="!edit.button">
-          修改題目信息
+    <div id="question-body">
+      <p style="margin: 8px 0;color: #9E9E9E; text-align:center">最後更新于 {{ details.updated_at | calendar}}</p>
+
+      <card>
+        <div slot="content">
+          <div class="flex-column">
+            <div class="flex-row flex-center" style="padding: 16px 16px 0 16px">
+              <div class="flex-column flex-50">
+                <span class="field-title">科目 Subject</span>
+                <select v-model="details.subject">
+                  <option v-for="subject in subjects" v-bind:value="subject.id">
+                    {{ subject.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="difficulty-box flex-column flex-50">
+                <span class="field-title">難度 Difficulty</span>
+                <span class="flex-row flex-baseline" style="margin-top: 8px">
+                  <i class="material-icons" v-for="1 in 5" @click="modify('difficulty', null, $index)" :class="{'difficulty-heighlight': details.difficulty > $index}">star_rate</i>
+                </span>
+              </div>
+            </div>
+            <div class="flex-column" style="padding: 16px 16px 16px 16px">
+              <span class="field-title">標籤 Tags</span>
+              <div class="flex-row flex-center flex-wrap" style="margin-top:8px">
+                <span class="q-d-tag" @click="modify('tag', 'remove', $index)" v-for="tag in details.tags" track-by="$index">{{tag}}</span>
+                <mdl-textfield label="輸入標籤.回車" @keyup.enter="modify('tag', 'add', edit.tag)" :value.sync="edit.tag" style="width:200px"></mdl-textfield>
+              </div>
+            </div>
+          </div>
+        </div>
+      </card>
+      <div class="flex-row" style="padding: 16px 0; justify-content: flex-end" v-if="edit.on">
+        <mdl-button @click="cancelUpdate()" v-show="edit.change">
+          取消
+        </mdl-button>
+        <mdl-button primary accent raised @click="updateInfo()" :disabled="!edit.change">
+          修改
         </mdl-button>
       </div>
-      <div slot="button-subtitle">
-        <p style="margin: 8px 0 0 0;color: #9E9E9E">最後更新于 {{ details.updated_at | date 'YYYY[年]M[月]DD[日] h:mm a'}}</p>
-      </div>
-      <div slot="sheet-zone">
-        <div class="flex-row flex-center">
-          <span>科目：</span>
-          <select v-model="details.subject">
-            <option v-for="subject in subjects" v-bind:value="subject.id">
-              {{ subject.name }}
-            </option>
-          </select>
-        </div>
-        <div class="difficulty-box flex-row flex-center">
-          <span style="line-height:26px">難度：</span>
-          <span class="flex-row flex-baseline">
-            <i class="material-icons" v-for="1 in 5" @click="details.difficulty = $index + 1" :class="{'difficulty-heighlight': details.difficulty > $index}">star_rate</i>
-          </span>
-        </div>
 
-        <div class="flex-column" style="position:relative;top:-20px">
-          <div v-show="details.tags && details.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
-            <span>標籤：</span>
-            <span class="q-d-tag" @click="tags('remove', null, $index)" v-for="tag in details.tags" track-by="$index">{{tag}}</span>
-          </div>
-          <mdl-textfield label="輸入標籤.回車" @keyup.enter="tags('add', edit.tag)" :value.sync="edit.tag" style="width:200px"></mdl-textfield>
-        </div>
-        <div style="position:relative;top:-15px;left:-10px">
-          <mdl-button primary accent raised class="sheet-button" @click="updateInfo()">
-            提交修改
-          </mdl-button>
-          <mdl-button class="sheet-button" @click="cancelUpdate()">
-            取消
-          </mdl-button>
-        </div>
-      </div>
-    </sheet-pannel>
-    <div id="question-body">
       <div v-if="details.type === 'mc'">
-        <mdl-button accent raised style="margin:0 0 8px 0" @click="getQuestionAnswer()" v-show="!answer.get" :disabled="answer.buttonDisable">顯示答案</mdl-button>
         <card>
           <div slot="content" style="padding:16px">
             <div class="q-d-info-wrapper">
@@ -151,14 +148,20 @@
         </card>
         <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.results === 0, 'wrong': answer.results !== 0 && choice === 0}" @click="checkMc(0)"><div slot="content"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.results === 1, 'wrong': answer.results !== 1 && choice === 1}" @click="checkMc(1)"><div slot="content"><span class="mc-choice-label">B</span>{{{details.choices[1]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}"><div slot="content"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}"><div slot="content"><span class="mc-choice-label">B</span>{{{details.choices[1]}}}</div></card>
           </div>
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.results === 2, 'wrong': answer.results !== 2 && choice === 2}" @click="checkMc(2)"><div slot="content"><span class="mc-choice-label">C</span>{{{details.choices[2]}}}</div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.results === 3, 'wrong': answer.results !== 3 && choice === 3}" @click="checkMc(3)"><div slot="content"><span class="mc-choice-label">D</span>{{{details.choices[3]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}"><div slot="content"><span class="mc-choice-label">C</span>{{{details.choices[2]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}"><div slot="content"><span class="mc-choice-label">D</span>{{{details.choices[3]}}}</div></card>
           </div>
         </div>
+
+        <card v-if="details.statistic">
+          <div slot="content" style="padding:16px">
+            {{{details.statistic | json}}}
+          </div>
+        </card>
       </div>
 
     </div>
@@ -166,7 +169,6 @@
 </template>
 
 <script>
-import sheetPannel from './reuseable/Sheet-pannel.vue'
 import Card from './reuseable/Card'
 import Subject from '../modules/Subjects'
 
@@ -180,7 +182,6 @@ export default {
     }
   },
   components: {
-    sheetPannel,
     Card
   },
   methods: {
@@ -188,42 +189,17 @@ export default {
       let apiURL = '/api/manage-question/question/' + question_id
       this.$http.get(apiURL).then(function (response) {
         this.details = response.data
+        if (response.data.type === 'mc') {
+          this.answer.mc = response.data.answer.mc
+        }
         this.tempDetails = JSON.parse(JSON.stringify(response.data))
         if (this.details.createdBy && this.details.createdBy === 'self') {
-          this.edit.button = true
+          this.edit.on = true
         }
         this.renderQuestions()
       }, function (response) {
         console.log(response)
       })
-    },
-    getQuestionAnswer: function (choice) {
-      this.answer.buttonDisable = true
-      if (!this.answer.get && this.validateURL) {
-        let data = {
-          question_id: this.$route.params.question_id
-        }
-        let apiURL = '/api/manage-question/answer'
-        this.$http.get(apiURL, data).then(function (response) {
-          if (this.details.type === 'mc') {
-            this.answer.results = response.data.mc
-          }
-          this.answer.get = true
-
-          if (choice !== null) {
-            this.choice = choice
-          }
-        }, function (response) {
-          console.log(response)
-        })
-      } else {
-        if (choice !== null) {
-          this.choice = choice
-        }
-      }
-    },
-    checkMc: function (choice) {
-      this.getQuestionAnswer(choice)
     },
     renderQuestions: function () {
       setTimeout(function renderQuestions () {
@@ -237,14 +213,27 @@ export default {
         )
       }, 0)
     },
-    tags: function (option, tag, index) {
-      if (option === 'add' && tag) {
-        if (tag.trim() !== '') {
-          this.details.tags.push(tag)
-          this.edit.tag = ''
+    modify: function (type, option, data) {
+      if (this.details.createdBy === 'self') {
+        if (type === 'difficulty') {
+          this.details.difficulty = data + 1
+          this.edit.change = true
+        } else if (type === 'tag') {
+          if (option === 'add' && data) {
+            if (data.trim() !== '') {
+              if (this.details.tags.indexOf(data) === -1) {
+                this.edit.change = true
+                this.details.tags.push(data)
+                this.edit.tag = ''
+              } else {
+                this.edit.tag = ''
+              }
+            }
+          } else if (option === 'remove' && data >= 0) {
+            this.edit.change = true
+            this.details.tags.splice(data, 1)
+          }
         }
-      } else if (option === 'remove' && index >= 0) {
-        this.details.tags.splice(index, 1)
       }
     },
     updateInfo: function () {
@@ -252,14 +241,14 @@ export default {
         let data = {
           subject: this.details.subject,
           difficulty: this.details.difficulty,
-          tags: this.details.tags,
-          updated_at: new Date()
+          tags: this.details.tags
         }
         let apiURL = '/api/manage-question/question/' + this.$route.params.question_id
         this.$http.put(apiURL, data).then(function (response) {
-          this.sheetshow = false
+          this.$showToast('修改成功')
+          this.edit.change = false
           this.details.updated_at = new Date()
-          this.tempDetails.updated_at = new Date()
+          this.tempDetails = JSON.parse(JSON.stringify(this.details))
         }, function (response) {
           console.log(response)
         })
@@ -268,6 +257,7 @@ export default {
     cancelUpdate: function () {
       this.sheetshow = false
       this.details = JSON.parse(JSON.stringify(this.tempDetails))
+      this.edit.change = false
     },
     getNumberArray: function (num) {
       return new Array(num)
@@ -276,18 +266,16 @@ export default {
   data () {
     return {
       validateURL: false,
-      sheetshow: false,
       choice: Number,
       details: {},
       tempDetails: {},
       answer: {
-        buttonDisable: false,
-        get: false,
-        results: undefined
+        mc: null
       },
       subjects: Subject.subjects,
       edit: {
-        button: false,
+        on: false,
+        change: false,
         tag: ''
       }
     }

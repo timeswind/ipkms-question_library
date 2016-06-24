@@ -66,11 +66,8 @@ export default {
     deleteSingleQuestion: function (question_id, index) {
       let comfirmDelete = window.confirm('你確定要刪除這個題目？')
       if (comfirmDelete) {
-        let data = {
-          question_id: question_id
-        }
-        var apiURL = '/api/manage-question/delete/single'
-        this.$http.delete(apiURL, data).then(function (response) {
+        var apiURL = '/api/manage-question/question/' + question_id
+        this.$http.delete(apiURL).then(function (response) {
           this.$showToast('操作成功')
           this.myQuestions.splice(index, 1)
         }, function (response) {

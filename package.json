@@ -12,6 +12,8 @@
     "test": "npm run unit && npm run e2e"
   },
   "dependencies": {
+    "chart.js": "^2.1.4",
+    "lodash": "^4.13.1",
     "material-design-lite": "^1.1.2",
     "mathquill": "^0.10.1-b",
     "moment": "^2.13.0",
