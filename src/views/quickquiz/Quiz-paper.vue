@@ -81,11 +81,14 @@
   color: #fff;
 }
 
+#quiz-paper .blank {
+  background-color: #FFC107;
+  color: #fff;
+}
+
 #quiz-paper .choice {
   padding: 16px;
   align-items: baseline;
-  cursor: pointer;
-  outline: none;
 }
 
 #quiz-paper .choice-a {
@@ -164,7 +167,7 @@
     <div class="wrapper flex-column">
       <div class="flex-row">
         <mdl-button class="icon-left-button" raised primary @click="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
-        <mdl-button class="icon-left-button" raised accent v-show="!sampleMode" @click="showAnswers()" style="margin-left:16px;">
+        <mdl-button class="icon-left-button" raised accent v-show="!sampleMode || observeMode" @click="showAnswers()" style="margin-left:16px;">
           <i class="material-icons" style="margin-right: 8px">visibility</i>
           <span>顯示 / 隱藏答案</span>
         </mdl-button>
@@ -278,17 +281,19 @@
                 <span class="flex-row flex-baseline" style="padding:16px">
                   <div class="flex-column flex-center">
                     <span class="index-label">{{$index + 1}}</span>
-                    <span class="accuracy" id="{{'analysis_' + $index}}" @click="showOverlay($index, 1)">{{accuracy[$index]}}</span>
-                    <mdl-tooltip :for="'analysis_' + $index" large class="flex-column">
-                      <div class="flex-row" style="margin-bottom:8px">
-                        <span style="margin-right:4px">正確: {{quickquiz.analysis.questions[$index][0]}}</span>
-                        <span>錯誤: {{quickquiz.analysis.questions[$index][1]}}</span>
-                      </div>
-                      <div class="flex-row">
-                        <span style="margin-right:4px">留空: {{quickquiz.analysis.questions[$index][2]}}</span>
-                        <span>例外: {{quickquiz.analysis.questions[$index][3]}}</span>
-                      </div>
-                    </mdl-tooltip>
+                    <div class="flex-column flex-center" v-if="quickquiz.finished">
+                      <span class="accuracy" id="{{'analysis_' + $index}}" @click="showOverlay($index, 1)">{{accuracy[$index]}}</span>
+                      <mdl-tooltip :for="'analysis_' + $index" large class="flex-column">
+                        <div class="flex-row" style="margin-bottom:8px">
+                          <span style="margin-right:4px">正確: {{quickquiz.analysis.questions[$index][0]}}</span>
+                          <span>錯誤: {{quickquiz.analysis.questions[$index][1]}}</span>
+                        </div>
+                        <div class="flex-row">
+                          <span style="margin-right:4px">留空: {{quickquiz.analysis.questions[$index][2]}}</span>
+                          <span>例外: {{quickquiz.analysis.questions[$index][3]}}</span>
+                        </div>
+                      </mdl-tooltip>
+                    </div>
                   </div>
 
                   <span class="question-body">{{{question.context}}}</span>
@@ -310,21 +315,21 @@
 
                 <div class="choices flex-column" style="width: 100%">
                   <div class="flex-row">
-                    <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0)}" @click="answerOnChoose($index, 0)">
+                    <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0), 'blank': showBlank($index, 0), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 0)">
                       <span class="choice-label">A</span>
                       <div>{{{question.choices[0]}}}</div>
                     </div>
-                    <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1)}" @click="answerOnChoose($index, 1)">
+                    <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1), 'blank': showBlank($index, 1), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 1)">
                       <span class="choice-label">B</span>
                       <div>{{{question.choices[1]}}}</div>
                     </div>
                   </div>
                   <div class="flex-row">
-                    <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2)}" @click="answerOnChoose($index, 2)">
+                    <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2), 'blank': showBlank($index, 2), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 2)">
                       <span class="choice-label">C</span>
                       <div>{{{question.choices[2]}}}</div>
                     </div>
-                    <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3)}" @click="answerOnChoose($index, 3)">
+                    <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3), 'blank': showBlank($index, 3), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 3)">
                       <span class="choice-label">D</span>
                       <div>{{{question.choices[3]}}}</div>
                     </div>
@@ -364,6 +369,7 @@ import store from '../../vuex/store'
 import { setQuickquizStudents, setQuickquizID } from '../../vuex/actions'
 import { getQuickquizID, getQuickquizStudents } from '../../vuex/getters'
 import { zipSampleToStudent } from '../../modules/quickquiz'
+import { calAnswerDiff, posToChoiceLable } from '../../modules/quizpaper/observe-mode'
 import io from 'socket.io-client'
 
 var qaChart = null
@@ -498,6 +504,10 @@ export default {
       return this.wrongs.indexOf(index) > -1
     },
 
+    checkBlank: function (index) {
+      return this.blanks.indexOf(index) > -1
+    },
+
     checkException: function (index) {
       return this.exceptions.indexOf(index) > -1
     },
@@ -507,8 +517,13 @@ export default {
     },
 
     showWrong: function (index, choose) {
-      return this.checkWrong(index) && this.checkChoose(index, choose)
+      return (this.checkWrong(index) && this.checkChoose(index, choose))
     },
+
+    showBlank: function (index, choose) {
+      return (this.checkBlank(index) && choose !== this.correctAnswers[index])
+    },
+
     showAnswer: function (index) {
       if (this.quickquiz.correctAnswers[index] !== null) {
         if (this.correctAnswers[index] !== null && this.correctAnswers[index] !== undefined) {
@@ -549,6 +564,10 @@ export default {
       })
 
       _(this.wrongs).forEach(function (value) {
+        self.checks[value] = false
+      })
+
+      _(this.blanks).forEach(function (value) {
         self.checks[value] = false
       })
     },
@@ -598,10 +617,10 @@ export default {
           backgroundColor: [
             '#4BC0C0',
             '#FF6384',
-            '#E7E9ED',
-            '#FFCE56'
+            '#FFCE56',
+            '#E7E9ED'
           ],
-          label: 'My dataset' // for legend
+          label: '數據' // for legend
         }],
         labels: [
           '正确',
@@ -644,14 +663,17 @@ export default {
 
       socket.on('response observe', function (data) {
         if (_.has(data, 'answers')) {
-          console.log(data.answers)
           self.answers = data.answers
         }
       })
 
       socket.on('question on fill', function (data) {
         if (_.has(data, 'answers')) {
-          console.log(data.answers)
+          let difference = calAnswerDiff(data.type, data.answers, self.answers)
+          if (_.isArray(difference) && difference.length === 1) {
+            let text = '第' + (parseInt(_.keys(difference[0])) + 1) + '题 --> ' + posToChoiceLable(difference[0][_.keys(difference[0])])
+            self.$showToast(text)
+          }
           self.answers = data.answers
         }
       })

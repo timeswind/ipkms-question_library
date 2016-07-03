@@ -1,46 +1,46 @@
-<style>
-#quiz-detail .wrapper {
+<style scoped>
+.wrapper {
   margin: 16px;
 }
 
-#quiz-detail .second-wrapper {
+.second-wrapper {
   background: #fff;
   margin-top: 16px;
 }
 
-#quiz-detail .quiz-title {
+.quiz-title {
   margin:0
 }
 
-#quiz-detail .quiz-finished {
+.quiz-finished {
   margin-left: 8px;
   font-size: 18px;
   color: #FF9800
 }
 
-#quiz-detail .quiz-time {
+.quiz-time {
   color: #2196F3;
   font-size: 18px;
   margin-left: 16px
 }
 
-#quiz-detail .quiz-time i{
+.quiz-time i{
   font-size: 18px;
   margin-right: 4px
 }
 
-#quiz-detail .quiz-questions-count {
+.quiz-questions-count {
   color: #2196F3;
   font-size: 18px;
   margin-left: auto;
 }
 
-#quiz-detail .quiz-questions-count i{
+.quiz-questions-count i{
   font-size: 18px;
   margin-right: 4px
 }
 
-#quiz-detail .student-status {
+.student-status {
   background-color: #9E9E9E;
   width: 10px;
   height: 10px;
@@ -48,7 +48,7 @@
   border-radius: 5px;
 }
 
-#quiz-detail .student-status.online {
+.student-status.online {
   background-color: #4CAF50;
   width: 10px;
   height: 10px;
@@ -56,32 +56,32 @@
   border-radius: 5px;
 }
 
-#quiz-detail .student {
+.student {
   padding: 8px 16px
 }
 
-#quiz-detail .student .student-name {
+.student .student-name {
   font-size: 18px;
   padding: 8px 0
 }
 
-#quiz-detail .student .doing-status {
+.student .doing-status {
   color: #009688;
   justify-content: center;
 }
 
-#quiz-detail .student .unfinish-status {
+.student .unfinish-status {
   color: #9E9E9E;
   justify-content: center;
 }
 
-#quiz-detail .student .finished-status {
+.student .finished-status {
   color: #009688;
   margin-left: auto;
   cursor: pointer;
 }
 
-#quiz-detail .student .doing-status {
+.student .doing-status {
   color: #3F51B5;
   text-align: center;
   cursor: pointer;
@@ -94,8 +94,8 @@
         <mdl-button class="icon-left-button" raised primary @click="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
         <mdl-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mdl-button>
         <mdl-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mdl-button>
-        <mdl-button style="margin-left:16px" raised primary v-link="{'name': 'quiz-paper', params: { quickquiz_id: $route.params.quickquiz_id, quizsample_id: 0 }}"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
-
+        <mdl-button style="margin-left:16px" raised primary @click="checkQuizPaper()"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
+        <mdl-button raised primary @click="mockData()">MOCK DATE</mdl-button>
       </div>
       <div class="flex-column second-wrapper mdl-shadow--2dp">
         <div class="flex-column" style="padding:16px">
@@ -118,7 +118,7 @@
           </span>
         </div>
 
-        <div class="flex-column" v-if="students">
+        <div class="flex-column" v-show="students && students.length > 0">
           <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">學生 {{students.length}}名</p>
           <div class="grids">
 
@@ -127,7 +127,7 @@
                 <div class="student-status online" v-show="students[$index].online"></div>
                 <span class="student-name">{{student.name}}</span>
               </div>
-              <span class="finished-status flex-row flex-center" v-if="students[$index].status === 'finish'" v-link="{name:'quiz-paper', params: {quickquiz_id: $route.params.quickquiz_id, quizsample_id: students[$index].sample._id}}">
+              <span class="finished-status flex-row flex-center" v-if="students[$index].status === 'finish'" @click="checkQuizPaper(student)">
                 <span style="margin-right:8px;color:#3F51B5">{{analysisSample($index, 'time')}}</span>
                 <span style="color: #E91E63;margin-right: 8px;">{{analysisSample($index, 'score')}}</span>
                 <span>已完成</span>
@@ -137,7 +137,7 @@
                 <span>未上交</span>
                 <i class="material-icons">short_text</i>
               </span>
-              <span class="doing-status flex-row flex-center" v-show="students[$index].status === 'doing'" v-link="{name:'quiz-paper', params: {quickquiz_id: $route.params.quickquiz_id, quizsample_id: students[$index].sample._id}}">
+              <span class="doing-status flex-row flex-center" v-show="students[$index].status === 'doing'" @click="checkQuizPaper(student)">
                 <span>做卷中&nbsp;</span>
                 <i class="material-icons">keyboard_arrow_right</i>
               </span>
@@ -146,7 +146,7 @@
         </div>
 
         <div class="flex-column" v-el:statistic>
-          <p style="padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">數據 統計</p>
+          <p style="padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa;border-top:1px solid #eee;">數據 統計</p>
           <div class="flex-row grids" v-if="quickquiz.finished">
             <div class="grid-2 flex-column flex-center flex-50">
               <span class="field-title">平均分</span>
@@ -195,30 +195,39 @@ import store from '../../vuex/store'
 import { setQuickquizStudents, setQuickquizID, updateQuickquizStudent } from '../../vuex/actions'
 import { getQuickquizID, getQuickquizStudents } from '../../vuex/getters'
 import { zipSampleToStudent, studentIndex } from '../../modules/quickquiz'
+import { isMongodbId } from '../../modules/mongodb'
 
 var socket = null
 export default {
   attached: function () {
-    if (this.$route.params.quickquiz_id) {
+    let quickquiz_id = this.$route.params.quickquiz_id
+    if (isMongodbId(quickquiz_id)) {
       this.validateURL = true
-      this.getQuickquizDetail(this.$route.params.quickquiz_id)
+      this.getQuickquizDetail(quickquiz_id)
+    } else {
+      console.log('invalid quickquiz id')
     }
   },
   detached: function () {
     socket.io.disconnect()
-    console.log('emit disconnect')
+    console.log('emit socket disconnect')
   },
   methods: {
     getQuickquizDetail: function (id) {
       let apiURL = '/api/manage-quickquiz/teacher/quickquiz/' + '?id=' + id
       this.$http.get(apiURL).then(function (response) {
+        console.log(response)
         let students = _.get(response.data, 'students', [])
         this.setQuickquizStudents(students)
         this.samples = _.get(response.data, 'samples', [])
+        console.log()
         delete response.data.students
         delete response.data.samples
         this.quickquiz = response.data
         this.analysis('count_exception')
+        if (!_.get(response.data, 'finished', false)) {
+          this.$els.statistic.style.display = 'none'
+        }
         this.listenForSocket()
       }, function (response) {
         this.$showToast('Error:' + response.data)
@@ -268,6 +277,12 @@ export default {
             if (students[i].status !== '') {
               student['status'] = students[i].status
             }
+            if (students[i].quizsample !== '' && !_.has(student, 'sample._id')) {
+              let sample = {
+                _id: students[i].quizsample
+              }
+              student['sample'] = sample
+            }
             self.updateQuickquizStudent(index, student)
           }
         }
@@ -277,6 +292,7 @@ export default {
         console.log('on Student Joined')
         // let student_name = _.get(data, 'name', null)
         let student_id = _.get(data, 'id', null)
+        let student_name = _.get(data, 'name', null)
 
         let index = studentIndex(self.students, student_id)
         if (index > -1) {
@@ -284,7 +300,12 @@ export default {
           student['online'] = true
           self.updateQuickquizStudent(index, student)
         } else {
-
+          let student = {
+            _id: student_id,
+            name: student_name,
+            online: true
+          }
+          self.updateQuickquizStudent(self.students.length, student)
         }
       })
 
@@ -294,16 +315,23 @@ export default {
         if (data && index > -1) {
           let student = self.students[index]
           student['online'] = false
+          student['status'] = null
           self.updateQuickquizStudent(index, student)
         }
       })
 
       socket.on('start doing', function (data) {
         if (data) {
-          let index = studentIndex(self.students, data)
+          let index = studentIndex(self.students, data.student)
           if (data && index > -1) {
             let student = self.students[index]
             student['status'] = 'doing'
+            if (!_.has(student, 'sample._id')) {
+              let sample = {
+                _id: data.quizsample
+              }
+              student['sample'] = sample
+            }
             self.updateQuickquizStudent(index, student)
           }
         }
@@ -386,8 +414,6 @@ export default {
       if (_.get(self.quickquiz, 'finished', false)) {
         this.drawSPChart()
         this.drawQAChart()
-      } else {
-        this.$els.statistic.style.display = 'none'
       }
     },
     drawSPChart: function (sort, type) {
@@ -529,6 +555,31 @@ export default {
         data: qaChartData
       })
       qaChart.render(500, false)
+    },
+    mockData: function () {
+      let self = this
+
+      let student = {
+        _id: '56a32a089776051346bf694d',
+        name: 'mockData',
+        online: true
+      }
+      self.updateQuickquizStudent(0, student)
+    },
+    checkQuizPaper: function (student) {
+      if (student) {
+        if (_.has(student, 'sample._id')) {
+          this.$router.go({
+            name: 'quiz-paper',
+            params: { quickquiz_id: this.$route.params.quickquiz_id, quizsample_id: student.sample._id }
+          })
+        }
+      } else {
+        this.$router.go({
+          name: 'quiz-paper',
+          params: { quickquiz_id: this.$route.params.quickquiz_id, quizsample_id: 0 }
+        })
+      }
     }
   },
   data () {

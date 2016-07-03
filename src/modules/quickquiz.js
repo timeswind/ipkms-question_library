@@ -5,7 +5,9 @@ export const zipSampleToStudent = function (samples, students) {
       let index = getIndexOfStudents(students, sample.student)
       if (index > -1) {
         let student = students[index]
-        student['status'] = 'finish'
+        if (_.has(sample, 'finishTime')) {
+          student['status'] = 'finish'
+        }
         student['sample'] = sample
         students[index] = student
       }
