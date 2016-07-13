@@ -8,6 +8,14 @@ export const hideLoginModal = function ({ dispatch, state }) {
   dispatch(types.HIDE_LOGIN_MODAL)
 }
 
+export const showLodingIndicator = function ({ dispatch, state }) {
+  dispatch(types.SHOW_LOADING_INDICATOR)
+}
+
+export const hideLodingIndicator = function ({ dispatch, state }) {
+  dispatch(types.HIDE_LOADING_INDICATOR)
+}
+
 export const showToast = function ({ dispatch, state }, text) {
   dispatch(types.SHOW_TOAST, text)
 }

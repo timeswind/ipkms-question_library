@@ -42,7 +42,7 @@
 </div>
 
 <mdl-snackbar display-on="toastOn"></mdl-snackbar>
-
+<mdl-spinner id="mainLoadingIndicator" single-color :active="loadingIndicatorShow"></mdl-spinner>
 <div v-show="loginModalShow" class="login-modal-mask" transition="modal">
   <div class="login-modal-card flex-column">
     <span style="color: #E91E63;
@@ -60,8 +60,8 @@
 
 <script>
 import store from './vuex/store'
-import { hideLoginModal } from './vuex/actions'
-import { getLoginModalState, getToastState } from './vuex/getters'
+import { hideLoginModal, hideLodingIndicator } from './vuex/actions'
+import { getLoginModalState, getLoadingIndicatorState, getToastState } from './vuex/getters'
 
 import './css/main.css'
 import './css/animation.css'
@@ -108,10 +108,12 @@ export default {
   store,
   vuex: {
     actions: {
-      hideLoginModal: hideLoginModal
+      hideLoginModal: hideLoginModal,
+      hideLodingIndicator: hideLodingIndicator
     },
     getters: {
       loginModalShow: getLoginModalState,
+      loadingIndicatorShow: getLoadingIndicatorState,
       toastState: getToastState
     }
   },

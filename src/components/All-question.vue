@@ -44,12 +44,14 @@ export default {
       if (this.filter.time === true) {
         sort = 1
       }
-      this.$http.get('/api/manage-question/questions/all?sort=' + sort).then(function (response) {
+      this.$http.get('/api/manage-question/questions?option=all&sort=' + sort).then(function (response) {
         if (response.data.length > 0) {
           this.questions = response.data
           this.renderQuestions()
           if (response.data.length < 9) {
             this.loadMore = false
+          } else {
+            this.loadMore = true
           }
         } else {
           this.loadMore = false
@@ -84,7 +86,7 @@ export default {
           sort = 1
         }
         let latest_id = this.questions[this.questions.length - 1]._id
-        let apiURL = '/api/manage-question/questions/all?page=' + latest_id + '&sort=' + sort
+        let apiURL = '/api/manage-question/questions?option=all&page=' + latest_id + '&sort=' + sort
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
             console.log(response.data)

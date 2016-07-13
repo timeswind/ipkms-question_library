@@ -33,19 +33,29 @@ Vue.prototype.$goBack = function () {
 
 // var self = this
 
+var stopReceivingResponseTimer = null
+
+function hideLoginIncicator () {
+  store.dispatch('HIDE_LOADING_INDICATOR')
+}
+
 Vue.http.interceptors.push({
 
   request: function (request) {
+    store.dispatch('SHOW_LOADING_INDICATOR')
     if (window.sessionStorage.token) {
       request.headers['x-access-token'] = window.sessionStorage.token
     }
     return request
   },
   response: function (response) {
+    clearTimeout(stopReceivingResponseTimer)
+    stopReceivingResponseTimer = setTimeout(hideLoginIncicator, 1500)
     if (response.status === 401 && response.data.authorize === false) {
       console.log('need relogin')
       store.dispatch('SHOW_LOGIN_MODAL')
     }
+
     return response
   }
 

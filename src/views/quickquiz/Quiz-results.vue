@@ -1,9 +1,9 @@
-<style>
-#quiz-results .main-wrapper {
+<style scoped>
+.main-wrapper {
   margin:16px auto;
   box-sizing: content-box;
 }
-#quiz-results .qrcode-wrapper {
+.qrcode-wrapper {
   width: 300px;
   height: 300px;
   margin: 0 auto
@@ -148,7 +148,7 @@ export default {
       })
     },
     generateLatestQuickQuizQrcode: function (quickquiz_id) {
-      let qrcodeData = 'quickquiz' + ':' + quickquiz_id
+      let qrcodeData = 'quickquiz' + '|' + quickquiz_id
 
       var qrcodedraw = new qrcode.QRCodeDraw()
       qrcodedraw.draw(document.getElementById('qrcode-canvas'), qrcodeData, {scale: 10}, function (error, canvas) {

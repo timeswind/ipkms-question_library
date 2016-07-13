@@ -2,6 +2,18 @@
   max-width: 800px;
   margin: 0 auto
 }
+
+#mainLoadingIndicator {
+  position: absolute;
+  right: 32px;
+  top: 16px;
+  z-index: 9999;
+}
+
+#mainLoadingIndicator .mdl-spinner__layer {
+  border-color: #fff !important
+}
+
 .mdl-navigation__link.active {
   background-color: #e0e0e0
 }

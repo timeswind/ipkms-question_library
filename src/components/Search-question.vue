@@ -1,14 +1,11 @@
 <style scoped>
 .search-zone {
-  width: 100%;
   background: #fff;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+  border-radius: 3px;
   padding: 20px 0;
   text-align: center;
-}
-
-.results-zone {
-
+  margin: 0 16px;
 }
 
 .difficulty-heighlight{

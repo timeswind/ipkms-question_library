@@ -1,8 +1,8 @@
-<style scoped>
-.wrapper {
+<style>
+#quiz-paper .wrapper {
   margin: 16px;
 }
-.second-wrapper {
+#quiz-paper .second-wrapper {
   display: flex;
   flex-direction: row;
   margin: 16px 0;
@@ -10,109 +10,105 @@
   justify-content: center;
 }
 
-.third-wrapper {
+#quiz-paper .third-wrapper {
   flex-basis: auto;
   flex-grow: 1;
   max-width: 800px;
 }
 
-.title, .question {
-  margin: 4px 0
-}
-
-.title {
+#quiz-paper .title {
   font-size: 20px;
   font-weight: bold
 }
 
-.time {
+#quiz-paper .time {
   font-size: 16px;
   align-items: center;
 }
 
-.time i {
+#quiz-paper .time i {
   font-size: 20px;
   margin-right: 4px
 }
 
-.author {
+#quiz-paper .author {
   font-size: 15px;
   margin-top: 8px;
   color: #9E9E9E;
 }
 
-.question div,.question p{
-  margin:0
+#quiz-paper .question div,#quiz-paper .question p{
+  margin-bottom:0 !important
 }
 
-.index-label {
+#quiz-paper .index-label {
   font-weight: bold;
   font-size: 20px;
   padding: 0;
 }
 
-.question-body p,.question-body div{
-  font-size: 18px;
+#quiz-paper .question_body>p, #quiz-paper .question_body>div{
+  font-size: 16px;
   padding-left: 16px;
-  font-family: serif;
+  margin-bottom:0;
 }
 
-.accuracy {
+#quiz-paper .accuracy {
   cursor: pointer;
   margin-top: 4px;
   color: #FF9800;
 }
 
-.choices {
+#quiz-paper .choices {
   border-top:1px solid #eee;
 }
 
-.choose {
+#quiz-paper .choose {
   box-shadow: inset 0 0 0 4px #3f51b5;
 }
 
-.right {
+#quiz-paper .right {
   background-color: #009688;
   color: #fff;
 }
 
-.wrong {
+#quiz-paper .wrong {
   background-color: #F44336;
   color: #fff;
 }
 
-.blank {
+#quiz-paper .blank {
   background-color: #FFC107;
   color: #fff;
 }
 
-.choice {
+#quiz-paper .choice {
   padding: 16px;
   align-items: baseline;
 }
 
-.choice-a {
+#quiz-paper .choice-a {
   border-right:1px solid #eee;
   border-bottom:1px solid #eee;
 }
 
-.choice-b {
+#quiz-paper .choice-b {
   border-bottom:1px solid #eee;
 }
 
-.choice-c {
+#quiz-paper .choice-c {
   border-right:1px solid #eee;
 }
 
-.choice-label {
+#quiz-paper .choice-label {
   padding-right: 16px;
 }
 
-.question-checkbox {
+#quiz-paper .question-checkbox {
   width: 20%
 }
 
-.overlay {
+#quiz-paper .overlay {
   background: #fff;
   height: 100%;
   width: 100%;
@@ -121,25 +117,25 @@
   left: 100px;
   position: absolute;
   padding: 0;
-  transition: all .5s;
+  transition: all #quiz-paper .5s;
   z-index: -1;
 }
-.card {
+#quiz-paper .card {
   position: relative;
 }
-.overlay_show {
+#quiz-paper .overlay_show {
   opacity: 1;
   left: 0;
   z-index: 2
 }
-.rightPeople_header {
+#quiz-paper .rightPeople_header {
   font-size: 18px;
   color: #009688;
   padding-bottom: 4px;
   border-bottom: 2px solid #009688;
   margin-bottom: 4px;
 }
-.wrongPeople_header {
+#quiz-paper .wrongPeople_header {
   font-size: 18px;
   color: #F44336;
   padding-bottom: 4px;
@@ -147,7 +143,7 @@
   margin-bottom: 4px;
 }
 
-.obserMode_flag {
+#quiz-paper .obserMode_flag {
   position: fixed;
   top: 63px;
   right: 32px;
@@ -278,7 +274,7 @@
                   </div>
 
                 </div>
-                <span class="flex-row flex-baseline" style="padding:16px">
+                <span class="flex-row flex-center" style="padding:16px">
                   <div class="flex-column flex-center">
                     <span class="index-label">{{$index + 1}}</span>
                     <div class="flex-column flex-center" v-if="quickquiz.finished">
@@ -296,7 +292,7 @@
                     </div>
                   </div>
 
-                  <span class="question-body">{{{question.context}}}</span>
+                  <span class="question_body">{{{question.context}}}</span>
                   <div class="flex-row" style="margin-left:auto;flex-shrink: 0" v-if="quickquiz.finished">
                     <mdl-button accent @click="showAnswer($index)" v-show="quickquiz.correctAnswers[$index] !== null && !sampleMode">
                       <span v-show="typeof correctAnswers[$index] === 'number'">隱藏答案</span>
