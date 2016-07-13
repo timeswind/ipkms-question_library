@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     getAllQcollections: function () {
-      this.$http.get('/api/manage-qcollection/all').then(function (response) {
+      this.$http.get('/api/manage-qcollection/qcollections/all').then(function (response) {
         if (response.data.length > 0) {
           this.allQcollections = response.data
           if (response.data.length < 12) {

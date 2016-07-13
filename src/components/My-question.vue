@@ -1,6 +1,9 @@
 <template>
   <div id="my-question">
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
+    <div class="filter">
+      <mdl-switch :checked.sync="filter.time">時間倒序</mdl-switch>
+    </div>
     <div class="mdl-grid" id="questions-preview-container">
       <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in myQuestions" track-by="_id">
         <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
@@ -26,7 +29,6 @@
 
 <script>
 import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
-
 export default {
   ready: function () {
     this.getMyQuestions()
@@ -36,7 +38,11 @@ export default {
   },
   methods: {
     getMyQuestions: function () {
-      this.$http.get('/api/manage-question/mine').then(function (response) {
+      var sort = -1
+      if (this.filter.time === true) {
+        sort = 1
+      }
+      this.$http.get('/api/manage-question/questions/mine?sort=' + sort).then(function (response) {
         if (response.data.length > 0) {
           if (response.data.length < 9) {
             this.loadMore = false
@@ -83,8 +89,12 @@ export default {
     nextPage: function () {
       if (this.myQuestions.length > 0) {
         this.loadMore = false
+        var sort = -1
+        if (this.filter.time === true) {
+          sort = 1
+        }
         let latest_id = this.myQuestions[this.myQuestions.length - 1]._id
-        let apiURL = '/api/manage-question/mine?page=' + latest_id
+        let apiURL = '/api/manage-question/questions/mine?page=' + latest_id + '&sort=' + sort
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
             for (var i = 0; i < response.data.length; i++) {
@@ -116,8 +126,29 @@ export default {
         qid: '1234'
       },
       myQuestions: [],
-      loadMore: true
+      loadMore: true,
+      filter: {
+        time: false,
+        difficulty: null
+      }
+    }
+  },
+  watch: {
+    'filter': {
+      handler: function () {
+        this.getMyQuestions()
+      },
+      deep: true
     }
   }
 }
 </script>
+<style scoped>
+.filter {
+  background: #fff;
+  padding: 16px;
+  margin: 0 16px 0 16px;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+}
+</style>

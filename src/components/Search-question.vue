@@ -1,5 +1,5 @@
-<style>
-#search-question .search-zone {
+<style scoped>
+.search-zone {
   width: 100%;
   background: #fff;
   box-shadow: 0 1px 6px rgba(0,0,0,0.35);
@@ -7,8 +7,23 @@
   text-align: center;
 }
 
-#search-question .results-zone {
+.results-zone {
 
+}
+
+.difficulty-heighlight{
+  color: #FFC107 !important
+}
+.select-difficulty-box {
+  color: #aaa;
+  margin-bottom: 16px
+}
+.select-difficulty-box i {
+  width: 24px;
+  cursor: pointer;
+}
+.q-tag {
+  cursor: pointer;
 }
 </style>
 <template>
@@ -20,8 +35,19 @@
         <span class="q-tag" @click="removeTag($index)" v-for="tag in search.tags" track-by="$index" style="padding:4px 8px">{{tag}}</span>
       </div>
       <mdl-textfield label="標籤" :value.sync="search.input" @keyup.enter="appendTag()"></mdl-textfield>
+      <span class="flex-column flex-center select-difficulty-box">
+        <span class="flex-row flex-center">
+          <span style="margin-right:8px">最低難度</span>
+          <i v-for="1 in 5" class="material-icons" @click="selectDifficulty('min', $index)" :class="{'difficulty-heighlight': search.minDifficulty > $index}">star_rate</i>
+        </span>
+        <span class="flex-row flex-center">
+          <span style="margin-right:8px">最高難度</span>
+          <i v-for="1 in 5" class="material-icons" @click="selectDifficulty('max', $index)" :class="{'difficulty-heighlight': search.maxDifficulty > $index}">star_rate</i>
+        </span>
+      </span>
+      <mdl-switch v-show="search.tags.length !== 0" :checked.sync="search.options.matchAny" style="width: 130px;margin-bottom: 16px">任意條件符合</mdl-switch>
       <div>
-        <mdl-button primary raised v-show="search.tags.length !== 0" @click="queryByTags()" :disabled="search.buttonDisable">搜索</mdl-button>
+        <mdl-button primary raised @click="query()" :disabled="search.buttonDisable">搜索</mdl-button>
       </div>
     </div>
     <div class="results-zone">
@@ -53,24 +79,35 @@ export default {
     qcollectionSelectorModal
   },
   methods: {
-    queryByTags: function () {
-      if (this.search.tags.length > 0) {
-        this.search.buttonDisable = true
-        let data = {
-          tags: this.search.tags
-        }
-        this.$http.post('/api/manage-question/query', data).then(function (response) {
-          console.log(response.data)
-          this.results = response.data
-          if (response.data.length > 0) {
-            this.renderQuestions()
-          }
-          this.search.buttonDisable = false
-        }, function (response) {
-          console.log(response.data)
-          this.search.buttonDisable = false
-        })
+    query: function () {
+      if (this.search.input !== '') {
+        this.appendTag()
       }
+      if (this.search.tags.length === 0) {
+        this.search.options.matchAny = true
+      }
+      this.search.buttonDisable = true
+      let data = {
+        tags: this.search.tags,
+        difficulty: {
+          min: this.search.minDifficulty,
+          max: this.search.maxDifficulty
+        },
+        options: {
+          matchAny: this.search.options.matchAny
+        }
+      }
+      this.$http.post('/api/manage-question/query', data).then(function (response) {
+        console.log(response.data)
+        this.results = response.data
+        if (response.data.length > 0) {
+          this.renderQuestions()
+        }
+        this.search.buttonDisable = false
+      }, function (response) {
+        console.log(response.data)
+        this.search.buttonDisable = false
+      })
     },
     appendTag: function (tag) {
       if (this.search.input.trim() !== '') {
@@ -99,6 +136,29 @@ export default {
     },
     getNumberArray: function (num) {
       return new Array(num)
+    },
+    selectDifficulty: function (type, difficulty) {
+      difficulty = difficulty + 1
+      if (type === 'min') {
+        if (!(difficulty > this.search.maxDifficulty)) {
+          this.search.minDifficulty = difficulty
+        } else {
+          this.search.minDifficulty = difficulty
+          this.search.maxDifficulty = difficulty
+        }
+      } else {
+        if (!(difficulty < this.search.minDifficulty)) {
+          this.search.maxDifficulty = difficulty
+        } else {
+          this.search.minDifficulty = difficulty
+          this.search.maxDifficulty = difficulty
+        }
+      }
+    },
+    showCollectionModal: function (qid) {
+      this.$broadcast('getMyQcollectionLists')
+      this.CollectionModal.show = true
+      this.CollectionModal.qid = qid
     }
   },
   data () {
@@ -106,7 +166,12 @@ export default {
       search: {
         buttonDisable: false,
         input: '',
-        tags: []
+        tags: [],
+        minDifficulty: 1,
+        maxDifficulty: 5,
+        options: {
+          matchAny: false
+        }
       },
       CollectionModal: {
         show: false,

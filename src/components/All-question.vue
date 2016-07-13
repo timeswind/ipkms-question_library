@@ -1,6 +1,9 @@
 <template>
   <div id="all-question">
     <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
+    <div class="filter">
+      <mdl-switch :checked.sync="filter.time">時間倒序</mdl-switch>
+    </div>
     <div class="mdl-grid" id="questions-preview-container">
       <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in questions" track-by="_id">
         <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
@@ -37,7 +40,11 @@ export default {
   },
   methods: {
     getQuestions: function () {
-      this.$http.get('/api/manage-question/all').then(function (response) {
+      var sort = -1
+      if (this.filter.time === true) {
+        sort = 1
+      }
+      this.$http.get('/api/manage-question/questions/all?sort=' + sort).then(function (response) {
         if (response.data.length > 0) {
           this.questions = response.data
           this.renderQuestions()
@@ -72,9 +79,12 @@ export default {
     nextPage: function () {
       if (this.questions.length > 0) {
         this.loadMore = false
+        var sort = -1
+        if (this.filter.time === true) {
+          sort = 1
+        }
         let latest_id = this.questions[this.questions.length - 1]._id
-        console.log(latest_id)
-        let apiURL = '/api/manage-question/all?page=' + latest_id
+        let apiURL = '/api/manage-question/questions/all?page=' + latest_id + '&sort=' + sort
         this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
             console.log(response.data)
@@ -107,8 +117,29 @@ export default {
         qid: ''
       },
       questions: [],
-      loadMore: true
+      loadMore: true,
+      filter: {
+        time: false,
+        difficulty: null
+      }
+    }
+  },
+  watch: {
+    'filter': {
+      handler: function () {
+        this.getQuestions()
+      },
+      deep: true
     }
   }
 }
 </script>
+<style scoped>
+.filter {
+  background: #fff;
+  padding: 16px;
+  margin: 0 16px 0 16px;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+}
+</style>

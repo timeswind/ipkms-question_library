@@ -180,6 +180,7 @@ export default {
         }
 
         this.$http.post('/api/manage-quickquiz/teacher/quickquizs', data).then(function (response) {
+          let quickquiz_id = response.data
           this.newQuickquiz.title = ''
           this.newQuickquiz.time = null
           this.newQuickquiz.qcollection = {}
@@ -189,7 +190,7 @@ export default {
           this.queryQcollection.button = true
           this.queryQcollection.fail = false
 
-          let qrcodeData = 'quickquiz' + ':' + response.data
+          let qrcodeData = 'quickquiz' + '|' + quickquiz_id
 
           var qrcodedraw = new qrcode.QRCodeDraw()
           qrcodedraw.draw(document.getElementById('qrcode-canvas'), qrcodeData, {scale: 10}, function (error, canvas) {

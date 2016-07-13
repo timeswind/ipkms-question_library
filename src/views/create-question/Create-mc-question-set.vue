@@ -1,19 +1,19 @@
-<style>
-#create-mc-question-set .newquestion-difficulty-box {
+<style scoped>
+.newquestion-difficulty-box {
   padding: 10px 0
 }
 
-#create-mc-question-set .newquestion-difficulty-box i {
+.newquestion-difficulty-box i {
   width: 24px;
   color: #aaa;
   cursor: pointer;
 }
 
-#create-mc-question-set .difficulty-heighlight{
+.difficulty-heighlight{
   color: #FFC107 !important
 }
 
-#create-mc-question-set .q-tag {
+.q-tag {
   color: #E91E63;
   margin: 0 5px;
   padding: 2px 4px;
@@ -21,7 +21,7 @@
   cursor: pointer;
 }
 
-#create-mc-question-set .body-wrapper {
+.body-wrapper {
   max-width: 800px;
   margin:32px auto;
 }
@@ -43,30 +43,30 @@
   line-height: 20px
 }
 
-#create-mc-question-set .toolbar-title {
+.toolbar-title {
   padding: 8px;
   margin: 0
 }
-#create-mc-question-set .mc-input-wrapper,#create-mc-question-set .mc-preview-wrapper {
+.mc-input-wrapper,.mc-preview-wrapper {
   display: inline-block;
   width: 100%
 }
 
-#create-mc-question-set .mc-preview-wrapper .card {
+.mc-preview-wrapper .card {
   cursor: pointer;
 }
 
-#create-mc-question-set .mc-preview-wrapper .hightlight-answer .card {
+.mc-preview-wrapper .hightlight-answer .card {
   background-color: #009688;
   color: #fff
 }
-#create-mc-question-set .mc-preview-wrapper .mc-label {
+.mc-preview-wrapper .mc-label {
   height:52px;
   line-height:52px;
   padding: 0 16px;
 }
 
-#create-mc-question-set .create-qcollection-modal {
+.create-qcollection-modal {
   display: block;
   position: fixed;
   z-index: 9998;
@@ -77,7 +77,7 @@
   background-color: rgba(0, 0, 0, .5);
 }
 
-#create-mc-question-set .modal-container {
+.modal-container {
   width: 300px;
   margin: 130px auto 0;
   background-color: #fff;
@@ -85,7 +85,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
 }
 
-#create-mc-question-set .qcollection-inbox {
+.qcollection-inbox {
   height: 60px;
   background: #fff;
   position: fixed;
@@ -98,11 +98,11 @@
   transition: height 0.2s ease;
 }
 
-#create-mc-question-set .qcollection-inbox.show {
+.qcollection-inbox.show {
   height: calc(100% - 160px);
 }
 
-#create-mc-question-set .qcollection-inbox .expand-icon {
+.qcollection-inbox .expand-icon {
   position: absolute;
   background: #fff;
   bottom: -26px;
@@ -114,15 +114,15 @@
   border-bottom-right-radius: 5px
 }
 
-#create-mc-question-set .qcollection-inbox p {
+.qcollection-inbox p {
   margin: 0
 }
 
 @media screen and (max-width: 1024px) {
-  #create-mc-question-set .create-qcollection-modal {
+  .create-qcollection-modal {
     box-sizing: border-box;
   }
-  #create-mc-question-set .qcollection-inbox {
+  .qcollection-inbox {
     top: 56px;
     left: 0;
     right: 0;
@@ -130,30 +130,30 @@
 }
 
 @media screen and (min-width: 1025px) {
-  #create-mc-question-set .create-qcollection-modal {
+  .create-qcollection-modal {
     box-sizing: border-box;
     padding-left: 240px
   }
-  #create-mc-question-set .qcollection-inbox {
+  .qcollection-inbox {
     top: 64px;
     left: 240px;
     right: 0;
   }
 }
 
-#create-mc-question-set .qcollection-inbox .qcollection-header {
+.qcollection-inbox .qcollection-header {
   max-width: 800px;
   padding: 16px 16px 0 16px;
   margin: 0 auto;
   margin-bottom: 16px
 }
-#create-mc-question-set .qcollection-inbox .qcollection-header .public {
+.qcollection-inbox .qcollection-header .public {
   border: 1px solid;
   color: #E91E63;
   font-size: 14px;
   padding: 2px 4px;
 }
-#create-mc-question-set .qcollection-inbox .qcollection-header .subject {
+.qcollection-inbox .qcollection-header .subject {
   color: #fff;
   background: #03A9F4;
   font-size: 14px;
@@ -161,17 +161,17 @@
   margin-left: 8px;
   margin-right: 8px
 }
-#create-mc-question-set .qcollection-inbox .qcollection-header .name {
+.qcollection-inbox .qcollection-header .name {
   font-size: 18px;
   font-weight: bold;
 }
-#create-mc-question-set .qcollection-inbox .questions {
+.qcollection-inbox .questions {
   height:calc(100% - 70px);
   overflow:auto;
   border-top: 1px solid #eee;
 }
 
-#create-mc-question-set .qcollection-inbox .question {
+.qcollection-inbox .question {
   padding: 16px;
   border-bottom: 1px solid #eee;
 }

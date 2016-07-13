@@ -89,7 +89,7 @@ export default {
   },
   methods: {
     getMyQcollections: function () {
-      this.$http.get('/api/manage-qcollection/mine').then(function (response) {
+      this.$http.get('/api/manage-qcollection/qcollections/mine').then(function (response) {
         if (response.data.length > 0) {
           this.qcollections = response.data
           if (response.data.length < 12) {

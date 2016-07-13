@@ -1,8 +1,8 @@
-<style>
-#quiz-paper .wrapper {
+<style scoped>
+.wrapper {
   margin: 16px;
 }
-#quiz-paper .second-wrapper {
+.second-wrapper {
   display: flex;
   flex-direction: row;
   margin: 16px 0;
@@ -10,109 +10,109 @@
   justify-content: center;
 }
 
-#quiz-paper .third-wrapper {
+.third-wrapper {
   flex-basis: auto;
   flex-grow: 1;
   max-width: 800px;
 }
 
-#quiz-paper .title, #quiz-paper .question {
+.title, .question {
   margin: 4px 0
 }
 
-#quiz-paper .title {
+.title {
   font-size: 20px;
   font-weight: bold
 }
 
-#quiz-paper .time {
+.time {
   font-size: 16px;
   align-items: center;
 }
 
-#quiz-paper .time i {
+.time i {
   font-size: 20px;
   margin-right: 4px
 }
 
-#quiz-paper .author {
+.author {
   font-size: 15px;
   margin-top: 8px;
   color: #9E9E9E;
 }
 
-#quiz-paper .question div,#quiz-paper .question p{
+.question div,.question p{
   margin:0
 }
 
-#quiz-paper .index-label {
+.index-label {
   font-weight: bold;
   font-size: 20px;
   padding: 0;
 }
 
-#quiz-paper .question-body p,#quiz-paper .question-body div{
+.question-body p,.question-body div{
   font-size: 18px;
   padding-left: 16px;
+  font-family: serif;
 }
 
-#quiz-paper .accuracy {
+.accuracy {
   cursor: pointer;
   margin-top: 4px;
   color: #FF9800;
 }
 
-#quiz-paper .choices {
+.choices {
   border-top:1px solid #eee;
 }
 
-#quiz-paper .choose {
-  background-color: #3F51B5;
-  color: #fff;
+.choose {
+  box-shadow: inset 0 0 0 4px #3f51b5;
 }
 
-#quiz-paper .right {
+.right {
   background-color: #009688;
   color: #fff;
 }
 
-#quiz-paper .wrong {
+.wrong {
   background-color: #F44336;
   color: #fff;
 }
 
-#quiz-paper .blank {
+.blank {
   background-color: #FFC107;
   color: #fff;
 }
 
-#quiz-paper .choice {
+.choice {
   padding: 16px;
   align-items: baseline;
 }
 
-#quiz-paper .choice-a {
+.choice-a {
   border-right:1px solid #eee;
   border-bottom:1px solid #eee;
 }
 
-#quiz-paper .choice-b {
+.choice-b {
   border-bottom:1px solid #eee;
 }
 
-#quiz-paper .choice-c {
+.choice-c {
   border-right:1px solid #eee;
 }
 
-#quiz-paper .choice-label {
+.choice-label {
   padding-right: 16px;
 }
 
-#quiz-paper .question-checkbox {
+.question-checkbox {
   width: 20%
 }
 
-#quiz-paper .overlay {
+.overlay {
   background: #fff;
   height: 100%;
   width: 100%;
@@ -124,22 +124,22 @@
   transition: all .5s;
   z-index: -1;
 }
-#quiz-paper .card {
+.card {
   position: relative;
 }
-#quiz-paper .overlay_show {
+.overlay_show {
   opacity: 1;
   left: 0;
   z-index: 2
 }
-#quiz-paper .rightPeople_header {
+.rightPeople_header {
   font-size: 18px;
   color: #009688;
   padding-bottom: 4px;
   border-bottom: 2px solid #009688;
   margin-bottom: 4px;
 }
-#quiz-paper .wrongPeople_header {
+.wrongPeople_header {
   font-size: 18px;
   color: #F44336;
   padding-bottom: 4px;
@@ -147,7 +147,7 @@
   margin-bottom: 4px;
 }
 
-#quiz-paper .obserMode_flag {
+.obserMode_flag {
   position: fixed;
   top: 63px;
   right: 32px;
