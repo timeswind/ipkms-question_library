@@ -31,7 +31,7 @@
       <div v-show="search.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
         <span class="q-tag" @click="removeTag($index)" v-for="tag in search.tags" track-by="$index" style="padding:4px 8px">{{tag}}</span>
       </div>
-      <mdl-textfield label="標籤" :value.sync="search.input" @keyup.enter="appendTag()"></mdl-textfield>
+      <mdl-textfield label="標籤.輸入回車" :value.sync="search.input" @keyup.enter="appendTag()"></mdl-textfield>
       <span class="flex-column flex-center select-difficulty-box">
         <span class="flex-row flex-center">
           <span style="margin-right:8px">最低難度</span>

@@ -117,7 +117,7 @@
   left: 100px;
   position: absolute;
   padding: 0;
-  transition: all #quiz-paper .5s;
+  transition: all ease .5s;
   z-index: -1;
 }
 #quiz-paper .card {
@@ -215,16 +215,19 @@
                 <span class="flex-row flex-center" style="margin-top: 16px;padding-top:16px; border-top:1px solid #ddd">
                   <span class="flex-column flex-33">
                     <span class="field-title">开始于</span>
-                    <span class="field-content">{{quizsample.startTime | calendar}}</span>
+                    <span class="field-content">{{quizsample.startTime | date 'YY[年]M[月]DD[日]hh[時]mm[分]'}}</span>
                   </span>
-                  <span class="flex-column flex-33" v-if="!observeMode">
-                    <span class="field-title">完成于</span>
-                    <span class="field-content">{{quizsample.finishTime | calendar}}</span>
-                  </span>
-                  <span class="flex-column flex-33" v-if="!observeMode">
-                    <span class="field-title">用時</span>
-                    <span class="field-content">{{timeDifference(quizsample.startTime, quizsample.finishTime)}}</span>
-                  </span>
+                  <div class="flex-row flex-66" v-if="quizsample.finishTime">
+                    <span class="flex-column flex-50" >
+                      <span class="field-title">完成于</span>
+                      <span class="field-content">{{quizsample.finishTime | date 'YY[年]M[月]DD[日]hh[時]mm[分]'}}</span>
+                    </span>
+                    <span class="flex-column flex-50">
+                      <span class="field-title">用時</span>
+                      <span class="field-content">{{timeDifference(quizsample.startTime, quizsample.finishTime)}}</span>
+                    </span>
+                  </div>
+
                 </span>
               </div>
             </div>

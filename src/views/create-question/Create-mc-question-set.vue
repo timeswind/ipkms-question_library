@@ -1,19 +1,19 @@
-<style scoped>
-.newquestion-difficulty-box {
+<style>
+#create-mc-question-set .newquestion-difficulty-box {
   padding: 10px 0
 }
 
-.newquestion-difficulty-box i {
+#create-mc-question-set .newquestion-difficulty-box i {
   width: 24px;
   color: #aaa;
   cursor: pointer;
 }
 
-.difficulty-heighlight{
+#create-mc-question-set .difficulty-heighlight{
   color: #FFC107 !important
 }
 
-.q-tag {
+#create-mc-question-set .q-tag {
   color: #E91E63;
   margin: 0 5px;
   padding: 2px 4px;
@@ -21,7 +21,7 @@
   cursor: pointer;
 }
 
-.body-wrapper {
+#create-mc-question-set .body-wrapper {
   max-width: 800px;
   margin:32px auto;
 }
@@ -43,30 +43,30 @@
   line-height: 20px
 }
 
-.toolbar-title {
+#create-mc-question-set .toolbar-title {
   padding: 8px;
   margin: 0
 }
-.mc-input-wrapper,.mc-preview-wrapper {
+#create-mc-question-set .mc-input-wrapper,.mc-preview-wrapper {
   display: inline-block;
   width: 100%
 }
 
-.mc-preview-wrapper .card {
+#create-mc-question-set .mc-preview-wrapper .card {
   cursor: pointer;
 }
 
-.mc-preview-wrapper .hightlight-answer .card {
+#create-mc-question-set .mc-preview-wrapper .hightlight-answer .card {
   background-color: #009688;
   color: #fff
 }
-.mc-preview-wrapper .mc-label {
+#create-mc-question-set .mc-preview-wrapper .mc-label {
   height:52px;
   line-height:52px;
   padding: 0 16px;
 }
 
-.create-qcollection-modal {
+#create-mc-question-set .create-qcollection-modal {
   display: block;
   position: fixed;
   z-index: 9998;
@@ -77,7 +77,7 @@
   background-color: rgba(0, 0, 0, .5);
 }
 
-.modal-container {
+#create-mc-question-set .modal-container {
   width: 300px;
   margin: 130px auto 0;
   background-color: #fff;
@@ -85,7 +85,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
 }
 
-.qcollection-inbox {
+#create-mc-question-set .qcollection-inbox {
   height: 60px;
   background: #fff;
   position: fixed;
@@ -98,11 +98,11 @@
   transition: height 0.2s ease;
 }
 
-.qcollection-inbox.show {
+#create-mc-question-set .qcollection-inbox.show {
   height: calc(100% - 160px);
 }
 
-.qcollection-inbox .expand-icon {
+#create-mc-question-set .qcollection-inbox .expand-icon {
   position: absolute;
   background: #fff;
   bottom: -26px;
@@ -114,15 +114,15 @@
   border-bottom-right-radius: 5px
 }
 
-.qcollection-inbox p {
+#create-mc-question-set .qcollection-inbox p {
   margin: 0
 }
 
 @media screen and (max-width: 1024px) {
-  .create-qcollection-modal {
+  #create-mc-question-set .create-qcollection-modal {
     box-sizing: border-box;
   }
-  .qcollection-inbox {
+  #create-mc-question-set .qcollection-inbox {
     top: 56px;
     left: 0;
     right: 0;
@@ -130,30 +130,30 @@
 }
 
 @media screen and (min-width: 1025px) {
-  .create-qcollection-modal {
+  #create-mc-question-set .create-qcollection-modal {
     box-sizing: border-box;
     padding-left: 240px
   }
-  .qcollection-inbox {
+  #create-mc-question-set .qcollection-inbox {
     top: 64px;
     left: 240px;
     right: 0;
   }
 }
 
-.qcollection-inbox .qcollection-header {
+#create-mc-question-set .qcollection-inbox .qcollection-header {
   max-width: 800px;
   padding: 16px 16px 0 16px;
   margin: 0 auto;
   margin-bottom: 16px
 }
-.qcollection-inbox .qcollection-header .public {
+#create-mc-question-set .qcollection-inbox .qcollection-header .public {
   border: 1px solid;
   color: #E91E63;
   font-size: 14px;
   padding: 2px 4px;
 }
-.qcollection-inbox .qcollection-header .subject {
+#create-mc-question-set .qcollection-inbox .qcollection-header .subject {
   color: #fff;
   background: #03A9F4;
   font-size: 14px;
@@ -161,17 +161,17 @@
   margin-left: 8px;
   margin-right: 8px
 }
-.qcollection-inbox .qcollection-header .name {
+#create-mc-question-set .qcollection-inbox .qcollection-header .name {
   font-size: 18px;
   font-weight: bold;
 }
-.qcollection-inbox .questions {
+#create-mc-question-set .qcollection-inbox .questions {
   height:calc(100% - 70px);
   overflow:auto;
   border-top: 1px solid #eee;
 }
 
-.qcollection-inbox .question {
+#create-mc-question-set .qcollection-inbox .question {
   padding: 16px;
   border-bottom: 1px solid #eee;
 }
@@ -212,292 +212,282 @@
 
           <div class="flex-column flex-center" style="margin:16px 0 32px 0">
             <mdl-button raised primary @click="nextPage()" :disabled="!newQcollection.loadMore">加載更多</mdl-button>
-            </div>
           </div>
-
-        </div>
-      </div>
-
-      <mdl-button accent raised class="float-button" @click="goToQCDetailView()" v-bind:disabled="publishButton.disabled">
-        完成編輯
-      </mdl-button>
-      <div class="body-wrapper">
-
-        <div class="qcollection-inbox" :class="{'show': qcollectionInbox.show}">
-
-          <div class="qcollection-header flex-row flex-center">
-            <span class="public">{{newQcollection.public | bTp}}</span>
-            <span class="subject">{{newQcollection.subject | subject}}</span>
-            <span class="name">{{newQcollection.name}}</span>
-            <span class="flex-row flex-center" style="margin-left:auto;font-size:18px;color:#2196F3"><i class="material-icons" style="font-size:24px;margin-right:8px">description</i> {{qcollectionInbox.questions.length}} 題</span>
-          </div>
-
-          <div class="flex-column questions" v-show="qcollectionInbox.show">
-            <div class="flex-row flex-baseline flex-no-shrink question" v-for="q in qcollectionInbox.questions" indexBy="_id">
-              <span style="margin-right:8px">{{$index + 1}}.</span>
-              <span style="margin-right:8px">{{{q.context}}}</span>
-              <span class="flex-row flex-center" style="margin-left:auto;color:#FFC107">{{q.difficulty}}<i class="material-icons" style="font-size:16px">star</i></span>
-            </div>
-          </div>
-
-          <div class="expand-icon" @click="toggleQCInbox()">
-            <i class="material-icons" v-show="qcollectionInbox.show">expand_less</i>
-            <i class="material-icons" v-else>expand_more</i>
-          </div>
-        </div>
-
-
-        <div style="margin:16px 0;width:100%;height:16px">
-        </div>
-        <card>
-          <div slot="content" style="padding:8px 16px 0 16px">
-            <div class="newquestion-difficulty-box flex-row flex-center">
-              <span>難度：</span>
-              <span class="flex-row">
-                <i v-for="1 in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
-              </span>
-            </div>
-            <div class="flex-column" style="position:relative;top:-16px">
-              <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
-                <span>標籤：</span>
-                <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
-              </div>
-              <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
-            </div>
-          </div>
-        </card>
-        <div class="flex-row">
-
-          <div class="flex-50">
-            <card>
-              <div slot="content">
-                <quill :content.sync="editorPreview.question"></quill>
-              </div>
-            </card>
-          </div>
-
-          <div class="flex-50">
-            <card>
-              <div slot="content">
-                <p class="toolbar-title">預覽</p>
-                <div id="question-preview-container"></div>
-              </div>
-            </card>
-          </div>
-
-        </div>
-        <div class="mc-preview-wrapper" id="mc-preview-container">
-          <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
-          <div class="flex-row">
-            <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click="newQuestion.answer.mc = 0">
-              <div slot="content" class="flex-row flex-baseline"><span class="mc-label">A</span><div id="mc1"></div></div>
-            </card>
-            <card flex="true" class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click="newQuestion.answer.mc = 1">
-              <div slot="content" class="flex-row flex-baseline"><span class="mc-label">B</span><div id="mc2"></div></div>
-            </card>
-
-          </div>
-          <div class="flex-row">
-            <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click="newQuestion.answer.mc = 2">
-              <div slot="content" class="flex-row flex-baseline"><span class="mc-label">C</span><div id="mc3"></div></div>
-            </card>
-            <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click="newQuestion.answer.mc = 3">
-              <div slot="content" class="flex-row flex-baseline"><span class="mc-label">D</span><div id="mc4"></div></div>
-            </card>
-          </div>
-        </div>
-        <h5 style="margin-left:4px">編輯答案</h5>
-
-        <div>
-          <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
-          <div class="flex-row">
-            <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
-            <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
-          </div>
-          <div class="flex-row">
-            <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
-            <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
-          </div>
-        </div>
-        <div class="flex-column" style="margin-top:16px">
-          <mdl-button primary raised @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
-            添加到題集
-          </mdl-button>
         </div>
 
       </div>
     </div>
-  </template>
 
-  <script>
-  import renderQuill from 'quill-render'
-  import Subject from '../../modules/Subjects'
-  import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
-  import Card from '../../components/reuseable/Card'
+    <mdl-button accent raised class="float-button" @click="goToQCDetailView()" v-bind:disabled="publishButton.disabled">
+      完成編輯
+    </mdl-button>
+    <div class="body-wrapper">
 
-  import 'quill/dist/quill.snow.css'
+      <div class="qcollection-inbox" :class="{'show': qcollectionInbox.show}">
 
-  var delayTimer
+        <div class="qcollection-header flex-row flex-center">
+          <span class="public">{{newQcollection.public | bTp}}</span>
+          <span class="subject">{{newQcollection.subject | subject}}</span>
+          <span class="name">{{newQcollection.name}}</span>
+          <span class="flex-row flex-center" style="margin-left:auto;font-size:18px;color:#2196F3"><i class="material-icons" style="font-size:24px;margin-right:8px">description</i> {{qcollectionInbox.questions.length}} 題</span>
+        </div>
 
-  export default {
-    components: {
-      Subject,
-      Card,
-      sheetPannel
-    },
-    methods: {
-      publishQuestion: function () {
-        this.publishButton.disabled = true
-        if (this.checkComplete()) {
-          this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
-          this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
-          this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
-          this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
-          this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
+        <div class="flex-column questions" v-show="qcollectionInbox.show">
+          <div class="flex-row flex-baseline flex-no-shrink question" v-for="q in qcollectionInbox.questions" indexBy="_id">
+            <span style="margin-right:8px">{{$index + 1}}.</span>
+            <span style="margin-right:8px">{{{q.context}}}</span>
+            <span class="flex-row flex-center" style="margin-left:auto;color:#FFC107">{{q.difficulty}}<i class="material-icons" style="font-size:16px">star</i></span>
+          </div>
+        </div>
 
-          let data = {
-            type: 'mc',
-            tags: this.newQuestion.tags,
-            subject: this.newQcollection.subject,
-            tips: this.newQuestion.tips,
-            difficulty: this.newQuestion.difficulty,
-            context: this.newQuestion.context,
-            choices: this.newQuestion.choices,
-            answer: {
-              mc: this.newQuestion.answer.mc
-            }
-          }
+        <div class="expand-icon" @click="toggleQCInbox()">
+          <i class="material-icons" v-show="qcollectionInbox.show">expand_less</i>
+          <i class="material-icons" v-else>expand_more</i>
+        </div>
+      </div>
 
-          console.log(data)
 
-          this.$http.post('/api/manage-question/questions', data).then(function (response) {
-            this.qcollectionInbox.questions.push(response.data)
-            this.addQuestionToCollection(response.data._id)
-            this.publishButton.disabled = false
-            this.newQuestion.context = ''
-            this.newQuestion.choices = ['', '', '', '']
-            this.newQuestion.answer.mc = 0
-            this.editorPreview = {
-              question: { ops: [] },
-              answer: {
-                mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
-              }
-            }
-            this.$broadcast('clear-editor')
-            this.renderQuestionPreview('clear')
-            this.renderMcPreview('clear')
-          }, function (response) {
-            this.$showToast('發佈失敗')
-            this.publishButton.disabled = false
-            console.log(response)
-          })
-        } else {
+      <div style="margin:16px 0;width:100%;height:16px">
+      </div>
+      <card>
+        <div slot="content" style="padding:8px 16px 0 16px">
+          <div class="newquestion-difficulty-box flex-row flex-center">
+            <span>難度：</span>
+            <span class="flex-row">
+              <i v-for="1 in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+            </span>
+          </div>
+          <div class="flex-column" style="position:relative;top:-16px">
+            <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
+              <span>標籤：</span>
+              <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
+            </div>
+            <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+          </div>
+        </div>
+      </card>
+      <div class="flex-row">
+
+        <div class="flex-50">
+          <card>
+            <div slot="content">
+              <quill :content.sync="editorPreview.question"></quill>
+            </div>
+          </card>
+        </div>
+
+        <div class="flex-50">
+          <card>
+            <div slot="content">
+              <p class="toolbar-title">預覽</p>
+              <div id="question-preview-container"></div>
+            </div>
+          </card>
+        </div>
+
+      </div>
+      <div class="mc-preview-wrapper" id="mc-preview-container">
+        <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
+        <div class="flex-row">
+          <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click="newQuestion.answer.mc = 0">
+            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">A</span><div id="mc1"></div></div>
+          </card>
+          <card flex="true" class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click="newQuestion.answer.mc = 1">
+            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">B</span><div id="mc2"></div></div>
+          </card>
+
+        </div>
+        <div class="flex-row">
+          <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click="newQuestion.answer.mc = 2">
+            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">C</span><div id="mc3"></div></div>
+          </card>
+          <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click="newQuestion.answer.mc = 3">
+            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">D</span><div id="mc4"></div></div>
+          </card>
+        </div>
+      </div>
+      <h5 style="margin-left:4px">編輯答案</h5>
+
+      <div>
+        <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
+        <div class="flex-row">
+          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
+          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
+        </div>
+        <div class="flex-row">
+          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
+          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+        </div>
+      </div>
+      <div class="flex-column" style="margin-top:16px">
+        <mdl-button primary raised @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
+          添加到題集
+        </mdl-button>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script>
+import renderQuill from 'quill-render'
+import Subject from '../../modules/Subjects'
+import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
+import Card from '../../components/reuseable/Card'
+
+import 'quill/dist/quill.snow.css'
+
+var delayTimer
+
+export default {
+  components: {
+    Subject,
+    Card,
+    sheetPannel
+  },
+  methods: {
+    publishQuestion: function () {
+      this.publishButton.disabled = true
+      if (this.checkComplete()) {
+        this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
+        this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
+        this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
+        this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
+        this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
+        let data = {
+          type: 'mc',
+          tags: this.newQuestion.tags,
+          subject: this.newQcollection.subject,
+          tips: this.newQuestion.tips,
+          difficulty: this.newQuestion.difficulty,
+          context: this.newQuestion.context,
+          choices: this.newQuestion.choices,
+          answer: {
+            mc: this.newQuestion.answer.mc
+          },
+          rawData: JSON.stringify(this.editorPreview)
+        }
+
+        console.log(data)
+
+        this.$http.post('/api/manage-question/questions', data).then(function (response) {
+          this.qcollectionInbox.questions.push(response.data)
+          this.addQuestionToCollection(response.data._id)
           this.publishButton.disabled = false
-          this.$showToast('信息不完整')
-        }
-      },
-      addQuestionToCollection: function (question_id) {
-        if (question_id && this.newQcollection.id) {
-          let data = {
-            qcollection_id: this.newQcollection.id,
-            question_id: question_id
+          this.newQuestion.context = ''
+          this.newQuestion.choices = ['', '', '', '']
+          this.newQuestion.answer.mc = 0
+          this.editorPreview = {
+            question: { ops: [] },
+            answer: {
+              mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
+            }
           }
-          this.$http.post('/api/manage-qcollection/add-question', data).then(function (response) {
-            this.$showToast('發佈成功')
-          }, function (response) {
-            this.$showToast('失敗')
-            console.log(response)
-          })
-        } else {
-          this.$showToast('發生錯誤')
-        }
-      },
-      getQuestions: function () {
-        let qcollection_id = this.newQcollection.id
-        let apiURL = '/api/manage-qcollection/detail/' + qcollection_id
-        this.$http.get(apiURL).then(function (response) {
-          this.qcollectionInbox.questions = response.data.questions
+          this.$broadcast('clear-editor')
+          this.renderQuestionPreview('clear')
+          this.renderMcPreview('clear')
         }, function (response) {
+          this.$showToast('發佈失敗')
+          this.publishButton.disabled = false
           console.log(response)
         })
-      },
-      checkComplete: function () {
-        let contentComplete = this.editorPreview.question.ops.length !== 0
-        let answerComplete = this.editorPreview.answer.mc[0].ops.length !== 0 && this.editorPreview.answer.mc[1].ops.length !== 0 && this.editorPreview.answer.mc[2].ops.length !== 0 && this.editorPreview.answer.mc[3].ops.length !== 0
-
-        return (contentComplete && answerComplete)
-      },
-      addTag: function () {
-        if (this.tag.trim() !== '') {
-          if (this.newQuestion.tags.indexOf(this.tag) === -1) {
-            this.newQuestion.tags.push(this.tag)
-            this.tag = ''
-          } else {
-            this.tag = ''
-          }
+      } else {
+        this.publishButton.disabled = false
+        this.$showToast('信息不完整')
+      }
+    },
+    addQuestionToCollection: function (question_id) {
+      if (question_id && this.newQcollection.id) {
+        let data = {
+          qcollection_id: this.newQcollection.id,
+          question_id: question_id
         }
-      },
-      removeTag: function (index) {
-        this.newQuestion.tags.splice(index, 1)
-      },
-      renderQuestionPreview: function (option) {
-        if (option === 'clear') {
-          window.document.getElementById('question-preview-container').innerHTML = '<p></p>'
+        this.$http.post('/api/manage-qcollection/add-question', data).then(function (response) {
+          this.$showToast('發佈成功')
+        }, function (response) {
+          this.$showToast('失敗')
+          console.log(response)
+        })
+      } else {
+        this.$showToast('發生錯誤')
+      }
+    },
+    getQuestions: function () {
+      let qcollection_id = this.newQcollection.id
+      let apiURL = '/api/manage-qcollection/qcollection?id=' + qcollection_id
+      this.$http.get(apiURL).then(function (response) {
+        this.qcollectionInbox.questions = response.data.questions
+      }, function (response) {
+        console.log(response)
+      })
+    },
+    checkComplete: function () {
+      let contentComplete = this.editorPreview.question.ops.length !== 0
+      let answerComplete = this.editorPreview.answer.mc[0].ops.length !== 0 && this.editorPreview.answer.mc[1].ops.length !== 0 && this.editorPreview.answer.mc[2].ops.length !== 0 && this.editorPreview.answer.mc[3].ops.length !== 0
+
+      return (contentComplete && answerComplete)
+    },
+    addTag: function () {
+      if (this.tag.trim() !== '') {
+        if (this.newQuestion.tags.indexOf(this.tag) === -1) {
+          this.newQuestion.tags.push(this.tag)
+          this.tag = ''
         } else {
-          window.document.getElementById('question-preview-container').innerHTML = renderQuill(this.editorPreview.question.ops)
-          setTimeout(function renderQuestionPreview () {
-            window.renderMathInElement(
-              document.getElementById('question-preview-container'),
-              {
-                delimiters: [
-                  {left: '$$', right: '$$', display: false}
-                ]
-              }
-            )
-          }, 0)
+          this.tag = ''
         }
-      },
-      renderMcPreview: function (option) {
-        if (option === 'clear') {
-          window.document.getElementById('mc1').innerHTML = '<p></p>'
-          window.document.getElementById('mc2').innerHTML = '<p></p>'
-          window.document.getElementById('mc3').innerHTML = '<p></p>'
-          window.document.getElementById('mc4').innerHTML = '<p></p>'
-        } else {
-          window.document.getElementById('mc1').innerHTML = renderQuill(this.editorPreview.answer.mc[0].ops)
-          window.document.getElementById('mc2').innerHTML = renderQuill(this.editorPreview.answer.mc[1].ops)
-          window.document.getElementById('mc3').innerHTML = renderQuill(this.editorPreview.answer.mc[2].ops)
-          window.document.getElementById('mc4').innerHTML = renderQuill(this.editorPreview.answer.mc[3].ops)
-
-          setTimeout(function renderMcPreview () {
-            window.renderMathInElement(
-              document.getElementById('mc-preview-container'),
-              {
-                delimiters: [
-                  {left: '$$', right: '$$', display: false}
-                ]
-              }
-            )
-          }, 0)
-        }
-      },
-      renderQCInbox: function (option) {
-        var divs = document.querySelectorAll('.question')
-
-        if (option === 'all') {
-          for (var i = 0; i < divs.length; i++) {
-            window.renderMathInElement(
-              divs[i],
-              {
-                delimiters: [
-                  {left: '$$', right: '$$', display: false}
-                ]
-              }
-            )
-          }
-        } else if (!isNaN(option)) {
+      }
+    },
+    removeTag: function (index) {
+      this.newQuestion.tags.splice(index, 1)
+    },
+    renderQuestionPreview: function (option) {
+      if (option === 'clear') {
+        window.document.getElementById('question-preview-container').innerHTML = '<p></p>'
+      } else {
+        window.document.getElementById('question-preview-container').innerHTML = renderQuill(this.editorPreview.question.ops)
+        setTimeout(function renderQuestionPreview () {
           window.renderMathInElement(
-            divs[option],
+            document.getElementById('question-preview-container'),
+            {
+              delimiters: [
+                {left: '$$', right: '$$', display: false}
+              ]
+            }
+          )
+        }, 0)
+      }
+    },
+    renderMcPreview: function (option) {
+      if (option === 'clear') {
+        window.document.getElementById('mc1').innerHTML = '<p></p>'
+        window.document.getElementById('mc2').innerHTML = '<p></p>'
+        window.document.getElementById('mc3').innerHTML = '<p></p>'
+        window.document.getElementById('mc4').innerHTML = '<p></p>'
+      } else {
+        window.document.getElementById('mc1').innerHTML = renderQuill(this.editorPreview.answer.mc[0].ops)
+        window.document.getElementById('mc2').innerHTML = renderQuill(this.editorPreview.answer.mc[1].ops)
+        window.document.getElementById('mc3').innerHTML = renderQuill(this.editorPreview.answer.mc[2].ops)
+        window.document.getElementById('mc4').innerHTML = renderQuill(this.editorPreview.answer.mc[3].ops)
+
+        setTimeout(function renderMcPreview () {
+          window.renderMathInElement(
+            document.getElementById('mc-preview-container'),
+            {
+              delimiters: [
+                {left: '$$', right: '$$', display: false}
+              ]
+            }
+          )
+        }, 0)
+      }
+    },
+    renderQCInbox: function (option) {
+      var divs = document.querySelectorAll('.question')
+
+      if (option === 'all') {
+        for (var i = 0; i < divs.length; i++) {
+          window.renderMathInElement(
+            divs[i],
             {
               delimiters: [
                 {left: '$$', right: '$$', display: false}
@@ -505,152 +495,163 @@
             }
           )
         }
-      },
-      goToQCDetailView: function () {
-        let path = {
-          name: 'qcollection-detail',
-          params: {
-            qcollection_id: this.newQcollection.id
+      } else if (!isNaN(option)) {
+        window.renderMathInElement(
+          divs[option],
+          {
+            delimiters: [
+              {left: '$$', right: '$$', display: false}
+            ]
           }
+        )
+      }
+    },
+    goToQCDetailView: function () {
+      let path = {
+        name: 'qcollection-detail',
+        params: {
+          qcollection_id: this.newQcollection.id
         }
-        this.$router.go(path)
-      },
-      mapSubjectsArray: function (subjects) {
-        return subjects.map(function (subject) {
-          var newObj = {
-            name: subject.name,
-            value: subject.id
+      }
+      this.$router.go(path)
+    },
+    mapSubjectsArray: function (subjects) {
+      return subjects.map(function (subject) {
+        var newObj = {
+          name: subject.name,
+          value: subject.id
+        }
+        return newObj
+      })
+    },
+    createNewQcollection: function (option, qcollection) {
+      if (option === 'from exist' && typeof qcollection === 'object') {
+        this.newQcollection.name = qcollection.name
+        this.newQcollection.subject = qcollection.subject
+        this.newQcollection.public = qcollection.public
+        this.newQcollection.id = qcollection._id
+        this.getQuestions()
+      } else {
+        if (this.newQcollection.name.trim() !== '' && this.newQcollection.subject.trim() !== '') {
+          let data = {
+            name: this.newQcollection.name,
+            subject: this.newQcollection.subject,
+            public: this.newQcollection.public
           }
-          return newObj
-        })
-      },
-      createNewQcollection: function (option, qcollection) {
-        if (option === 'from exist' && typeof qcollection === 'object') {
-          this.newQcollection.name = qcollection.name
-          this.newQcollection.subject = qcollection.subject
-          this.newQcollection.public = qcollection.public
-          this.newQcollection.id = qcollection._id
-          this.getQuestions()
+          this.$http.post('/api/manage-qcollection/qcollection', data).then(function (response) {
+            console.log(response.data)
+            this.newQcollection.id = response.data._id
+          }, function (response) {
+            console.log(response)
+          })
+        }
+      }
+    },
+    getMyQcollections: function () {
+      this.$http.get('/api/manage-qcollection/qcollections/mine').then(function (response) {
+        if (response.data.length > 0) {
+          this.newQcollection.myQcollections = response.data
+          if (response.data.length < 12) {
+            this.newQcollection.loadMore = false
+          }
         } else {
-          if (this.newQcollection.name.trim() !== '' && this.newQcollection.subject.trim() !== '') {
-            let data = {
-              name: this.newQcollection.name,
-              subject: this.newQcollection.subject,
-              public: this.newQcollection.public
-            }
-            this.$http.post('/api/manage-qcollection/qcollection', data).then(function (response) {
-              console.log(response.data)
-              this.newQcollection.id = response.data._id
-            }, function (response) {
-              console.log(response)
-            })
-          }
+          this.newQcollection.loadMore = false
         }
-      },
-      getMyQcollections: function () {
-        this.$http.get('/api/manage-qcollection/mine').then(function (response) {
+      }, function (response) {
+        this.newQcollection.loadMore = false
+        console.log(response)
+      })
+    },
+    nextPage: function () {
+      if (this.newQcollection.myQcollections.length > 0) {
+        this.newQcollection.loadMore = false
+        let latest_id = this.newQcollection.myQcollections[this.newQcollection.myQcollections.length - 1]._id
+        let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
+        this.$http.get(apiURL).then(function (response) {
           if (response.data.length > 0) {
-            this.newQcollection.myQcollections = response.data
+            for (var i = 0; i < response.data.length; i++) {
+              this.newQcollection.myQcollections.push(response.data[i])
+            }
             if (response.data.length < 12) {
               this.newQcollection.loadMore = false
+            } else {
+              this.newQcollection.loadMore = true
             }
           } else {
             this.newQcollection.loadMore = false
           }
         }, function (response) {
-          this.newQcollection.loadMore = false
+          this.newQcollection.loadMore = true
           console.log(response)
         })
-      },
-      nextPage: function () {
-        if (this.newQcollection.myQcollections.length > 0) {
-          this.newQcollection.loadMore = false
-          let latest_id = this.newQcollection.myQcollections[this.newQcollection.myQcollections.length - 1]._id
-          let apiURL = '/api/manage-qcollection/mine?page=' + latest_id
-          this.$http.get(apiURL).then(function (response) {
-            if (response.data.length > 0) {
-              for (var i = 0; i < response.data.length; i++) {
-                this.newQcollection.myQcollections.push(response.data[i])
-              }
-              if (response.data.length < 12) {
-                this.newQcollection.loadMore = false
-              } else {
-                this.newQcollection.loadMore = true
-              }
-            } else {
-              this.newQcollection.loadMore = false
-            }
-          }, function (response) {
-            this.newQcollection.loadMore = true
-            console.log(response)
-          })
-        }
-      },
-      toggleQCInbox: function () {
-        if (!this.qcollectionInbox.show) {
-          this.renderQCInbox('all')
-        }
-        this.qcollectionInbox.show = !this.qcollectionInbox.show
       }
     },
-    data () {
-      return {
-        publishButton: {
-          disabled: false
-        },
-        subjects: this.mapSubjectsArray(Subject.subjects),
-        tag: '',
-        newQcollection: {
-          name: '',
-          subject: '',
-          public: false,
-          id: null,
-          myQcollections: [],
-          loadMore: true
-        },
-        qcollectionInbox: {
-          show: false,
-          questions: []
-        },
-        newQuestion: {
-          type: 'mc',
-          tags: [],
-          tips: '',
-          difficulty: 1,
-          context: '',
-          choices: ['', '', '', ''],
-          answer: {
-            mc: 0
-          }
-        },
-        editorPreview: {
-          question: { ops: [] },
-          answer: {
-            mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
-          }
-        }
+    toggleQCInbox: function () {
+      if (!this.qcollectionInbox.show) {
+        this.renderQCInbox('all')
       }
-    },
-    filters: {
-      'timestamp': function (input) {
-        return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
-      }
-    },
-    watch: {
-      'editorPreview.question.ops': function () {
-        var self = this
-        clearTimeout(delayTimer)
-        delayTimer = setTimeout(function () {
-          self.renderQuestionPreview()
-        }, 500)
+      this.qcollectionInbox.show = !this.qcollectionInbox.show
+    }
+  },
+  data () {
+    return {
+      publishButton: {
+        disabled: false
       },
-      'editorPreview.answer.mc': function () {
-        var self = this
-        clearTimeout(delayTimer)
-        delayTimer = setTimeout(function () {
-          self.renderMcPreview()
-        }, 500)
+      subjects: this.mapSubjectsArray(Subject.subjects),
+      tag: '',
+      newQcollection: {
+        name: '',
+        subject: '',
+        public: false,
+        id: null,
+        myQcollections: [],
+        loadMore: true
+      },
+      qcollectionInbox: {
+        show: false,
+        questions: []
+      },
+      newQuestion: {
+        type: 'mc',
+        tags: [],
+        tips: '',
+        difficulty: 1,
+        context: '',
+        choices: ['', '', '', ''],
+        answer: {
+          mc: 0
+        },
+        rawData: ''
+      },
+      editorPreview: {
+        question: { ops: [] },
+        answer: {
+          mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
+        }
       }
     }
+  },
+  filters: {
+    'timestamp': function (input) {
+      return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
+    }
+  },
+  watch: {
+    'editorPreview.question.ops': function () {
+      var self = this
+      clearTimeout(delayTimer)
+      delayTimer = setTimeout(function () {
+        self.renderQuestionPreview()
+      }, 500)
+    },
+    'editorPreview.answer.mc': function () {
+      var self = this
+      clearTimeout(delayTimer)
+      delayTimer = setTimeout(function () {
+        self.renderMcPreview()
+      }, 500)
+    }
   }
-  </script>
+}
+</script>

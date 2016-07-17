@@ -7,6 +7,7 @@
           <span style="font-size: 20px">題集信息</span>
           <div v-show="!editMode">
             <mdl-button primary style="margin-left: 8px" @click="editMode = true">修改</mdl-button>
+            <mdl-button accent style="margin-left: 8px" @click="deleteCollection()">刪除題集</mdl-button>
           </div>
           <div v-else>
             <mdl-button accent style="margin-left: 8px" @click="updateQcollectionInfo()">提交</mdl-button>
@@ -70,7 +71,9 @@
 
       </div>
     </card>
-
+    <div style="text-align: center;margin-top: 16px;font-size: 16px;color: #9E9E9E;">
+      共 {{questions.length}} 題
+    </div>
     <div class="mdl-grid" id="questions-preview-container">
       <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in questions">
         <div v-if="typeof q === 'object'">
@@ -102,10 +105,10 @@
 
 <script>
 import _ from 'lodash'
-import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
-import sheetPannel from './reuseable/Sheet-pannel.vue'
-import Subject from '../modules/Subjects'
-import Card from './reuseable/Card.vue'
+import qcollectionSelectorModal from '../../components/reuseable/Select-qcollection.vue'
+import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
+import Subject from '../../modules/Subjects'
+import Card from '../../components/reuseable/Card.vue'
 
 export default {
   ready: function () {
@@ -194,9 +197,11 @@ export default {
         description: this.qcinfo.description
       }
 
-      let apiURL = '/api/manage-qcollection/update-info'
+      let apiURL = '/api/manage-qcollection/qcollection'
       this.$http.put(apiURL, data).then(function (response) {
         this.editMode = false
+        this.$showToast('更新成功')
+        console.log('update qcollection success')
       }, function (response) {
         console.log('fail to update this qcollection')
       })
@@ -206,12 +211,11 @@ export default {
         qcollection_id: this.qcinfo._id,
         aveDifficulty: newDifficulty
       }
-
       let apiURL = '/api/manage-qcollection/update-difficulty'
       this.$http.put(apiURL, data).then(function (response) {
-
+        console.log('update diffuculty success')
       }, function (response) {
-        console.log('fail to update this qcollection')
+        console.log('fail to update diffuculty')
       })
     },
     calculateAveDifficulty: function () {

@@ -11,9 +11,6 @@ import 'material-design-lite/material.min.js'
 
 import App from './App'
 
-import 'vue-toast/dist/vue-toast.min.css'
-import vueToast from 'vue-toast'
-
 Vue.config.debug = true
 
 Vue.use(VueRouter)
@@ -21,7 +18,6 @@ Vue.use(VueResource)
 Vue.use(VueQuill)
 Vue.use(Filters)
 Vue.use(VueMdl)
-Vue.component('vue-toast', vueToast)
 
 Vue.prototype.$showToast = function (message) {
   store.dispatch('SHOW_TOAST', message)
@@ -104,30 +100,37 @@ router.map({
   '/manage-qcollection': {
     name: 'manage-qcollection',
     component: function (resolve) {
-      require(['./components/manage-qcollection.vue'], resolve)
+      require(['./views/qcollection/manage-qcollection.vue'], resolve)
     },
     title: '管理題集',
     subRoutes: {
       '/my': {
         name: 'my-qcollection',
         component: function (resolve) {
-          require(['./components/My-qcollection.vue'], resolve)
+          require(['./views/qcollection/My-qcollection.vue'], resolve)
         },
         title: '我的題集'
       },
       '/all': {
         name: 'all-qcollection',
         component: function (resolve) {
-          require(['./components/All-qcollection.vue'], resolve)
+          require(['./views/qcollection/All-qcollection.vue'], resolve)
         },
         title: '所有題集'
+      },
+      '/search': {
+        name: 'search-qcollection',
+        component: function (resolve) {
+          require(['./views/qcollection/Search-qcollection.vue'], resolve)
+        },
+        title: '搜索題集'
       }
     }
   },
   '/manage-qcollection/detail/:qcollection_id': {
     name: 'qcollection-detail',
     component: function (resolve) {
-      require(['./components/Qcollection-detail.vue'], resolve)
+      require(['./views/qcollection/Qcollection-detail.vue'], resolve)
     },
     title: '題集內容'
 

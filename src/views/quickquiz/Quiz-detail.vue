@@ -79,7 +79,7 @@
               <span>正確題數</span>
             </mdl-button>
           </div>
-          <canvas width="400px" height="200" v-el:sp-chart></canvas>
+          <canvas v-el:sp-chart></canvas>
           <div class="flex-row flex-center" style="margin-top:32px;border-top:1px solid #ddd;padding-top:16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">題目數據</span>
             <mdl-button accent raised @click="drawQAChart('correct')">
@@ -333,12 +333,14 @@ export default {
       }
     },
     drawSPChart: function (sort, type) {
-      if (spChart !== null) {
-        spChart.destroy()
-      }
       let self = this
       let studentCount = this.students.length
       let student_performance_chart = this.$els.spChart
+      student_performance_chart.height = 20 * studentCount
+
+      if (spChart !== null) {
+        spChart.destroy()
+      }
       // initialise data
       let name_set = _.map(this.students, function (student) { return student.name })
       let time_cost_set = _.map(this.students, function (student, key) {
@@ -407,16 +409,20 @@ export default {
       }
 
       spChart = new Chart(student_performance_chart, {
-        type: 'bar',
+        type: 'horizontalBar',
         data: spChartdata
       })
       spChart.render(500, false)
     },
     drawQAChart: function (sort, type) {
+      let questionCount = this.quickquiz.questions
+      let question_analysis_chart = this.$els.qaChart
+      question_analysis_chart.height = 30 * questionCount
+
       if (qaChart !== null) {
         qaChart.destroy()
       }
-      let question_analysis_chart = this.$els.qaChart
+
       // initialise data
       let labels_set = _.map(_.times(this.quickquiz.questions, Number), function (number) { return '第' + (number + 1) + '題' })
       let correct_count_set = _.map(this.quickquiz.analysis.questions, function (question, key) {
@@ -475,7 +481,7 @@ export default {
       }
 
       qaChart = new Chart(question_analysis_chart, {
-        type: 'bar',
+        type: 'horizontalBar',
         data: qaChartData
       })
       qaChart.render(500, false)

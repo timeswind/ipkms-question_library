@@ -47,7 +47,7 @@
         </mdl-button>
       </div>
     </div>
-    <div v-show="!showCreatSheet" style="padding: 16px 16px 0 16px">
+    <div v-show="!showCreatSheet" style="padding: 0 16px">
       <div class="flex-row">
         <div>
           <mdl-button primary raised @click="showCreatSheet = true">
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import Subject from '../modules/Subjects'
+import Subject from '../../modules/Subjects'
 
 export default {
   ready: function () {

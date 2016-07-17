@@ -234,6 +234,7 @@ export default {
         this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
         this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
         this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
+        this.newQuestion.rawData = JSON.stringify(this.editorPreview)
 
         this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
           this.$showToast('發佈成功')
@@ -351,7 +352,8 @@ export default {
         choices: ['', '', '', ''],
         answer: {
           mc: 0
-        }
+        },
+        rawData: ''
       },
       editorPreview: {
         question: { ops: [] },

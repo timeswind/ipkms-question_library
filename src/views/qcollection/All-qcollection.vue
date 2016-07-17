@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import Subject from '../modules/Subjects'
+import Subject from '../../modules/Subjects'
 
 export default {
   ready: function () {

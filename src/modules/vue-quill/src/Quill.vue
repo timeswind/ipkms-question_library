@@ -101,6 +101,9 @@ export default {
     },
     'focus-editor': function () {
       this.focusEditor()
+    },
+    'clear-editor': function () {
+      this.editor.setContents([])
     }
   },
   methods: {

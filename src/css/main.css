@@ -221,6 +221,10 @@
   flex: 33
 }
 
+.flex-66 {
+  flex: 66
+}
+
 .tabbar {
   display: flex;
   max-width: 400px;
