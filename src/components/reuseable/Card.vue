@@ -18,7 +18,7 @@
 <script>
 export default {
   props: {
-    flex: false
+
   }
 }
 </script>

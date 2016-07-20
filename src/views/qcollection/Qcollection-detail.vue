@@ -5,7 +5,7 @@
       <div slot="content" style="padding: 16px" class="flex-column">
         <div class="flex-row flex-center" style="padding-bottom: 8px; border-bottom: 1px solid #eee">
           <span style="font-size: 20px">題集信息</span>
-          <div v-show="!editMode">
+          <div v-if="!editMode">
             <mdl-button primary style="margin-left: 8px" @click="editMode = true">修改</mdl-button>
             <mdl-button accent style="margin-left: 8px" @click="deleteCollection()">刪除題集</mdl-button>
           </div>
@@ -14,7 +14,7 @@
             <mdl-button primary style="margin-left: 8px" @click="editMode = false">取消</mdl-button>
           </div>
         </div>
-        <div class="flex-column" v-show="!editMode" style="margin-top: 16px">
+        <div class="flex-column" v-if="!editMode" style="margin-top: 16px">
           <div class="flex-row">
             <div class="flex-column flex-50">
               <span class="field-title">題集名字</span>
@@ -83,7 +83,7 @@
             <div class="q-difficulty">
               <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
             </div>
-            <p class="q-context">{{{q.context}}}</p>
+            <p class="q-context" v-html="q.context"></p>
             <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
           </div>
           <div class="question-tools">
@@ -91,7 +91,7 @@
             <mdl-button v-on:click="removeOneQuestion(q._id, $index)"><i class="material-icons">close</i>移除</mdl-button>
           </div>
         </div>
-        <div class="flex-column" v-else>
+        <div v-else class="flex-column">
           <span style="color:#999999;font-size: 18px;padding: 16px">該題已從題庫中移除</span>
           <div class="question-tools">
             <mdl-button v-on:click="removeOneQuestion(q, $index)"><i class="material-icons">delete_forever</i>删除</mdl-button>

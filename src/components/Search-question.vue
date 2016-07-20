@@ -35,11 +35,11 @@
       <span class="flex-column flex-center select-difficulty-box">
         <span class="flex-row flex-center">
           <span style="margin-right:8px">最低難度</span>
-          <i v-for="1 in 5" class="material-icons" @click="selectDifficulty('min', $index)" :class="{'difficulty-heighlight': search.minDifficulty > $index}">star_rate</i>
+          <i v-for="n in 5" class="material-icons" @click="selectDifficulty('min', $index)" :class="{'difficulty-heighlight': search.minDifficulty > $index}">star_rate</i>
         </span>
         <span class="flex-row flex-center">
           <span style="margin-right:8px">最高難度</span>
-          <i v-for="1 in 5" class="material-icons" @click="selectDifficulty('max', $index)" :class="{'difficulty-heighlight': search.maxDifficulty > $index}">star_rate</i>
+          <i v-for="n in 5" class="material-icons" @click="selectDifficulty('max', $index)" :class="{'difficulty-heighlight': search.maxDifficulty > $index}">star_rate</i>
         </span>
       </span>
       <mdl-switch v-show="search.tags.length !== 0" :checked.sync="search.options.matchAny" style="width: 130px;margin-bottom: 16px">任意條件符合</mdl-switch>
@@ -56,7 +56,7 @@
             <div class="q-difficulty">
               <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
             </div>
-            <p class="q-context">{{{q.context}}}</p>
+            <p class="q-context" v-html="q.context"></p>
             <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
           </div>
           <div class="question-tools">

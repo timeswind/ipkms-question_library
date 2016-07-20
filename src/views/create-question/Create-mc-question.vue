@@ -106,7 +106,7 @@
               <div class="newquestion-difficulty-box flex-column flex-50">
                 <span class="field-title" style="margin-bottom:4px">難度</span>
                 <span class="flex-row">
-                  <i v-for="1 in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
                 </span>
               </div>
             </div>
@@ -151,19 +151,19 @@
       <div class="mc-preview-wrapper" id="mc-preview-container">
         <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
         <div class="flex-row">
-          <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click="newQuestion.answer.mc = 0">
+          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">
             <div slot="content" class="flex-row flex-baseline"><span class="mc-label">A</span><div id="mc1"></div></div>
           </card>
-          <card flex="true" class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click="newQuestion.answer.mc = 1">
+          <card class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">
             <div slot="content" class="flex-row flex-baseline"><span class="mc-label">B</span><div id="mc2"></div></div>
           </card>
 
         </div>
         <div class="flex-row">
-          <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click="newQuestion.answer.mc = 2">
+          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">
             <div slot="content" class="flex-row flex-baseline"><span class="mc-label">C</span><div id="mc3"></div></div>
           </card>
-          <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click="newQuestion.answer.mc = 3">
+          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">
             <div slot="content" class="flex-row flex-baseline"><span class="mc-label">D</span><div id="mc4"></div></div>
           </card>
         </div>
@@ -195,8 +195,8 @@
       </div>
 
       <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
-        <div class="question" v-for="q in questionInbox.questions" indexBy="_id">
-          <span>{{{q.context}}}</span>
+        <div class="question" v-for="q in questionInbox.questions" track-by="_id">
+          <span v-html="q.context"></span>
           <div class="flex-row">
             <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
             <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>

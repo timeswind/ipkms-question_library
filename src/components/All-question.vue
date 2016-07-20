@@ -12,7 +12,7 @@
           <div class="q-difficulty">
             <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
           </div>
-          <p class="q-context">{{{q.context}}}</p>
+          <p class="q-context" v-html="q.context"></p>
           <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
         </div>
         <div class="question-tools">

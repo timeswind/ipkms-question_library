@@ -238,8 +238,8 @@
               <div class="flex-row question-checkbox flex-center" v-for="i in quickquiz.questions.length">
                 <span style="margin-right: 8px; font-weight:bold; font-size: 16px">{{$index + 1}}.</span>
 
-                <span v-if="checks[$index] == null" style="color:#FFC107;cursor:pointer" id="{{'qchecks_' + $index}}"><i class="material-icons">report_problem</i></span>
-                <div class="flex-row flex-center" v-else>
+                <span v-if="checks[$index] == null" style="color:#FFC107;cursor:pointer" :id="'qchecks_' + $index"><i class="material-icons">report_problem</i></span>
+                <div class="flex-row flex-center" v-if="checks[$index] !== null">
                   <span v-if="checks[$index] === true" style="color:#009688"><i class="material-icons">check_box</i></span>
                   <span v-if="checks[$index] === false" style="color:#F44336"><i class="material-icons">cancel</i></span>
                   <span style="margin-left: 8px; color: #009688;">{{accuracy[$index]}}</span>
@@ -252,15 +252,15 @@
             </div>
           </card>
           <div id="question-body">
-            <card v-for="question in quickquiz.questions" track-by="_id" class="question" id="{{'question_' + $index}}">
-              <div slot="content" class="flex-column" v-if="typeof question === 'object'">
+            <card v-for="question in quickquiz.questions" track-by="_id" class="question" :id="'question_' + $index">
+              <div v-if="typeof question === 'object'" slot="content" class="flex-column">
                 <div class="overlay flex-column" :class="{'overlay_show': overlay.on === $index}">
                   <div class="flex-row" style="justify-content: flex-end">
                     <mdl-button icon @click="hideOverlay()">
                       <i class="material-icons">close</i>
                     </mdl-button>
                   </div>
-                  <div v-show="overlay.type === 0">
+                  <div v-if="overlay.type === 0">
                     <div class="flex-row">
                       <div class="flex-50 flex-column" style="padding: 0 16px 16px 16px">
                         <span class="rightPeople_header">正確 {{accuracy[$index]}}</span>
@@ -273,7 +273,7 @@
                     </div>
                   </div>
                   <div v-else>
-                    <canvas id="{{'qaChart_' + $index}}"></canvas>
+                    <canvas :id="'qaChart_' + $index"></canvas>
                   </div>
 
                 </div>
@@ -281,7 +281,7 @@
                   <div class="flex-column flex-center">
                     <span class="index-label">{{$index + 1}}</span>
                     <div class="flex-column flex-center" v-if="quickquiz.finished">
-                      <span class="accuracy" id="{{'analysis_' + $index}}" @click="showOverlay($index, 1)">{{accuracy[$index]}}</span>
+                      <span class="accuracy" :id="'analysis_' + $index" @click="showOverlay($index, 1)">{{accuracy[$index]}}</span>
                       <mdl-tooltip :for="'analysis_' + $index" large class="flex-column">
                         <div class="flex-row" style="margin-bottom:8px">
                           <span style="margin-right:4px">正確: {{quickquiz.analysis.questions[$index][0]}}</span>
@@ -295,13 +295,13 @@
                     </div>
                   </div>
 
-                  <span class="question_body">{{{question.context}}}</span>
+                  <span class="question_body" v-html="question.context"></span>
                   <div class="flex-row" style="margin-left:auto;flex-shrink: 0" v-if="quickquiz.finished">
                     <mdl-button accent @click="showAnswer($index)" v-show="quickquiz.correctAnswers[$index] !== null && !sampleMode">
-                      <span v-show="typeof correctAnswers[$index] === 'number'">隱藏答案</span>
+                      <span v-if="typeof correctAnswers[$index] === 'number'">隱藏答案</span>
                       <span v-else="correctAnswers[$index] === undefined || correctAnswers[$index] === null">顯示答案</span>
                     </mdl-button>
-                    <mdl-button id="{{'menu_' + $index}}" icon>
+                    <mdl-button :id="'menu_' + $index" icon>
                       <i class="material-icons">more_vert</i>
                     </mdl-button>
                     <mdl-menu :for="'menu_' + $index">
@@ -316,27 +316,27 @@
                   <div class="flex-row">
                     <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0), 'blank': showBlank($index, 0), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 0)">
                       <span class="choice-label">A</span>
-                      <div>{{{question.choices[0]}}}</div>
+                      <div v-html="question.choices[0]"></div>
                     </div>
                     <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1), 'blank': showBlank($index, 1), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 1)">
                       <span class="choice-label">B</span>
-                      <div>{{{question.choices[1]}}}</div>
+                      <div v-html="question.choices[1]"></div>
                     </div>
                   </div>
                   <div class="flex-row">
                     <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2), 'blank': showBlank($index, 2), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 2)">
                       <span class="choice-label">C</span>
-                      <div>{{{question.choices[2]}}}</div>
+                      <div v-html="question.choices[2]"></div>
                     </div>
                     <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3), 'blank': showBlank($index, 3), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 3)">
                       <span class="choice-label">D</span>
-                      <div>{{{question.choices[3]}}}</div>
+                      <div v-html="question.choices[3]"></div>
                     </div>
                   </div>
                 </div>
 
               </div>
-              <div slot="content" class="flex-column" v-else>
+              <div v-else slot="content" class="flex-column">
                 <span class="flex-row flex-baseline" style="padding:16px; color:#9E9E9E">
                   <div class="flex-column flex-center">
                     <span class="index-label">{{$index + 1}}</span>

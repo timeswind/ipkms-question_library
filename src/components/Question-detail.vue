@@ -111,7 +111,7 @@
               <div class="difficulty-box flex-column flex-50">
                 <span class="field-title">難度 Difficulty</span>
                 <span class="flex-row flex-baseline" style="margin-top: 8px">
-                  <i class="material-icons" v-for="1 in 5" @click="modify('difficulty', null, $index)" :class="{'difficulty-heighlight': details.difficulty > $index}">star_rate</i>
+                  <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, $index)" :class="{'difficulty-heighlight': details.difficulty > $index}">star_rate</i>
                 </span>
               </div>
             </div>
@@ -143,23 +143,23 @@
                 <i class="material-icons" v-for="i in getNumberArray(details.difficulty)" track-by="$index">star_rate</i>
               </div>
             </div>
-            {{{details.context}}}
+            <div v-html="details.context"></div>
           </div>
         </card>
         <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}"><div slot="content"><span class="mc-choice-label">A</span>{{{details.choices[0]}}}</div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}"><div slot="content"><span class="mc-choice-label">B</span>{{{details.choices[1]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
           </div>
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}"><div slot="content"><span class="mc-choice-label">C</span>{{{details.choices[2]}}}</div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}"><div slot="content"><span class="mc-choice-label">D</span>{{{details.choices[3]}}}</div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
           </div>
         </div>
 
         <card v-if="details.statistic">
           <div slot="content" style="padding:16px">
-            {{{details.statistic | json}}}
+            {{details.statistic | json}}
           </div>
         </card>
       </div>
