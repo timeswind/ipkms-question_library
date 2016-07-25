@@ -1,3 +1,7 @@
+export function getUserLanguage (state) {
+  return state.utilities.userLanguage
+}
+
 export function getLoginModalState (state) {
   return state.utilities.loginModal
 }

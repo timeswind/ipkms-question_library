@@ -19,6 +19,14 @@ Vue.use(VueQuill)
 Vue.use(Filters)
 Vue.use(VueMdl)
 
+var language = (window.navigator.userLanguage || window.navigator.language).substring(0, 2)
+if (language !== 'zh') {
+  language = 'eng'
+} else {
+  language = 'cht'
+}
+store.dispatch('SET_USER_LANGUAGE', language)
+
 Vue.prototype.$showToast = function (message) {
   store.dispatch('SHOW_TOAST', message)
 }

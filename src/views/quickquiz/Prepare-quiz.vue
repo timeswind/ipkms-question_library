@@ -70,9 +70,13 @@
               <mdl-radio style="margin-left:32px;" :checked.sync="queryQcollection.type" value="mine">我的題集</mdl-radio>
               <mdl-radio style="margin-left:16px;" :checked.sync="queryQcollection.type" value="all">公開題集</mdl-radio>
             </div>
+
+          </div>
+
+          <div class="flex-column flex-50" style="margin-bottom:16px">
             <div class="flex-column" v-show="newQuickquiz.qcollection._id">
-              <h6 style="margin:0 0 4px 0;color:#E91E63">已選題集</h6>
-              <div class="flex-column qcollection-mini-card"  style="max-width:300px;margin-bottom:16px;border-color:#E91E63">
+              <h4 class="display-1" style="margin:0 0 4px 0;color:#E91E63">已選題集</h4>
+              <div class="flex-column qcollection-mini-card"  style="margin-bottom:16px;border-color:#E91E63">
                 <span class="name">{{newQuickquiz.qcollection.name}}</span>
                 <div class="flex-row" style="align-items: baseline">
                   <span class="subject">{{newQuickquiz.qcollection.subject | subject}}</span>
@@ -81,10 +85,6 @@
                 </div>
               </div>
             </div>
-
-          </div>
-
-          <div class="flex-column flex-50" style="margin-bottom:16px">
             <div class="flex-row flex-center">
               <h4 v-show="queryQcollection.fail" class="display-1" style="margin-top: 0;margin-bottom:8px;color:#F44336">未找到題集</h4>
               <h4 v-show="!queryQcollection.fail" class="display-1" style="margin-top: 0;margin-bottom:8px">選擇題集</h4>

@@ -15,7 +15,7 @@
 
 #create-mc-question-set .q-tag {
   color: #E91E63;
-  margin: 0 5px;
+  margin:8px 4px 0 0;
   padding: 2px 4px;
   border: 1px solid #e91e63;
   cursor: pointer;
@@ -186,10 +186,18 @@
         <div style="padding:0 16px 16px 16px" class="create-new-qcollection-form" v-show="newQcollection.myQcollections.length === 0">
           <mdl-button primary style="margin-left:-16px" @click="getMyQcollections()">或選擇現有題集</mdl-button>
 
-          <div>
-            <mdl-textfield floating-label="題集名字" :value.sync="newQcollection.name"></mdl-textfield>
+          <div class="flex-column">
+            <span class="field-title" style="position: relative; top: 16px">題集名字</span>
+            <mdl-textfield floating-label="" :value.sync="newQcollection.name"></mdl-textfield>
           </div>
-          <mdl-select label="所屬學科" id="subject-select" :value.sync="newQcollection.subject" :options="subjects"></mdl-select>
+          <div class="flex-column">
+            <span class="field-title">科目</span>
+            <select v-model="newQcollection.subject" style="width: 100%">
+              <option v-for="subject in subjects" v-bind:value="subject.id">
+                {{ subject.name }}
+              </option>
+            </select>
+          </div>
           <div style="padding:20px 0">
             <mdl-checkbox :checked.sync="newQcollection.public">公開</mdl-checkbox>
           </div>
@@ -227,7 +235,7 @@
 
         <div class="qcollection-header flex-row flex-center">
           <span class="public">{{newQcollection.public | bTp}}</span>
-          <span class="subject">{{newQcollection.subject | subject}}</span>
+          <span class="subject" v-if="newQcollection.subject">{{newQcollection.subject | subject}}</span>
           <span class="name">{{newQcollection.name}}</span>
           <span class="flex-row flex-center" style="margin-left:auto;font-size:18px;color:#2196F3"><i class="material-icons" style="font-size:24px;margin-right:8px">description</i> {{qcollectionInbox.questions.length}} 題</span>
         </div>
@@ -250,21 +258,66 @@
       <div style="margin:16px 0;width:100%;height:16px">
       </div>
       <card>
-        <div slot="content" style="padding:8px 16px 0 16px">
-          <div class="newquestion-difficulty-box flex-row flex-center">
-            <span>難度：</span>
-            <span class="flex-row">
-              <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
-            </span>
+        <div slot="content" style="padding: 16px 16px 0 16px">
+          <div class="flex-column">
+            <div class="flex-row">
+              <div class="flex-column flex-50">
+                <span class="field-title">語言</span>
+                <select v-model="newQuestion.language" v-on:change="setUserLanguage(newQuestion.language)">
+                  <option v-for="language in languages" v-bind:value="language.id">
+                    {{ language.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="newquestion-difficulty-box flex-column flex-50">
+                <span class="field-title" style="margin-bottom:4px">難度</span>
+                <span class="flex-row">
+                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+                </span>
+              </div>
+            </div>
+            <div class="flex-row" style="padding-top: 16px;">
+              <div class="flex-column">
+                <div style="margin-right: 10px;">
+                  <span class="field-title">標籤</span>
+                </div>
+                <div class="flex-row flex-center flex-wrap">
+                  <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
+                </div>
+                <div style="position: relative;top: -12px">
+                  <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <div slot="content" style="padding:8px 16px 0 16px">
+          <div class="flex-row">
+            <div class="newquestion-difficulty-box flex-column flex-50">
+              <span class="field-title" style="margin-bottom:4px">難度</span>
+              <span class="flex-row">
+                <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+              </span>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">語言</span>
+              <select v-model="newQuestion.language">
+                <option v-for="language in languages" v-bind:value="language.id">
+                  {{ language.name }}
+                </option>
+              </select>
+            </div>
           </div>
           <div class="flex-column" style="position:relative;top:-16px">
+            <div style="position: relative; top: 16px">
+              <span class="field-title">標籤</span>
+            </div>
             <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
-              <span>標籤：</span>
               <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
             </div>
             <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
           </div>
-        </div>
+        </div> -->
       </card>
       <div class="flex-row">
 
@@ -332,14 +385,20 @@
 <script>
 import renderQuill from 'quill-render'
 import Subject from '../../modules/Subjects'
+import Language from '../../modules/Languages'
 import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
 import Card from '../../components/reuseable/Card'
-
+import store from '../../vuex/store'
+import { setUserLanguage } from '../../vuex/actions'
+import { getUserLanguage } from '../../vuex/getters'
 import 'quill/dist/quill.snow.css'
 
 var delayTimer
 
 export default {
+  created: function () {
+    this.newQuestion.language = this.getUserLanguage
+  },
   components: {
     Subject,
     Card,
@@ -515,15 +574,6 @@ export default {
       }
       this.$router.go(path)
     },
-    mapSubjectsArray: function (subjects) {
-      return subjects.map(function (subject) {
-        var newObj = {
-          name: subject.name,
-          value: subject.id
-        }
-        return newObj
-      })
-    },
     createNewQcollection: function (option, qcollection) {
       if (option === 'from exist' && typeof qcollection === 'object') {
         this.newQcollection.name = qcollection.name
@@ -598,7 +648,8 @@ export default {
       publishButton: {
         disabled: false
       },
-      subjects: this.mapSubjectsArray(Subject.subjects),
+      subjects: Subject.subjects,
+      languages: Language.languages,
       tag: '',
       newQcollection: {
         name: '',
@@ -613,6 +664,7 @@ export default {
         questions: []
       },
       newQuestion: {
+        language: '',
         type: 'mc',
         tags: [],
         tips: '',
@@ -651,6 +703,15 @@ export default {
       delayTimer = setTimeout(function () {
         self.renderMcPreview()
       }, 500)
+    }
+  },
+  store,
+  vuex: {
+    actions: {
+      setUserLanguage: setUserLanguage
+    },
+    getters: {
+      getUserLanguage: getUserLanguage
     }
   }
 }

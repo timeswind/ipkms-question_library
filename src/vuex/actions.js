@@ -1,5 +1,9 @@
 import * as types from './mutation-types'
 
+export const setUserLanguage = function ({ dispatch, state }, language) {
+  dispatch(types.SET_USER_LANGUAGE, language)
+}
+
 export const showLoginModal = function ({ dispatch, state }) {
   dispatch(types.SHOW_LOGIN_MODAL)
 }

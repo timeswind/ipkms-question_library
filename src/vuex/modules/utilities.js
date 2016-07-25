@@ -1,5 +1,6 @@
 // vuex/modules/utilities.js
 import {
+  SET_USER_LANGUAGE,
   SHOW_LOGIN_MODAL,
   HIDE_LOGIN_MODAL,
   SHOW_TOAST,
@@ -8,12 +9,16 @@ import {
 } from '../mutation-types'
 // initial state
 const state = {
+  userLanguage: 'cht',
   loginModal: false,
   loadingIndicator: false,
   toast: ''
 }
 
 const mutations = {
+  [SET_USER_LANGUAGE] (state, language) {
+    state.userLanguage = language
+  },
   [SHOW_LOGIN_MODAL] (state) {
     state.loginModal = true
   },

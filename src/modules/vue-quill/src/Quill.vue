@@ -23,6 +23,7 @@
               <span data-value="justify" class="ql-picker-item"></span>
             </span>
           </span>
+          <!-- <a class="ql-format-button ql-link"></a> -->
         </div>
       </slot>
     </div>
@@ -62,7 +63,7 @@ export default {
   },
   ready () {
     this.editor = new Quill(this.$els.quill, {
-      modules: { toolbar: this.$els.toolbar },
+      modules: { toolbar: this.$els.toolbar, 'link-tooltip': true },
       theme: 'snow'
     })
     this.formats.map((format) => {

@@ -22,6 +22,17 @@
 .q-tag {
   cursor: pointer;
 }
+.results-board {
+  background: #fff;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+  border-radius: 3px;
+  padding: 16px 0;
+  text-align: center;
+  margin: 16px 16px 0 16px;
+  color: #FF9800;
+  font-size: 16px;
+  border-left: 4px solid
+}
 </style>
 <template>
   <div id="search-question">
@@ -48,8 +59,11 @@
       </div>
     </div>
     <div class="results-zone">
+      <div class="results-board" v-if="results.info">
+        {{results.info}}
+      </div>
       <div class="mdl-grid" id="questions-preview-container">
-        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results" track-by="_id">
+        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results.questions" track-by="_id">
           <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
             <span class="q-subject">{{q.subject | subject}}</span>
             <span class="q-type">{{q.type}}</span>
@@ -83,6 +97,7 @@ export default {
       if (this.search.tags.length === 0) {
         this.search.options.matchAny = true
       }
+      this.results.info = ''
       this.search.buttonDisable = true
       let data = {
         tags: this.search.tags,
@@ -96,9 +111,11 @@ export default {
       }
       this.$http.post('/api/manage-question/query', data).then(function (response) {
         console.log(response.data)
-        this.results = response.data
+        this.results.questions = response.data
         if (response.data.length > 0) {
           this.renderQuestions()
+        } else {
+          this.results.info = '未找到符合條件的題目'
         }
         this.search.buttonDisable = false
       }, function (response) {
@@ -116,7 +133,7 @@ export default {
       this.search.tags.splice(index, 1)
     },
     renderQuestions: function () {
-      let length = this.results.length
+      let length = this.results.questions.length
 
       setTimeout(function renderQuestions () {
         for (var i = 0; i < length; i++) {
@@ -174,7 +191,10 @@ export default {
         show: false,
         qid: ''
       },
-      results: {}
+      results: {
+        questions: [],
+        info: ''
+      }
     }
   }
 }

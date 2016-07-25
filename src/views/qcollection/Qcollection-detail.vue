@@ -28,7 +28,7 @@
           <div class="flex-row" style="margin-top: 16px">
             <div class="flex-column flex-50">
               <span class="field-title">是否公開</span>
-              <span class="field-content">{{qcinfo.public}}</span>
+              <span class="field-content">{{qcinfo.public | bTp}}</span>
             </div>
             <div class="flex-column flex-50">
               <span class="field-title">平均難度</span>

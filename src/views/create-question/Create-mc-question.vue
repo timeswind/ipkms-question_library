@@ -110,20 +110,28 @@
                 </span>
               </div>
             </div>
-
-
-            <div class="flex-column">
-              <div style="padding-top: 25px;margin-right: 10px;">
-                <span class="field-title">標籤</span>
+            <div class="flex-row" style="padding-top: 25px;">
+              <div class="flex-column flex-50">
+                <div style="margin-right: 10px;">
+                  <span class="field-title">標籤</span>
+                </div>
+                <div class="flex-row flex-center flex-wrap">
+                  <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
+                </div>
+                <div style="position: relative;top: -12px">
+                  <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+                </div>
               </div>
-              <div class="flex-row flex-center flex-wrap">
-                <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
-              </div>
-              <div style="position: relative;top: -12px">
-                <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+
+              <div class="flex-column flex-50">
+                <span class="field-title">語言</span>
+                <select v-model="newQuestion.language" v-on:change="setUserLanguage(newQuestion.language)">
+                  <option v-for="language in languages" v-bind:value="language.id">
+                    {{ language.name }}
+                  </option>
+                </select>
               </div>
             </div>
-
           </div>
         </div>
       </card>
@@ -213,7 +221,11 @@
 <script>
 import renderQuill from 'quill-render'
 import Subject from '../../modules/Subjects'
+import Language from '../../modules/Languages'
 import Card from '../../components/reuseable/Card'
+import store from '../../vuex/store'
+import { setUserLanguage } from '../../vuex/actions'
+import { getUserLanguage } from '../../vuex/getters'
 
 import 'quill/dist/quill.snow.css'
 // var MathQuill = window.MathQuill
@@ -221,6 +233,9 @@ import 'quill/dist/quill.snow.css'
 var delayTimer
 
 export default {
+  created: function () {
+    this.newQuestion.language = this.getUserLanguage
+  },
   components: {
     Subject,
     Card
@@ -235,7 +250,6 @@ export default {
         this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
         this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
         this.newQuestion.rawData = JSON.stringify(this.editorPreview)
-
         this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
           this.$showToast('發佈成功')
           this.publishButton.disabled = false
@@ -341,8 +355,10 @@ export default {
         show: false
       },
       subjects: Subject.subjects,
+      languages: Language.languages,
       tag: '',
       newQuestion: {
+        language: '',
         type: 'mc',
         subject: 'math',
         tags: [],
@@ -382,6 +398,15 @@ export default {
       delayTimer = setTimeout(function () {
         self.renderMcPreview()
       }, 500)
+    }
+  },
+  store,
+  vuex: {
+    actions: {
+      setUserLanguage: setUserLanguage
+    },
+    getters: {
+      getUserLanguage: getUserLanguage
     }
   }
 }
