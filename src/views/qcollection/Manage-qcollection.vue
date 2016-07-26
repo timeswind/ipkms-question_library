@@ -9,7 +9,7 @@
       </div>
     </topbar>
 
-    <router-view :is="view" transition="fade" transition-mode="out-in" style="margin-top:72px"></router-view>
+    <router-view :is="view"  style="margin-top:72px" transition="fade" mode="out-in"><router-view>
 
   </div>
 </template>

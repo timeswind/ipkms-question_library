@@ -90,9 +90,12 @@
     <mdl-button primary raised class="float-button" @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
       發佈
     </mdl-button>
+    <p><span id="answer">x=</span></p>
+
     <div class="body-wrapper">
       <card>
         <div slot="content" style="padding: 16px 16px 0 16px">
+
           <div class="flex-column">
             <div class="flex-row">
               <div class="flex-column flex-50">
@@ -228,13 +231,26 @@ import { setUserLanguage } from '../../vuex/actions'
 import { getUserLanguage } from '../../vuex/getters'
 
 import 'quill/dist/quill.snow.css'
+
+var MQ = null
 // var MathQuill = window.MathQuill
 
 var delayTimer
 
 export default {
-  created: function () {
+  ready: function () {
+    MQ = window.MathQuill.getInterface(2)
     this.newQuestion.language = this.getUserLanguage
+
+    var answerSpan = document.getElementById('answer')
+    var answerMathField = MQ.MathField(answerSpan, {
+      handlers: {
+        edit: function () {
+          var enteredMath = answerMathField.latex() // Get entered math in LaTeX format
+          console.log(enteredMath)
+        }
+      }
+    })
   },
   components: {
     Subject,

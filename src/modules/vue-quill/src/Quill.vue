@@ -14,18 +14,14 @@
           <span class="ql-format-separator"></span>
           <a class="ql-format-button ql-bullet"></a>
           <span class="ql-format-separator"></span>
-          <span title="Text Alignment" class="ql-align ql-picker">
-            <span class="ql-picker-label" data-value="left"></span>
-            <span class="ql-picker-options">
-              <span data-value="left" class="ql-picker-item ql-selected"></span>
-              <span data-value="center" class="ql-picker-item"></span>
-              <span data-value="right" class="ql-picker-item"></span>
-              <span data-value="justify" class="ql-picker-item"></span>
-            </span>
-          </span>
-          <!-- <a class="ql-format-button ql-link"></a> -->
+
+          <a class="insert-math-button" @click="mathBox.show = !mathBox.show">輸入公式</a>
         </div>
       </slot>
+    </div>
+    <div v-show="mathBox.show" class="math-input flex-column" style="border-bottom: 1px solid #ddd;padding:8px">
+      <span v-el:mathquillbox></span>
+      <button type="button" @click="insertMath(mathBox.enteredMath)" style="margin-top:8px">插入公式</button>
     </div>
     <div class="ui attached segment" v-el:quill @click.prevent="focusEditor"></div>
   </div>
@@ -33,6 +29,7 @@
 
 <script>
 const Quill = require('quill')
+const MQ = window.MathQuill.getInterface(2)
 export default {
   props: {
     content: {},
@@ -58,10 +55,23 @@ export default {
   },
   data () {
     return {
-      editor: {}
+      editor: {},
+      mathBox: {
+        show: false,
+        enteredMath: ''
+      }
     }
   },
   ready () {
+    var self = this
+    var mathinput = this.$els.mathquillbox
+    var MathField = MQ.MathField(mathinput, {
+      handlers: {
+        edit: function () {
+          self.mathBox.enteredMath = MathField.latex() // Get entered math in LaTeX format
+        }
+      }
+    })
     this.editor = new Quill(this.$els.quill, {
       modules: { toolbar: this.$els.toolbar, 'link-tooltip': true },
       theme: 'snow'
@@ -108,6 +118,12 @@ export default {
     }
   },
   methods: {
+    insertMath (latex) {
+      var format = ' $$' + latex + '$$ '
+      var range = this.editor.getLength()
+      this.editor.insertText(range - 1, format, true)
+      this.mathBox.enteredMath = ''
+    },
     focusEditor (e) {
       if (e && e.srcElement) {
         let classList = e.srcElement.classList
@@ -126,3 +142,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+  .insert-math-button {
+    cursor: pointer;
+  }
+</style>

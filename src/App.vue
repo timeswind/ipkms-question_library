@@ -21,7 +21,7 @@
       </div>
       <main class="mdl-layout__content">
         <div class="page-content">
-          <router-view :is="view" transition="fade" transition-mode="out-in"></router-view>
+          <router-view :is="view" transition="fade" transition-mode="out-in"><router-view>
         </div>
       </main>
     </div>
