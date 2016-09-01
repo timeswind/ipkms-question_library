@@ -24,6 +24,11 @@ module.exports = merge(baseConfig, {
     })
   },
   plugins: [
+    new webpack.NormalModuleReplacementPlugin(/^\.\/package$/, function(result) {
+      if(/cheerio/.test(result.context)) {
+        result.request = "./package.json"
+      }
+    }),
     // http://vuejs.github.io/vue-loader/workflow/production.html
     new webpack.DefinePlugin({
       'process.env': {

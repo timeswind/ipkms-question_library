@@ -169,8 +169,8 @@
 </template>
 
 <script>
-import Card from './reuseable/Card'
-import Subject from '../modules/Subjects'
+import Card from '../../components/reuseable/Card'
+import Subject from '../../modules/Subjects'
 
 export default {
   ready: function () {

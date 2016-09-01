@@ -342,11 +342,7 @@
                     <span class="index-label">{{$index + 1}}</span>
                   </div>
 
-                  <span class="question-body">
-                    <p>
-                      該題已從題庫中移除
-                    </p>
-                  </span>
+                  <span class="question-body" style="margin-left: 16px">該題已從題庫中移除</span>
                 </span>
 
               </div>

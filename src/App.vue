@@ -3,10 +3,12 @@
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
       <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
-          <span class="mdl-layout-title" v-show="$route.matched.length > 1">
-            {{$route.matched[0].handler.title}}
-          </span>
-          <i class="material-icons" v-show="$route.matched.length > 1">keyboard_arrow_right</i>
+          <div v-show="$route.matched.length > 1" class="flex-row flex-center">
+            <span class="mdl-layout-title">
+              {{$route.matched[0].handler.title}}
+            </span>
+            <i class="material-icons">keyboard_arrow_right</i>
+          </div>
           <span class="mdl-layout-title">{{$route.title}}</span>
         </div>
       </header>
@@ -21,7 +23,7 @@
       </div>
       <main class="mdl-layout__content">
         <div class="page-content">
-          <router-view :is="view" transition="fade" transition-mode="out-in"><router-view>
+          <router-view :is="view" transition="fade" transition-mode="out-in"></router-view>
         </div>
       </main>
     </div>
@@ -138,5 +140,14 @@ body {
   box-shadow: 0 1px 6px rgba(0,0,0,0.35);
   padding: 16px;
   border-radius: 3px;
+}
+
+@media screen and (min-width: 1025px) {
+
+  .mdl-layout__header {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+  }
+
 }
 </style>

@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
+import qcollectionSelectorModal from '../../components/reuseable/Select-qcollection.vue'
 export default {
   ready: function () {
     this.getMyQuestions()

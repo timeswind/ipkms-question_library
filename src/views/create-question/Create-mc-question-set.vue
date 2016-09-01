@@ -291,33 +291,6 @@
             </div>
           </div>
         </div>
-        <!-- <div slot="content" style="padding:8px 16px 0 16px">
-          <div class="flex-row">
-            <div class="newquestion-difficulty-box flex-column flex-50">
-              <span class="field-title" style="margin-bottom:4px">難度</span>
-              <span class="flex-row">
-                <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
-              </span>
-            </div>
-            <div class="flex-column flex-50">
-              <span class="field-title">語言</span>
-              <select v-model="newQuestion.language">
-                <option v-for="language in languages" v-bind:value="language.id">
-                  {{ language.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="flex-column" style="position:relative;top:-16px">
-            <div style="position: relative; top: 16px">
-              <span class="field-title">標籤</span>
-            </div>
-            <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
-              <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
-            </div>
-            <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
-          </div>
-        </div> -->
       </card>
       <div class="flex-row">
 
@@ -414,6 +387,7 @@ export default {
         this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
         this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
         let data = {
+          language: this.newQuestion.language,
           type: 'mc',
           tags: this.newQuestion.tags,
           subject: this.newQcollection.subject,

@@ -10,13 +10,13 @@
 
     </topbar>
 
-    <router-view :is="view"  style="margin-top:72px" transition="fade" mode="out-in"><router-view>
+    <router-view :is="view"  style="margin-top:72px" transition="fade" transition-mode="out-in"><router-view>
 
   </div>
 </template>
 
 <script>
-import topbar from './reuseable/Topbar.vue'
+import topbar from '../../components/reuseable/Topbar.vue'
 
 export default {
   attached () {

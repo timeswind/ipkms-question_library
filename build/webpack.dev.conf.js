@@ -17,6 +17,11 @@ module.exports = merge(baseConfig, {
     publicPath: '/'
   },
   plugins: [
+    new webpack.NormalModuleReplacementPlugin(/^\.\/package$/, function(result) {
+      if(/cheerio/.test(result.context)) {
+        result.request = "./package.json"
+      }
+    }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),

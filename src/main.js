@@ -1,3 +1,8 @@
+// import jquery library used by MathQuill
+// window.$ = jQuery
+// window.jQuery = jQuery
+
+// import Vue
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
@@ -47,7 +52,7 @@ Vue.http.interceptors.push({
 
   request: function (request) {
     store.dispatch('SHOW_LOADING_INDICATOR')
-    if (window.sessionStorage.token) {
+    if (request.url.charAt(0) === '/' && window.sessionStorage.token) {
       request.headers['x-access-token'] = window.sessionStorage.token
     }
     return request
@@ -146,28 +151,28 @@ router.map({
   '/manage-question': {
     name: 'manage-question',
     component: function (resolve) {
-      require(['./components/Manage-question.vue'], resolve)
+      require(['./views/questions/Manage-question.vue'], resolve)
     },
     title: '管理題目',
     subRoutes: {
       '/my': {
         name: 'my-question',
         component: function (resolve) {
-          require(['./components/My-question.vue'], resolve)
+          require(['./views/questions/My-question.vue'], resolve)
         },
         title: '我的題目'
       },
       '/all': {
         name: 'all-question',
         component: function (resolve) {
-          require(['./components/All-question.vue'], resolve)
+          require(['./views/questions/All-question.vue'], resolve)
         },
         title: '所有題目'
       },
       '/search': {
         name: 'search-question',
         component: function (resolve) {
-          require(['./components/Search-question.vue'], resolve)
+          require(['./views/questions/Search-question.vue'], resolve)
         },
         title: '搜索題目'
       }
@@ -176,7 +181,7 @@ router.map({
   '/manage-question/detail/:question_id': {
     name: 'question-detail',
     component: function (resolve) {
-      require(['./components/Question-detail.vue'], resolve)
+      require(['./views/questions/Question-detail.vue'], resolve)
     },
     title: '题目內容'
 

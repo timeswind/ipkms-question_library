@@ -163,9 +163,9 @@
 
 <script>
 import renderQuill from 'quill-render'
-import Subject from '../modules/Subjects'
-import sheetPannel from './reuseable/Sheet-pannel.vue'
-import Card from './reuseable/Card'
+import Subject from '../../modules/Subjects'
+import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
+import Card from '../../components/reuseable/Card'
 
 import 'quill/dist/quill.snow.css'
 

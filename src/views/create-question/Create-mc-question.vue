@@ -1,87 +1,3 @@
-<style>
-#create-mc-question .newquestion-difficulty-box i {
-  width: 24px;
-  color: #aaa;
-  cursor: pointer;
-}
-
-#create-mc-question .difficulty-heighlight{
-  color: #FFC107 !important
-}
-
-#create-mc-question .q-tag {
-  color: #E91E63;
-  margin:8px 4px 0 0;
-  padding: 2px 4px;
-  border: 1px solid #e91e63;
-  cursor: pointer;
-}
-
-#create-mc-question .body-wrapper {
-  max-width: 800px;
-  margin:32px auto;
-}
-
-#question-preview-container {
-  padding: 8px;
-  border-top:  1px solid #ccc;
-  min-height: 43px;
-  box-sizing: border-box;
-}
-
-#question-preview-container p, #mc1 p, #mc2 p, #mc3 p, #mc4 p {
-  margin: 0
-}
-
-#question-preview-container ul, #mc1 ul, #mc2 ul, #mc3 ul, #mc4 ul {
-  margin: 0
-}
-
-#create-mc-question .toolbar-title {
-  padding: 8px;
-  margin: 0
-}
-#create-mc-question .mc-input-wrapper,#create-mc-question .mc-preview-wrapper {
-  display: inline-block;
-  width: 100%
-}
-
-#create-mc-question .mc-preview-wrapper .card {
-  cursor: pointer;
-}
-
-#create-mc-question .mc-preview-wrapper .hightlight-answer .card {
-  background-color: #009688;
-  color: #fff
-}
-#create-mc-question .mc-preview-wrapper .mc-label {
-  margin-right: 16px
-}
-#create-mc-question .questions_inbox {
-  position: fixed;
-  right: -360px;
-  top: 55px;
-  background: #fff;
-  width: 360px;
-  box-shadow: 0 0 12px #aaa;
-  height: 100%;
-  transition: right 0.2s;
-}
-
-#create-mc-question .questions_inbox.show {
-  right: 0;
-}
-
-#create-mc-question .questions_inbox .question {
-  padding: 8px 16px;
-  border-bottom: 1px solid #eee
-}
-
-#create-mc-question .mc-preview-wrapper .card {
-  padding: 16px
-}
-
-</style>
 <template>
   <div id="create-mc-question">
     <mdl-button primary raised class="float-button" style="bottom: 80px" @click="questionInbox.show = true" v-bind:disabled="publishButton.disabled">
@@ -90,12 +6,9 @@
     <mdl-button primary raised class="float-button" @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
       發佈
     </mdl-button>
-    <p><span id="answer">x=</span></p>
-
-    <div class="body-wrapper">
+    <div class="body_wrapper">
       <card>
         <div slot="content" style="padding: 16px 16px 0 16px">
-
           <div class="flex-column">
             <div class="flex-row">
               <div class="flex-column flex-50">
@@ -106,10 +19,10 @@
                   </option>
                 </select>
               </div>
-              <div class="newquestion-difficulty-box flex-column flex-50">
+              <div class="set_difficulty flex-column flex-50">
                 <span class="field-title" style="margin-bottom:4px">難度</span>
                 <span class="flex-row">
-                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty_status': newQuestion.difficulty > $index}">star_rate</i>
                 </span>
               </div>
             </div>
@@ -138,64 +51,77 @@
           </div>
         </div>
       </card>
-      <h5 style="margin-left:4px">編輯題目</h5>
-      <div class="flex-row">
-
-        <div class="flex-50">
-          <card>
-            <div slot="content">
-              <quill :content.sync="editorPreview.question"></quill>
-            </div>
-          </card>
+      <div class="flex-column" style="margin-bottom: 16px">
+        <h5 style="margin-left:4px">編輯題目</h5>
+        <div style="background:#ddd" class="flex-column">
+          <mdl-button primary @click="editorPreview.image.show = !editorPreview.image.show"><i class="material-icons">photo</i>
+            <span>添加圖片</span>
+          </mdl-button>
         </div>
-
-        <div class="flex-50">
-          <card>
-            <div slot="content">
-              <p class="toolbar-title">預覽</p>
-              <div id="question-preview-container"></div>
-            </div>
-          </card>
+        <div v-show="editorPreview.image.show">
+          <form v-on:change="readImg($event)">
+            <input type="file" id="uploadedImg"/>
+          </form>
+          <div class="flex-column flex-center">
+            <canvas v-el:fabricprocess></canvas>
+            <mdl-textfield label="圖片名字" :value.sync="editorPreview.image.label"></mdl-textfield>
+            <mdl-button primary @click="outputImg()"><i class="material-icons">photo</i> <span>输出图片</span></mdl-button>
+          </div>
         </div>
-
       </div>
-      <div class="mc-preview-wrapper" id="mc-preview-container">
+      <div class="flex-row">
+        <div class="flex-50">
+          <card>
+            <div slot="content">
+              <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.question"></quill>
+            </div>
+          </card>
+        </div>
+        <div class="flex-50">
+          <card>
+            <div slot="content">
+              <p class="toolbar_title">預覽</p>
+              <div class="question_preview"></div>
+            </div>
+          </card>
+        </div>
+      </div>
+      <div class="mc_preview">
         <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
         <div class="flex-row">
           <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">A</span><div id="mc1"></div></div>
+            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">A</div><div id="mc1" class="mc_content"></div></div>
           </card>
           <card class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">B</span><div id="mc2"></div></div>
+            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">B</div><div id="mc2" class="mc_content"></div></div>
           </card>
 
         </div>
         <div class="flex-row">
           <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">C</span><div id="mc3"></div></div>
+            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">C</div><div id="mc3" class="mc_content"></div></div>
           </card>
           <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">D</span><div id="mc4"></div></div>
+            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">D</div><div id="mc4" class="mc_content"></div></div>
           </card>
         </div>
       </div>
       <h5 style="margin-left:4px">編輯答案</h5>
 
-      <div>
-
+      <div id="mc_input_container">
         <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
         <div class="flex-row">
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
+          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
+          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
         </div>
         <div class="flex-row">
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
+          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
         </div>
       </div>
     </div>
 
-    <div class="questions_inbox flex-column" :class="{'show': questionInbox.show}">
+    <div class="questions_inbox" class="flex-column" :class="{'show': questionInbox.show}">
       <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
         <i class="material-icons" @click="questionInbox.show = false">close</i>
         <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
@@ -222,6 +148,7 @@
 </template>
 
 <script>
+import 'fabric'
 import renderQuill from 'quill-render'
 import Subject from '../../modules/Subjects'
 import Language from '../../modules/Languages'
@@ -231,32 +158,49 @@ import { setUserLanguage } from '../../vuex/actions'
 import { getUserLanguage } from '../../vuex/getters'
 
 import 'quill/dist/quill.snow.css'
-
-var MQ = null
-// var MathQuill = window.MathQuill
-
 var delayTimer
 
 export default {
   ready: function () {
-    MQ = window.MathQuill.getInterface(2)
     this.newQuestion.language = this.getUserLanguage
-
-    var answerSpan = document.getElementById('answer')
-    var answerMathField = MQ.MathField(answerSpan, {
-      handlers: {
-        edit: function () {
-          var enteredMath = answerMathField.latex() // Get entered math in LaTeX format
-          console.log(enteredMath)
-        }
-      }
-    })
   },
   components: {
     Subject,
     Card
   },
   methods: {
+    readImg: function (e) {
+      let c = this.$els.fabricprocess
+      var canvas = new window.fabric.Canvas(c, { width: 600, height: 300 })
+      c.fabric = canvas
+      var reader = new window.FileReader()
+      reader.onload = function (event) {
+        var imgObj = new window.Image()
+        imgObj.src = event.target.result
+        imgObj.onload = function () {
+          var image = new window.fabric.Image(imgObj)
+          image.set({
+            angle: 0,
+            padding: 10,
+            cornersize: 10,
+            height: 160,
+            width: imgObj.width * (160 / imgObj.height)
+          })
+          canvas.centerObject(image)
+          canvas.add(image)
+          canvas.renderAll()
+        }
+      }
+      reader.readAsDataURL(e.target.files[0])
+    },
+    outputImg: function () {
+      let c = this.$els.fabricprocess
+      let canvas = c.fabric
+      this.$http.get('/api/qiniu/uptoken').then(function (response) {
+        console.log(response.data.uptoken)
+        this.uploadImage(canvas.getObjects()[0].toDataURL(), response.data.uptoken)
+      })
+    },
     publishQuestion: function () {
       this.publishButton.disabled = true
       if (this.checkComplete()) {
@@ -315,12 +259,12 @@ export default {
     },
     renderQuestionPreview: function (option) {
       if (option === 'clear') {
-        window.document.getElementById('question-preview-container').innerHTML = '<p></p>'
+        window.document.querySelector('.question_preview').innerHTML = '<p></p>'
       } else {
-        window.document.getElementById('question-preview-container').innerHTML = renderQuill(this.editorPreview.question.ops)
+        window.document.querySelector('.question_preview').innerHTML = renderQuill(this.editorPreview.question.ops)
         setTimeout(function renderQuestionPreview () {
           window.renderMathInElement(
-            document.getElementById('question-preview-container'),
+            document.querySelector('.question_preview'),
             {
               delimiters: [
                 {left: '$$', right: '$$', display: false}
@@ -344,7 +288,7 @@ export default {
 
         setTimeout(function renderMcPreview () {
           window.renderMathInElement(
-            document.getElementById('mc-preview-container'),
+            document.getElementById('mc_preview'),
             {
               delimiters: [
                 {left: '$$', right: '$$', display: false}
@@ -358,6 +302,15 @@ export default {
       this.$http.get('/api/manage-question/mine').then(function (response) {
         document.getElementById('getLatestQuestionsButton').style.display = 'none'
         this.questionInbox.questions = response.data
+      })
+    },
+    uploadImage: function (imageData, token) {
+      imageData = imageData.split(',')[1]
+      let uptoken = 'UpToken ' + token
+      this.$http.post('http://upload.qiniu.com/putb64/' + imageData.length * 0.75, imageData, {headers: {'Content-Type': 'application/octet-stream', 'Authorization': uptoken}}).then(function (response) {
+        console.log(response.data)
+        this.editorPreview.image.data = response.data.key
+        this.newQuestion.images.push(this.editorPreview.image)
       })
     }
   },
@@ -382,12 +335,19 @@ export default {
         difficulty: 1,
         context: '',
         choices: ['', '', '', ''],
+        images: [],
         answer: {
           mc: 0
         },
         rawData: ''
       },
       editorPreview: {
+        image: {
+          label: '',
+          type: 'qiniu',
+          data: '',
+          show: false
+        },
         question: { ops: [] },
         answer: {
           mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
@@ -427,3 +387,92 @@ export default {
   }
 }
 </script>
+<style>
+#create-mc-question .set_difficulty i {
+  width: 24px;
+  color: #aaa;
+  cursor: pointer;
+}
+
+#create-mc-question .difficulty_status {
+  color: #FFC107 !important
+}
+
+#create-mc-question .body_wrapper {
+  max-width: 800px;
+  margin:32px auto;
+}
+
+#create-mc-question .question_preview {
+  padding: 8px;
+  border-top:  1px solid #ccc;
+  min-height: 43px;
+  box-sizing: border-box;
+}
+
+#create-mc-question .question_preview, #create-mc-question .mc_content {
+  box-sizing: border-box;
+  cursor: text;
+  line-height: 1.42;
+  height: 100%;
+  outline: none;
+  overflow-y: auto;
+  padding: 12px 15px;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+#create-mc-question .mc_content p,  #create-mc-question .mc_content ol, #create-mc-question .question_preview p,  #create-mc-question .question_preview ol{
+  margin: 0
+}
+
+#create-mc-question .toolbar_title {
+  padding: 8px;
+  margin: 0
+}
+
+#create-mc-question .mc_preview {
+  display: inline-block;
+  width: 100%
+}
+
+#create-mc-question .mc_label {
+  padding: 16px;
+}
+
+#create-mc-question .mc_content {
+  padding-bottom: 16px;
+}
+
+#create-mc-question .questions_inbox {
+  position: fixed;
+  right: -360px;
+  top: 55px;
+  background: #fff;
+  width: 360px;
+  box-shadow: 0 0 12px #aaa;
+  height: 100%;
+  transition: right 0.2s;
+}
+
+#create-mc-question .questions_inbox.show {
+  right: 0;
+}
+
+#create-mc-question .questions_inbox .question {
+  padding: 8px 16px;
+  border-bottom: 1px solid #eee
+}
+
+#create-mc-question .mc_preview {
+  cursor: pointer;
+}
+
+#create-mc-question .mc_preview .hightlight-answer .card {
+  background-color: #009688;
+  color: #fff
+}
+
+</style>

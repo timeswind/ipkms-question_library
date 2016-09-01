@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import qcollectionSelectorModal from './reuseable/Select-qcollection.vue'
-import topbar from './reuseable/Topbar.vue'
+import qcollectionSelectorModal from '../../components/reuseable/Select-qcollection.vue'
+import topbar from '../../components/reuseable/Topbar.vue'
 
 export default {
   ready: function () {

@@ -1,24 +1,6 @@
 <template>
   <div>
-    <div v-el:toolbar class="ui top attached menu toolbar ql-toolbar ql-snow">
-      <slot name="toolbar">
-        <div class="ql-format-group">
-          <a class="ql-format-button ql-bold"></a>
-          <span class="ql-format-separator"></span>
-          <a class="ql-format-button ql-underline"></a>
-          <span class="ql-format-separator"></span>
-          <a class="ql-format-button ql-italic"></a>
-        </div>
-        <div class="ql-format-group">
-          <a class="ql-format-button ql-list"></a>
-          <span class="ql-format-separator"></span>
-          <a class="ql-format-button ql-bullet"></a>
-          <span class="ql-format-separator"></span>
-
-          <a class="insert-math-button" @click="mathBox.show = !mathBox.show">輸入公式</a>
-        </div>
-      </slot>
-    </div>
+    <button type="button" @click="mathBox.show = !mathBox.show" style="margin-top:8px">公式</button>
     <div v-show="mathBox.show" class="math-input flex-column" style="border-bottom: 1px solid #ddd;padding:8px">
       <span v-el:mathquillbox></span>
       <button type="button" @click="insertMath(mathBox.enteredMath)" style="margin-top:8px">插入公式</button>
@@ -34,6 +16,14 @@ export default {
   props: {
     content: {},
     author: {},
+    toolbar: {
+      type: Array,
+      required: true
+    },
+    placeholder: {
+      type: String,
+      default: ''
+    },
     formats: {
       type: Array,
       default () {
@@ -72,10 +62,22 @@ export default {
         }
       }
     })
-    this.editor = new Quill(this.$els.quill, {
-      modules: { toolbar: this.$els.toolbar, 'link-tooltip': true },
+    // var toolbarOptions = ['bold', 'italic', 'underline', 'strike'];
+
+    var options = {
+      modules: {
+        formula: true,
+        toolbar: this.toolbar // Include button in toolbar
+      },
+      placeholder: this.placeholder,
+      readOnly: false,
       theme: 'snow'
-    })
+    }
+    this.editor = new Quill(this.$els.quill, options)
+    // this.editor = new Quill(this.$els.quill, {
+    //   modules: { toolbar: this.$els.toolbar, 'link-tooltip': true },
+    //   theme: 'snow'
+    // })
     this.formats.map((format) => {
       this.editor.addFormat(format.name, format.options)
     })
@@ -91,11 +93,11 @@ export default {
     this.editor.on('selection-change', (range) => {
       this.$dispatch('selection-change', this.editor, range)
     })
-    if (typeof this.author !== 'undefined') {
-      this.editor.addModule('authorship', {
-        authorId: this.author
-      })
-    }
+    // if (typeof this.author !== 'undefined') {
+    //   this.editor.addModule('authorship', {
+    //     authorId: this.author
+    //   })
+    // }
     if (this.keyBindings.length) {
       const keyboard = this.editor.getModule('keyboard')
       this.keyBindings.map((binding) => {
@@ -108,7 +110,7 @@ export default {
       this.editor.setContents(content)
     },
     'set-html': function (html) {
-      this.editor.setHTML(html)
+      this.editor.pasteHTML(html)
     },
     'focus-editor': function () {
       this.focusEditor()
@@ -119,9 +121,10 @@ export default {
   },
   methods: {
     insertMath (latex) {
-      var format = ' $$' + latex + '$$ '
+      // var format = ' $$' + latex + '$$ '
       var range = this.editor.getLength()
-      this.editor.insertText(range - 1, format, true)
+      // this.editor.insertText(range - 1, format, true)
+      this.editor.insertText(range - 1, ' ', 'formula', latex)
       this.mathBox.enteredMath = ''
     },
     focusEditor (e) {
@@ -143,7 +146,7 @@ export default {
 }
 </script>
 <style scoped>
-  .insert-math-button {
-    cursor: pointer;
-  }
+.insert-math-button {
+  cursor: pointer;
+}
 </style>

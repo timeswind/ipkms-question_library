@@ -338,8 +338,8 @@ select {
 .q-context {
   margin: 0;
   font-size: 16px;
-  padding-left: 12px;
-  border-left: 4px solid #3F51B5;
+  /*padding-left: 12px;*/
+  /*border-left: 4px solid #3F51B5;*/
   margin-top: 20px;
   margin-bottom: 20px
 }
@@ -352,9 +352,10 @@ select {
 }
 .q-tag {
   color: #E91E63;
-  margin: 0 8px 0 0;
+  margin:8px 4px 0 0;
   padding: 2px 4px;
   border: 1px solid #e91e63;
+  cursor: pointer;
 }
 .question-tools {
   padding: 4px 0;
@@ -407,4 +408,17 @@ select {
 .chooseable {
   outline: none;
   cursor: pointer;
+}
+
+.mc_content p{
+  margin:0 !important
+}
+
+#mc_preview .card {
+  cursor: pointer;
+}
+
+#mc_preview .right_answer .card {
+  background-color: #009688;
+  color: #fff
 }
