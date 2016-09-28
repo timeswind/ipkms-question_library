@@ -16,10 +16,6 @@ export default {
   props: {
     content: {},
     author: {},
-    toolbar: {
-      type: Array,
-      required: true
-    },
     placeholder: {
       type: String,
       default: ''
