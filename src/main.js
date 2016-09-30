@@ -1,8 +1,3 @@
-// import jquery library used by MathQuill
-// window.$ = jQuery
-// window.jQuery = jQuery
-
-// import Vue
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
@@ -61,7 +56,6 @@ Vue.http.interceptors.push({
     clearTimeout(stopReceivingResponseTimer)
     stopReceivingResponseTimer = setTimeout(hideLoginIncicator, 1500)
     if (response.status === 401 && response.data.authorize === false) {
-      console.log('need relogin')
       store.dispatch('SHOW_LOGIN_MODAL')
     }
 
@@ -79,6 +73,13 @@ router.map({
       require(['./views/Entry.vue'], resolve)
     },
     title: '題庫'
+  },
+  '/login': {
+    name: 'login',
+    component: function (resolve) {
+      require(['./views/Login.vue'], resolve)
+    },
+    title: '登入'
   },
   '/create-question': {
     name: 'create-question',
@@ -224,6 +225,18 @@ router.map({
     title: 'Quiz Paper'
   }
 
+})
+
+router.beforeEach(function (transition) {
+  if (transition.to.path !== '/login') {
+    if (window.sessionStorage.token) {
+      transition.next()
+    } else {
+      router.go({name: 'login'})
+    }
+  } else {
+    transition.next()
+  }
 })
 
 router.start(App, '#app')

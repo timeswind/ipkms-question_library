@@ -32,9 +32,7 @@
     <mdl-spinner id="mainLoadingIndicator" single-color :active="loadingIndicatorShow"></mdl-spinner>
     <div v-show="loginModalShow" class="login-modal-mask" transition="modal">
       <div class="login-modal-card flex-column">
-        <span style="color: #E91E63;
-        margin-top: 4px;
-        margin-bottom: 8px;">登入信息过期</span>
+        <span style="color: #E91E63; margin-top: 4px; margin-bottom: 8px;">登入信息过期</span>
         <h4 class="display-1" style="margin-top:0">重新登入</h4>
         <mdl-textfield floating-label="郵箱" :value.sync="reLogin.email" type="email"></mdl-textfield>
         <mdl-textfield floating-label="密碼" :value.sync="reLogin.password" type="password" @keyup.enter="login()"></mdl-textfield>

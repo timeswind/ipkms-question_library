@@ -8,7 +8,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, '../dist/static'),
-    publicPath: '/ql/static/',
+    publicPath: '/static/question-library/',
     filename: '[name].js'
   },
   resolve: {
