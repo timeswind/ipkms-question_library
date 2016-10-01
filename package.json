@@ -19,7 +19,7 @@
     "material-design-lite": "^1.1.3",
     "moment": "^2.13.0",
     "qrcode-canvas": "0.0.1",
-    "quill": "^1.0.2",
+    "quill": "^1.0.6",
     "quill-render": "^1.0.5",
     "socket.io-client": "^1.4.5",
     "stackblur-canvas": "^1.2.1",

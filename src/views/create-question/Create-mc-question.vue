@@ -69,87 +69,105 @@
           </div>
         </div>
       </div>
-      <div class="flex-row">
-        <div class="flex-50">
-          <card>
-            <div slot="content">
-              <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.question"></quill>
-            </div>
-          </card>
-        </div>
-        <div class="flex-50">
-          <card>
-            <div slot="content">
-              <p class="toolbar_title">預覽</p>
-              <div class="question_preview"></div>
-            </div>
-          </card>
-        </div>
-      </div>
-      <div class="mc_preview">
-        <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
-        <div class="flex-row">
-          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">
-            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">A</div><div id="mc1" class="mc_content"></div></div>
-          </card>
-          <card class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">
-            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">B</div><div id="mc2" class="mc_content"></div></div>
-          </card>
-
-        </div>
-        <div class="flex-row">
-          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">
-            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">C</div><div id="mc3" class="mc_content"></div></div>
-          </card>
-          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">
-            <div slot="content" class="flex-row flex-baseline"><div class="mc_label">D</div><div id="mc4" class="mc_content"></div></div>
-          </card>
-        </div>
-      </div>
-      <h5 style="margin-left:4px">編輯答案</h5>
-
-      <div id="mc_input_container">
-        <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
-        <div class="flex-row">
-          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
-          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
-        </div>
-        <div class="flex-row">
-          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
-          <card class="flex-50"><div slot="content"><quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
-        </div>
-      </div>
-    </div>
-
-    <div class="questions_inbox" class="flex-column" :class="{'show': questionInbox.show}">
-      <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
-        <i class="material-icons" @click="questionInbox.show = false">close</i>
-        <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
-      </div>
-
-      <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
-        <mdl-button primary raised @click="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
-      </div>
-
-      <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
-        <div class="question" v-for="q in questionInbox.questions" track-by="_id">
-          <span v-html="q.context"></span>
-          <div class="flex-row">
-            <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
-            <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
+      <div class="flex-column">
+        <card>
+          <div slot="content">
+            <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.question"></quill>
           </div>
-        </div>
+        </card>
       </div>
 
+      <!-- <div class="mc_preview">
+      <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
+      <div class="flex-row">
+      <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">
+      <div slot="content" class="flex-row flex-baseline"><div class="mc_label">A</div><div id="mc1" class="mc_content"></div></div>
+    </card>
+    <card class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">
+    <div slot="content" class="flex-row flex-baseline"><div class="mc_label">B</div><div id="mc2" class="mc_content"></div></div>
+  </card>
 
+</div>
+<div class="flex-row">
+<card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">
+<div slot="content" class="flex-row flex-baseline"><div class="mc_label">C</div><div id="mc3" class="mc_content"></div></div>
+</card>
+<card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">
+<div slot="content" class="flex-row flex-baseline"><div class="mc_label">D</div><div id="mc4" class="mc_content"></div></div>
+</card>
+</div>
+</div> -->
+<h5 style="margin-left:4px">編輯答案</h5>
 
+<div id="mc_input_container">
+  <div class="flex-row">
+    <div class="flex-column flex-50">
+      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">A</div>
+      <card>
+        <div slot="content">
+          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[0]"></quill>
+        </div>
+      </card>
+    </div>
+    <div class="flex-column flex-50">
+      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">B</div>
+      <card>
+        <div slot="content">
+          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[1]"></quill>
+        </div>
+      </card>
     </div>
   </div>
+  <div class="flex-row">
+    <div class="flex-column flex-50">
+      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">C</div>
+      <card>
+        <div slot="content">
+          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[2]"></quill>
+        </div>
+      </card>
+    </div>
+    <div class="flex-column flex-50">
+      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">D</div>
+      <card>
+        <div slot="content">
+          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[3]"></quill>
+        </div>
+      </card>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="questions_inbox" class="flex-column" :class="{'show': questionInbox.show}">
+  <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
+    <i class="material-icons" @click="questionInbox.show = false">close</i>
+    <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
+  </div>
+
+  <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
+    <mdl-button primary raised @click="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
+  </div>
+
+  <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
+    <div class="question" v-for="q in questionInbox.questions" track-by="_id">
+      <span v-html="q.context"></span>
+      <div class="flex-row">
+        <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
+        <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>
+</div>
 </template>
 
 <script>
 import 'fabric'
-import renderQuill from 'quill-render'
+// import renderQuill from 'quill-render'
 import Subject from '../../modules/Subjects'
 import Language from '../../modules/Languages'
 import Card from '../../components/reuseable/Card'
@@ -158,7 +176,7 @@ import { setUserLanguage } from '../../vuex/actions'
 import { getUserLanguage } from '../../vuex/getters'
 
 import 'quill/dist/quill.snow.css'
-var delayTimer
+// var delayTimer
 
 export default {
   ready: function () {
@@ -204,12 +222,19 @@ export default {
     publishQuestion: function () {
       this.publishButton.disabled = true
       if (this.checkComplete()) {
-        this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
-        this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
-        this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
-        this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
-        this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
-        this.newQuestion.rawData = JSON.stringify(this.editorPreview)
+        // this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
+        this.newQuestion.delta = JSON.stringify(this.editorPreview.question.ops)
+        // this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
+        // this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
+        // this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
+        // this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
+        this.newQuestion.choices[0] = JSON.stringify(this.editorPreview.answer.mc[0].ops)
+        this.newQuestion.choices[1] = JSON.stringify(this.editorPreview.answer.mc[1].ops)
+        this.newQuestion.choices[2] = JSON.stringify(this.editorPreview.answer.mc[2].ops)
+        this.newQuestion.choices[3] = JSON.stringify(this.editorPreview.answer.mc[3].ops)
+
+        // this.newQuestion.rawData = JSON.stringify(this.editorPreview)
+
         this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
           this.$showToast('發佈成功')
           this.publishButton.disabled = false
@@ -219,6 +244,12 @@ export default {
             mc: 1
           }
           this.editorPreview = {
+            image: {
+              label: '',
+              type: 'qiniu',
+              data: '',
+              show: false
+            },
             question: { ops: [] },
             answer: {
               mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
@@ -258,46 +289,46 @@ export default {
       this.newQuestion.tags.splice(index, 1)
     },
     renderQuestionPreview: function (option) {
-      if (option === 'clear') {
-        window.document.querySelector('.question_preview').innerHTML = '<p></p>'
-      } else {
-        window.document.querySelector('.question_preview').innerHTML = renderQuill(this.editorPreview.question.ops)
-        setTimeout(function renderQuestionPreview () {
-          window.renderMathInElement(
-            document.querySelector('.question_preview'),
-            {
-              delimiters: [
-                {left: '$$', right: '$$', display: false}
-              ]
-            }
-          )
-        }, 0)
-      }
+      // if (option === 'clear') {
+      //   window.document.querySelector('.question_preview').innerHTML = '<p></p>'
+      // } else {
+      //   window.document.querySelector('.question_preview').innerHTML = renderQuill(this.editorPreview.question.ops)
+      //   setTimeout(function renderQuestionPreview () {
+      //     window.renderMathInElement(
+      //       document.querySelector('.question_preview'),
+      //       {
+      //         delimiters: [
+      //           {left: '$$', right: '$$', display: false}
+      //         ]
+      //       }
+      //     )
+      //   }, 0)
+      // }
     },
-    renderMcPreview: function (option) {
-      if (option === 'clear') {
-        window.document.getElementById('mc1').innerHTML = '<p></p>'
-        window.document.getElementById('mc2').innerHTML = '<p></p>'
-        window.document.getElementById('mc3').innerHTML = '<p></p>'
-        window.document.getElementById('mc4').innerHTML = '<p></p>'
-      } else {
-        window.document.getElementById('mc1').innerHTML = renderQuill(this.editorPreview.answer.mc[0].ops)
-        window.document.getElementById('mc2').innerHTML = renderQuill(this.editorPreview.answer.mc[1].ops)
-        window.document.getElementById('mc3').innerHTML = renderQuill(this.editorPreview.answer.mc[2].ops)
-        window.document.getElementById('mc4').innerHTML = renderQuill(this.editorPreview.answer.mc[3].ops)
-
-        setTimeout(function renderMcPreview () {
-          window.renderMathInElement(
-            document.getElementById('mc_preview'),
-            {
-              delimiters: [
-                {left: '$$', right: '$$', display: false}
-              ]
-            }
-          )
-        }, 0)
-      }
-    },
+    // renderMcPreview: function (option) {
+    //   if (option === 'clear') {
+    //     window.document.getElementById('mc1').innerHTML = '<p></p>'
+    //     window.document.getElementById('mc2').innerHTML = '<p></p>'
+    //     window.document.getElementById('mc3').innerHTML = '<p></p>'
+    //     window.document.getElementById('mc4').innerHTML = '<p></p>'
+    //   } else {
+    //     window.document.getElementById('mc1').innerHTML = renderQuill(this.editorPreview.answer.mc[0].ops)
+    //     window.document.getElementById('mc2').innerHTML = renderQuill(this.editorPreview.answer.mc[1].ops)
+    //     window.document.getElementById('mc3').innerHTML = renderQuill(this.editorPreview.answer.mc[2].ops)
+    //     window.document.getElementById('mc4').innerHTML = renderQuill(this.editorPreview.answer.mc[3].ops)
+    //
+    //     setTimeout(function renderMcPreview () {
+    //       window.renderMathInElement(
+    //         document.getElementById('mc_preview'),
+    //         {
+    //           delimiters: [
+    //             {left: '$$', right: '$$', display: false}
+    //           ]
+    //         }
+    //       )
+    //     }, 0)
+    //   }
+    // },
     getLatestQuestionsCreatedByMe: function () {
       this.$http.get('/api/manage-question/mine').then(function (response) {
         document.getElementById('getLatestQuestionsButton').style.display = 'none'
@@ -339,6 +370,7 @@ export default {
         answer: {
           mc: 0
         },
+        delta: {},
         rawData: ''
       },
       editorPreview: {
@@ -360,22 +392,22 @@ export default {
       return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
     }
   },
-  watch: {
-    'editorPreview.question.ops': function () {
-      var self = this
-      clearTimeout(delayTimer)
-      delayTimer = setTimeout(function () {
-        self.renderQuestionPreview()
-      }, 500)
-    },
-    'editorPreview.answer.mc': function () {
-      var self = this
-      clearTimeout(delayTimer)
-      delayTimer = setTimeout(function () {
-        self.renderMcPreview()
-      }, 500)
-    }
-  },
+  // watch: {
+  //   'editorPreview.question.ops': function () {
+  //   var self = this
+  //   clearTimeout(delayTimer)
+  //   delayTimer = setTimeout(function () {
+  //     self.renderQuestionPreview()
+  //   }, 500)
+  //   },
+  //   'editorPreview.answer.mc': function () {
+  //     var self = this
+  //     clearTimeout(delayTimer)
+  //     delayTimer = setTimeout(function () {
+  //       self.renderMcPreview()
+  //     }, 500)
+  //   }
+  // },
   store,
   vuex: {
     actions: {
@@ -466,13 +498,15 @@ export default {
   border-bottom: 1px solid #eee
 }
 
-#create-mc-question .mc_preview {
+#create-mc-question .mc_select {
   cursor: pointer;
+  padding: 8px;
+  background: #ddd;
 }
 
-#create-mc-question .mc_preview .hightlight-answer .card {
+#create-mc-question .hightlight-answer {
   background-color: #009688;
-  color: #fff
+  color: #fff;
 }
 
 </style>

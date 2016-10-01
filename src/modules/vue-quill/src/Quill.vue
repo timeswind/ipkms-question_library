@@ -1,9 +1,13 @@
 <template>
   <div>
-    <button type="button" @click="mathBox.show = !mathBox.show" style="margin-top:8px">公式</button>
-    <div v-show="mathBox.show" class="math-input flex-column" style="border-bottom: 1px solid #ddd;padding:8px">
+    <button class="c-button" type="button" @click="mathBox.show = true" v-show="!mathBox.show" style="margin: 8px">公式輸入</button>
+    <div v-show="mathBox.show" class="math-input flex-column">
       <span v-el:mathquillbox></span>
-      <button type="button" @click="insertMath(mathBox.enteredMath)" style="margin-top:8px">插入公式</button>
+      <div class="flex-row flex-baseline">
+        <button class="c-button"  type="button" @click="insertMath(mathBox.enteredMath)">插入公式</button>
+        <button class="c-button"  type="button" @click="mathBox.show = false">關閉</button>
+        <!-- <a style="font-size: 12px" href="https://www.udacity.com/wiki/ma006/mathquill">快捷操作</a> -->
+      </div>
     </div>
     <div class="ui attached segment" v-el:quill @click.prevent="focusEditor"></div>
   </div>
@@ -15,7 +19,6 @@ const MQ = window.MathQuill.getInterface(2)
 export default {
   props: {
     content: {},
-    author: {},
     placeholder: {
       type: String,
       default: ''
@@ -30,6 +33,12 @@ export default {
       type: Array,
       default () {
         return []
+      }
+    },
+    toolbar: {
+      type: Array,
+      default () {
+        return ['bold', 'italic', 'underline', 'strike']
       }
     },
     output: {
@@ -58,6 +67,10 @@ export default {
         }
       }
     })
+
+    this.MathField = MathField
+
+    // console.log(MathField)
     // var toolbarOptions = ['bold', 'italic', 'underline', 'strike'];
 
     var options = {
@@ -89,11 +102,6 @@ export default {
     this.editor.on('selection-change', (range) => {
       this.$dispatch('selection-change', this.editor, range)
     })
-    // if (typeof this.author !== 'undefined') {
-    //   this.editor.addModule('authorship', {
-    //     authorId: this.author
-    //   })
-    // }
     if (this.keyBindings.length) {
       const keyboard = this.editor.getModule('keyboard')
       this.keyBindings.map((binding) => {
@@ -117,11 +125,13 @@ export default {
   },
   methods: {
     insertMath (latex) {
-      // var format = ' $$' + latex + '$$ '
-      var range = this.editor.getLength()
-      // this.editor.insertText(range - 1, format, true)
-      this.editor.insertText(range - 1, ' ', 'formula', latex)
-      this.mathBox.enteredMath = ''
+      if (latex.trim() !== '') {
+        var oldDalta = this.editor.getContents()
+        oldDalta.ops.push({ insert: { formula: latex } })
+        this.editor.setContents(oldDalta)
+        this.MathField.latex('')
+        this.mathBox.enteredMath = ''
+      }
     },
     focusEditor (e) {
       if (e && e.srcElement) {
@@ -142,7 +152,14 @@ export default {
 }
 </script>
 <style scoped>
-.insert-math-button {
+.c-button {
   cursor: pointer;
+  margin: 8px 8px 0 0;
+  padding: 8px;
+  background-color: #eee;
+  border: 1px solid #ddd
+}
+.math-input {
+  padding: 8px
 }
 </style>

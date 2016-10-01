@@ -44,7 +44,7 @@ export default {
           email: this.login.email,
           password: this.login.password
         }
-        this.$http.post('/login', data).then(function (response) {
+        this.$http.post('/api/login', data).then(function (response) {
           console.log(response)
           if (response.status === 200 && response.data && response.data.token) {
             window.sessionStorage.token = response.data.token
