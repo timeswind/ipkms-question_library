@@ -50,17 +50,34 @@
                 <i class="material-icons" v-for="i in getNumberArray(details.difficulty)" track-by="$index">star_rate</i>
               </div>
             </div>
-            <div v-html="details.context"></div>
+            <div v-if="details.delta">
+              <div v-html="renderDelta(details.delta)"></div>
+            </div>
+            <div v-if="details.context">
+              <div v-html="details.context"></div>
+            </div>
           </div>
         </card>
         <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
-          <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
+          <div v-if="details.delta">
+            <div class="flex-row">
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="renderDelta(details.choices[0])"></div></div></card>
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="renderDelta(details.choices[1])"></div></div></card>
+            </div>
+            <div class="flex-row">
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="renderDelta(details.choices[2])"></div></div></card>
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="renderDelta(details.choices[3])"></div></div></card>
+            </div>
           </div>
-          <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
+          <div v-if="details.context">
+            <div class="flex-row">
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
+            </div>
+            <div class="flex-row">
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
+              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
+            </div>
           </div>
         </div>
 
@@ -78,6 +95,7 @@
 <script>
 import Card from '../../components/reuseable/Card'
 import Subject from '../../modules/Subjects'
+import deltaRender from '../../modules/delta-render.js'
 
 export default {
   ready: function () {
@@ -92,6 +110,9 @@ export default {
     Card
   },
   methods: {
+    renderDelta: function (delta) {
+      return deltaRender(delta)
+    },
     getQuestionDetail: function (question_id) {
       let apiURL = '/api/manage-question/question/' + question_id
       this.$http.get(apiURL).then(function (response) {
@@ -99,11 +120,17 @@ export default {
         if (response.data.type === 'mc') {
           this.answer.mc = response.data.answer.mc
         }
+        console.log(response.data.delta)
+        if (response.data.delta && response.data.delta !== '') {
+
+        } else {
+          console.log('old render')
+          this.renderQuestions()
+        }
         this.tempDetails = JSON.parse(JSON.stringify(response.data))
         if (this.details.createdBy && this.details.createdBy === 'self') {
           this.edit.on = true
         }
-        this.renderQuestions()
       }, function (response) {
         console.log(response)
       })

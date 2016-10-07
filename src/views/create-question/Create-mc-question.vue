@@ -257,7 +257,7 @@ export default {
           }
           this.$broadcast('clear-editor')
           this.renderQuestionPreview('clear')
-          this.renderMcPreview('clear')
+          // this.renderMcPreview('clear')
           this.questionInbox.questions.push(response.data)
         }, function (response) {
           this.$showToast('發佈失敗')

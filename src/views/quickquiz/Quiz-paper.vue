@@ -45,6 +45,7 @@
   font-weight: bold;
   font-size: 20px;
   padding: 0;
+  margin-right: 16px;
 }
 
 #quiz-paper .question_body>p, #quiz-paper .question_body>div{
@@ -294,8 +295,12 @@
                       </mdl-tooltip>
                     </div>
                   </div>
-
-                  <span class="question_body" v-html="question.context"></span>
+                  <div v-if="question.delta">
+                    <div class="question_body" v-html="renderDelta(question.delta)"></div>
+                  </div>
+                  <div v-if="question.context">
+                    <div class="question_body" v-html="question.context"></div>
+                  </div>
                   <div class="flex-row" style="margin-left:auto;flex-shrink: 0" v-if="quickquiz.finished">
                     <mdl-button accent @click="showAnswer($index)" v-show="quickquiz.correctAnswers[$index] !== null && !sampleMode">
                       <span v-if="typeof correctAnswers[$index] === 'number'">隱藏答案</span>
@@ -313,24 +318,48 @@
                 </span>
 
                 <div class="choices flex-column" style="width: 100%">
-                  <div class="flex-row">
-                    <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0), 'blank': showBlank($index, 0), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 0)">
-                      <span class="choice-label">A</span>
-                      <div v-html="question.choices[0]"></div>
+                  <div v-if="question.delta">
+                    <div class="flex-row">
+                      <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0), 'blank': showBlank($index, 0), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 0)">
+                        <span class="choice-label">A</span>
+                        <div v-html="renderDelta(question.choices[0])"></div>
+                      </div>
+                      <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1), 'blank': showBlank($index, 1), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 1)">
+                        <span class="choice-label">B</span>
+                        <div v-html="renderDelta(question.choices[1])"></div>
+                      </div>
                     </div>
-                    <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1), 'blank': showBlank($index, 1), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 1)">
-                      <span class="choice-label">B</span>
-                      <div v-html="question.choices[1]"></div>
+                    <div class="flex-row">
+                      <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2), 'blank': showBlank($index, 2), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 2)">
+                        <span class="choice-label">C</span>
+                        <div v-html="renderDelta(question.choices[2])"></div>
+                      </div>
+                      <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3), 'blank': showBlank($index, 3), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 3)">
+                        <span class="choice-label">D</span>
+                        <div v-html="renderDelta(question.choices[3])"></div>
+                      </div>
                     </div>
                   </div>
-                  <div class="flex-row">
-                    <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2), 'blank': showBlank($index, 2), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 2)">
-                      <span class="choice-label">C</span>
-                      <div v-html="question.choices[2]"></div>
+                  <div v-if="question.context">
+                    <div class="flex-row">
+                      <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose($index, 0), 'right': showRight($index, 0), 'wrong': showWrong($index, 0), 'blank': showBlank($index, 0), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 0)">
+                        <span class="choice-label">A</span>
+                        <div v-html="question.choices[0]"></div>
+                      </div>
+                      <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose($index, 1), 'right': showRight($index, 1), 'wrong': showWrong($index, 1), 'blank': showBlank($index, 1), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 1)">
+                        <span class="choice-label">B</span>
+                        <div v-html="question.choices[1]"></div>
+                      </div>
                     </div>
-                    <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3), 'blank': showBlank($index, 3), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 3)">
-                      <span class="choice-label">D</span>
-                      <div v-html="question.choices[3]"></div>
+                    <div class="flex-row">
+                      <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose($index, 2), 'right': showRight($index, 2), 'wrong': showWrong($index, 2), 'blank': showBlank($index, 2), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 2)">
+                        <span class="choice-label">C</span>
+                        <div v-html="question.choices[2]"></div>
+                      </div>
+                      <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose($index, 3), 'right': showRight($index, 3), 'wrong': showWrong($index, 3), 'blank': showBlank($index, 3), 'chooseable': !sampleMode && !observeMode}" @click="answerOnChoose($index, 3)">
+                        <span class="choice-label">D</span>
+                        <div v-html="question.choices[3]"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -366,6 +395,7 @@ import { getQuickquizID, getQuickquizStudents } from '../../vuex/getters'
 import { zipSampleToStudent } from '../../modules/quickquiz'
 import { calAnswerDiff, posToChoiceLable } from '../../modules/quizpaper/observe-mode'
 import io from 'socket.io-client'
+import deltaRender from '../../modules/delta-render.js'
 
 var qaChart = null
 var socket = null
@@ -385,6 +415,9 @@ export default {
     Card
   },
   methods: {
+    renderDelta: function (delta) {
+      return deltaRender(delta)
+    },
     getQuickquizQuestions: function (id) {
       var apiURL = '/api/manage-quickquiz/quickquiz' + '?id=' + id
       this.$http.get(apiURL).then(function (response) {

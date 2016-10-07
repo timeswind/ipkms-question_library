@@ -12,7 +12,12 @@
           <div class="q-difficulty">
             <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
           </div>
-          <p class="q-context" v-html="q.context"></p>
+          <div v-if="q.delta">
+            <p class="q-context" v-html="renderDelta(q.delta)"></p>
+          </div>
+          <div v-if="q.context">
+            <p class="q-context" v-html="q.context"></p>
+          </div>
           <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
         </div>
         <div class="question-tools">
@@ -29,6 +34,7 @@
 <script>
 import qcollectionSelectorModal from '../../components/reuseable/Select-qcollection.vue'
 import topbar from '../../components/reuseable/Topbar.vue'
+import deltaRender from '../../modules/delta-render.js'
 
 export default {
   ready: function () {
@@ -39,6 +45,9 @@ export default {
     topbar
   },
   methods: {
+    renderDelta: function (delta) {
+      return deltaRender(delta)
+    },
     getQuestions: function () {
       var sort = -1
       if (this.filter.time === true) {

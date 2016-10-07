@@ -83,7 +83,12 @@
             <div class="q-difficulty">
               <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
             </div>
-            <p class="q-context" v-html="q.context"></p>
+            <div v-if="q.delta">
+              <p class="q-context" v-html="renderDelta(q.delta)"></p>
+            </div>
+            <div v-if="q.context">
+              <p class="q-context" v-html="q.context"></p>
+            </div>
             <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
           </div>
           <div class="question-tools">
@@ -109,6 +114,7 @@ import qcollectionSelectorModal from '../../components/reuseable/Select-qcollect
 import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
 import Subject from '../../modules/Subjects'
 import Card from '../../components/reuseable/Card.vue'
+import deltaRender from '../../modules/delta-render.js'
 
 export default {
   ready: function () {
@@ -121,6 +127,9 @@ export default {
     Card
   },
   methods: {
+    renderDelta: function (delta) {
+      return deltaRender(delta)
+    },
     deleteCollection: function () {
       let comfirmDelete = window.confirm('你確定要刪除這個題集？')
       if (comfirmDelete) {
