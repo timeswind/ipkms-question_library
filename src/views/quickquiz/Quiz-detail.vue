@@ -164,15 +164,24 @@ export default {
       socket = io.connect('/quickquiz')
 
       socket.on('connect', function () {
-        console.log('on connect')
-        socket.emit('authenticate', {token: window.sessionStorage.token})
+        socket
+        .emit('authenticate', { token: window.sessionStorage.token }) // send the jwt
+        .on('authenticated', function () {
+          self.socket.authenticated = true
+          socket.emit('user join', { quickquizId: self.$route.params.quickquiz_id })
+          console.log('socket auth success')
+        })
+        .on('unauthorized', function (msg) {
+          console.log('unauthorized: ' + JSON.stringify(msg.data))
+          throw new Error(msg.data.type)
+        })
       })
 
-      socket.on('authenticated', function () {
-        self.socket.authenticated = true
-        socket.emit('user join', {quickquizId: self.$route.params.quickquiz_id})
-        console.log('socket auth success')
-      })
+      // socket.on('authenticated', function () {
+      //   self.socket.authenticated = true
+      //   socket.emit('user join', {quickquizId: self.$route.params.quickquiz_id})
+      //   console.log('socket auth success')
+      // })
 
       socket.on('joined', function (data) {
         self.socket.joined = true
