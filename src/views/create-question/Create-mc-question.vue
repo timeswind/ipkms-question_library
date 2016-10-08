@@ -77,104 +77,85 @@
         </card>
       </div>
 
-      <!-- <div class="mc_preview">
+      <h5 style="margin-left:4px">編輯答案</h5>
       <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
-      <div class="flex-row">
-      <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">
-      <div slot="content" class="flex-row flex-baseline"><div class="mc_label">A</div><div id="mc1" class="mc_content"></div></div>
-    </card>
-    <card class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">
-    <div slot="content" class="flex-row flex-baseline"><div class="mc_label">B</div><div id="mc2" class="mc_content"></div></div>
-  </card>
-
-</div>
-<div class="flex-row">
-<card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">
-<div slot="content" class="flex-row flex-baseline"><div class="mc_label">C</div><div id="mc3" class="mc_content"></div></div>
-</card>
-<card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">
-<div slot="content" class="flex-row flex-baseline"><div class="mc_label">D</div><div id="mc4" class="mc_content"></div></div>
-</card>
-</div>
-</div> -->
-<h5 style="margin-left:4px">編輯答案</h5>
-
-<div id="mc_input_container">
-  <div class="flex-row">
-    <div class="flex-column flex-50">
-      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">A</div>
-      <card>
-        <div slot="content">
-          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[0]"></quill>
+      <div id="mc_input_container">
+        <div class="flex-row">
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">A</div>
+            <card>
+              <div slot="content">
+                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[0]"></quill>
+              </div>
+            </card>
+          </div>
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">B</div>
+            <card>
+              <div slot="content">
+                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[1]"></quill>
+              </div>
+            </card>
+          </div>
         </div>
-      </card>
-    </div>
-    <div class="flex-column flex-50">
-      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">B</div>
-      <card>
-        <div slot="content">
-          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[1]"></quill>
+        <div class="flex-row">
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">C</div>
+            <card>
+              <div slot="content">
+                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[2]"></quill>
+              </div>
+            </card>
+          </div>
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">D</div>
+            <card>
+              <div slot="content">
+                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[3]"></quill>
+              </div>
+            </card>
+          </div>
         </div>
-      </card>
+      </div>
     </div>
-  </div>
-  <div class="flex-row">
-    <div class="flex-column flex-50">
-      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">C</div>
-      <card>
-        <div slot="content">
-          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[2]"></quill>
+
+    <div class="questions_inbox" class="flex-column" :class="{'show': questionInbox.show}">
+      <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
+        <i class="material-icons" @click="questionInbox.show = false">close</i>
+        <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
+      </div>
+
+      <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
+        <mdl-button primary raised @click="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
+      </div>
+
+      <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
+        <div class="question" v-for="q in questionInbox.questions" track-by="_id">
+          <div v-if="q.delta">
+            <div class="q-context" v-html="renderDelta(q.delta)"></div>
+          </div>
+          <div v-if="q.context">
+            <div class="q-context" v-html="q.context"></div>
+          </div>
+          <div class="flex-row">
+            <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
+            <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
+          </div>
         </div>
-      </card>
-    </div>
-    <div class="flex-column flex-50">
-      <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">D</div>
-      <card>
-        <div slot="content">
-          <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[3]"></quill>
-        </div>
-      </card>
-    </div>
-  </div>
-</div>
-</div>
-
-<div class="questions_inbox" class="flex-column" :class="{'show': questionInbox.show}">
-  <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
-    <i class="material-icons" @click="questionInbox.show = false">close</i>
-    <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
-  </div>
-
-  <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
-    <mdl-button primary raised @click="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
-  </div>
-
-  <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
-    <div class="question" v-for="q in questionInbox.questions" track-by="_id">
-      <span v-html="q.context"></span>
-      <div class="flex-row">
-        <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
-        <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
       </div>
     </div>
   </div>
-
-
-
-</div>
-</div>
 </template>
 
 <script>
 import 'fabric'
-// import renderQuill from 'quill-render'
+import deltaRender from '../../modules/delta-render'
 import Subject from '../../modules/Subjects'
 import Language from '../../modules/Languages'
 import Card from '../../components/reuseable/Card'
 import store from '../../vuex/store'
 import { setUserLanguage } from '../../vuex/actions'
 import { getUserLanguage } from '../../vuex/getters'
-
 import 'quill/dist/quill.snow.css'
 // var delayTimer
 
@@ -187,6 +168,9 @@ export default {
     Card
   },
   methods: {
+    renderDelta: function (delta) {
+      return deltaRender(delta)
+    },
     readImg: function (e) {
       let c = this.$els.fabricprocess
       var canvas = new window.fabric.Canvas(c, { width: 600, height: 300 })
@@ -233,8 +217,6 @@ export default {
         this.newQuestion.choices[2] = JSON.stringify(this.editorPreview.answer.mc[2].ops)
         this.newQuestion.choices[3] = JSON.stringify(this.editorPreview.answer.mc[3].ops)
 
-        // this.newQuestion.rawData = JSON.stringify(this.editorPreview)
-
         this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
           this.$showToast('發佈成功')
           this.publishButton.disabled = false
@@ -256,7 +238,7 @@ export default {
             }
           }
           this.$broadcast('clear-editor')
-          this.renderQuestionPreview('clear')
+          // this.renderQuestionPreview('clear')
           // this.renderMcPreview('clear')
           this.questionInbox.questions.push(response.data)
         }, function (response) {
@@ -288,23 +270,23 @@ export default {
     removeTag: function (index) {
       this.newQuestion.tags.splice(index, 1)
     },
-    renderQuestionPreview: function (option) {
-      // if (option === 'clear') {
-      //   window.document.querySelector('.question_preview').innerHTML = '<p></p>'
-      // } else {
-      //   window.document.querySelector('.question_preview').innerHTML = renderQuill(this.editorPreview.question.ops)
-      //   setTimeout(function renderQuestionPreview () {
-      //     window.renderMathInElement(
-      //       document.querySelector('.question_preview'),
-      //       {
-      //         delimiters: [
-      //           {left: '$$', right: '$$', display: false}
-      //         ]
-      //       }
-      //     )
-      //   }, 0)
-      // }
-    },
+    // renderQuestionPreview: function (option) {
+    // if (option === 'clear') {
+    //   window.document.querySelector('.question_preview').innerHTML = '<p></p>'
+    // } else {
+    //   window.document.querySelector('.question_preview').innerHTML = renderQuill(this.editorPreview.question.ops)
+    //   setTimeout(function renderQuestionPreview () {
+    //     window.renderMathInElement(
+    //       document.querySelector('.question_preview'),
+    //       {
+    //         delimiters: [
+    //           {left: '$$', right: '$$', display: false}
+    //         ]
+    //       }
+    //     )
+    //   }, 0)
+    // }
+    // },
     // renderMcPreview: function (option) {
     //   if (option === 'clear') {
     //     window.document.getElementById('mc1').innerHTML = '<p></p>'
@@ -364,14 +346,12 @@ export default {
         tags: [],
         tips: '',
         difficulty: 1,
-        context: '',
         choices: ['', '', '', ''],
         images: [],
         answer: {
           mc: 0
         },
-        delta: {},
-        rawData: ''
+        delta: ''
       },
       editorPreview: {
         image: {

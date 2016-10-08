@@ -51,12 +51,12 @@
   display: inline-block;
   width: 100%
 }
-
-#create-mc-question-set .mc-preview-wrapper .card {
+#create-mc-question-set .mc_select {
   cursor: pointer;
+  padding: 8px;
+  background: #ddd;
 }
-
-#create-mc-question-set .mc-preview-wrapper .hightlight-answer .card {
+#create-mc-question-set .hightlight-answer {
   background-color: #009688;
   color: #fff
 }
@@ -243,7 +243,12 @@
         <div class="flex-column questions" v-show="qcollectionInbox.show">
           <div class="flex-row flex-baseline flex-no-shrink question" v-for="q in qcollectionInbox.questions" track-by="_id">
             <span style="margin-right:8px">{{$index + 1}}.</span>
-            <span style="margin-right:8px" v-html="q.context"></span>
+            <div v-if="q.delta">
+              <p class="q-context" v-html="renderDelta(q.delta)"></p>
+            </div>
+            <div v-if="q.context">
+              <p class="q-context" v-html="q.context"></p>
+            </div>
             <span class="flex-row flex-center" style="margin-left:auto;color:#FFC107">{{q.difficulty}}<i class="material-icons" style="font-size:16px">star</i></span>
           </div>
         </div>
@@ -292,57 +297,38 @@
           </div>
         </div>
       </card>
-      <div class="flex-row">
 
-        <div class="flex-50">
-          <card>
-            <div slot="content">
-              <quill :content.sync="editorPreview.question"></quill>
-            </div>
-          </card>
-        </div>
-
-        <div class="flex-50">
-          <card>
-            <div slot="content">
-              <p class="toolbar-title">預覽</p>
-              <div id="question-preview-container"></div>
-            </div>
-          </card>
-        </div>
-
-      </div>
-      <div class="mc-preview-wrapper" id="mc-preview-container">
-        <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
-        <div class="flex-row">
-          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">A</span><div id="mc1"></div></div>
-          </card>
-          <card class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">B</span><div id="mc2"></div></div>
-          </card>
-
-        </div>
-        <div class="flex-row">
-          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">C</span><div id="mc3"></div></div>
-          </card>
-          <card class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">
-            <div slot="content" class="flex-row flex-baseline"><span class="mc-label">D</span><div id="mc4"></div></div>
-          </card>
-        </div>
+      <div class="flex-column">
+        <card>
+          <div slot="content">
+            <quill :content.sync="editorPreview.question"></quill>
+          </div>
+        </card>
       </div>
       <h5 style="margin-left:4px">編輯答案</h5>
+      <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
 
       <div>
         <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
         <div class="flex-row">
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">A</div>
+            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
+          </div>
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">B</div>
+            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
+          </div>
         </div>
         <div class="flex-row">
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
-          <card class="flex-50"><div slot="content"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">C</div>
+            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
+          </div>
+          <div class="flex-column flex-50">
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">D</div>
+            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+          </div>
         </div>
       </div>
       <div class="flex-column" style="margin-top:16px">
@@ -356,7 +342,8 @@
 </template>
 
 <script>
-import renderQuill from 'quill-render'
+// import renderQuill from 'quill-render'
+import deltaRender from '../../modules/delta-render'
 import Subject from '../../modules/Subjects'
 import Language from '../../modules/Languages'
 import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
@@ -366,7 +353,7 @@ import { setUserLanguage } from '../../vuex/actions'
 import { getUserLanguage } from '../../vuex/getters'
 import 'quill/dist/quill.snow.css'
 
-var delayTimer
+// var delayTimer
 
 export default {
   created: function () {
@@ -378,14 +365,22 @@ export default {
     sheetPannel
   },
   methods: {
+    renderDelta: function (delta) {
+      return deltaRender(delta)
+    },
     publishQuestion: function () {
       this.publishButton.disabled = true
       if (this.checkComplete()) {
-        this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
-        this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
-        this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
-        this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
-        this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
+        // this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
+        this.newQuestion.delta = JSON.stringify(this.editorPreview.question.ops)
+        // this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
+        // this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
+        // this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
+        // this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
+        this.newQuestion.choices[0] = JSON.stringify(this.editorPreview.answer.mc[0].ops)
+        this.newQuestion.choices[1] = JSON.stringify(this.editorPreview.answer.mc[1].ops)
+        this.newQuestion.choices[2] = JSON.stringify(this.editorPreview.answer.mc[2].ops)
+        this.newQuestion.choices[3] = JSON.stringify(this.editorPreview.answer.mc[3].ops)
         let data = {
           language: this.newQuestion.language,
           type: 'mc',
@@ -393,12 +388,11 @@ export default {
           subject: this.newQcollection.subject,
           tips: this.newQuestion.tips,
           difficulty: this.newQuestion.difficulty,
-          context: this.newQuestion.context,
+          delta: this.newQuestion.delta,
           choices: this.newQuestion.choices,
           answer: {
             mc: this.newQuestion.answer.mc
-          },
-          rawData: JSON.stringify(this.editorPreview)
+          }
         }
 
         console.log(data)
@@ -407,7 +401,7 @@ export default {
           this.qcollectionInbox.questions.push(response.data)
           this.addQuestionToCollection(response.data._id)
           this.publishButton.disabled = false
-          this.newQuestion.context = ''
+          this.newQuestion.delta = ''
           this.newQuestion.choices = ['', '', '', '']
           this.newQuestion.answer.mc = 0
           this.editorPreview = {
@@ -417,8 +411,6 @@ export default {
             }
           }
           this.$broadcast('clear-editor')
-          this.renderQuestionPreview('clear')
-          this.renderMcPreview('clear')
         }, function (response) {
           this.$showToast('發佈失敗')
           this.publishButton.disabled = false
@@ -472,47 +464,6 @@ export default {
     },
     removeTag: function (index) {
       this.newQuestion.tags.splice(index, 1)
-    },
-    renderQuestionPreview: function (option) {
-      if (option === 'clear') {
-        window.document.getElementById('question-preview-container').innerHTML = '<p></p>'
-      } else {
-        window.document.getElementById('question-preview-container').innerHTML = renderQuill(this.editorPreview.question.ops)
-        setTimeout(function renderQuestionPreview () {
-          window.renderMathInElement(
-            document.getElementById('question-preview-container'),
-            {
-              delimiters: [
-                {left: '$$', right: '$$', display: false}
-              ]
-            }
-          )
-        }, 0)
-      }
-    },
-    renderMcPreview: function (option) {
-      if (option === 'clear') {
-        window.document.getElementById('mc1').innerHTML = '<p></p>'
-        window.document.getElementById('mc2').innerHTML = '<p></p>'
-        window.document.getElementById('mc3').innerHTML = '<p></p>'
-        window.document.getElementById('mc4').innerHTML = '<p></p>'
-      } else {
-        window.document.getElementById('mc1').innerHTML = renderQuill(this.editorPreview.answer.mc[0].ops)
-        window.document.getElementById('mc2').innerHTML = renderQuill(this.editorPreview.answer.mc[1].ops)
-        window.document.getElementById('mc3').innerHTML = renderQuill(this.editorPreview.answer.mc[2].ops)
-        window.document.getElementById('mc4').innerHTML = renderQuill(this.editorPreview.answer.mc[3].ops)
-
-        setTimeout(function renderMcPreview () {
-          window.renderMathInElement(
-            document.getElementById('mc-preview-container'),
-            {
-              delimiters: [
-                {left: '$$', right: '$$', display: false}
-              ]
-            }
-          )
-        }, 0)
-      }
     },
     renderQCInbox: function (option) {
       var divs = document.querySelectorAll('.question')
@@ -643,12 +594,11 @@ export default {
         tags: [],
         tips: '',
         difficulty: 1,
-        context: '',
+        delta: '',
         choices: ['', '', '', ''],
         answer: {
           mc: 0
-        },
-        rawData: ''
+        }
       },
       editorPreview: {
         question: { ops: [] },
@@ -661,22 +611,6 @@ export default {
   filters: {
     'timestamp': function (input) {
       return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
-    }
-  },
-  watch: {
-    'editorPreview.question.ops': function () {
-      var self = this
-      clearTimeout(delayTimer)
-      delayTimer = setTimeout(function () {
-        self.renderQuestionPreview()
-      }, 500)
-    },
-    'editorPreview.answer.mc': function () {
-      var self = this
-      clearTimeout(delayTimer)
-      delayTimer = setTimeout(function () {
-        self.renderMcPreview()
-      }, 500)
     }
   },
   store,
