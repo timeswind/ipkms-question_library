@@ -146,14 +146,13 @@
 
 #quiz-paper .obserMode_flag {
   position: fixed;
-  top: 63px;
+  top: 78px;
   right: 32px;
   z-index: 2;
   box-shadow: 1px 1px 3px #aaa;
   padding: 16px;
   background-color: #FF9800;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-radius: 3px
 }
 </style>
 <template>
@@ -413,6 +412,12 @@ export default {
   },
   components: {
     Card
+  },
+  detached: function () {
+    if (socket !== null) {
+      socket.io.disconnect()
+      console.log('emit socket disconnect')
+    }
   },
   methods: {
     renderDelta: function (delta) {
