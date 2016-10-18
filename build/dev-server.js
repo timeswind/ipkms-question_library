@@ -13,18 +13,10 @@ var proxyTable = {
     target: 'http://localhost:3000/',
     changeOrigin: true
   },
-  '/login': {
-    target: 'http://localhost:3000/',
-    changeOrigin: true
-  },
   '/socket.io': {
     target: 'http://localhost:3000/',
     changeOrigin: true,
     ws:true
-  },
-  '/static/material-icons': {
-    target: 'http://localhost:3000/',
-    changeOrigin: true
   }
 }
 
