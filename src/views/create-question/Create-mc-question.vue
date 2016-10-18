@@ -71,7 +71,7 @@
         <div v-if="newQuestion.images" style="text-align:center">
           <div v-for="image in newQuestion.images" track-by="$index">
             <div v-if="image.type === 'qiniu'">
-              <img :src="'http://obmooknfq.bkt.clouddn.com/' + image.data + '?imageMogr2/format/webp/'"/>
+              <img :src="'http://obmooknfq.bkt.clouddn.com/' + image.data + '?imageMogr2/format/jpg/'"/>
             </div>
           </div>
         </div>
