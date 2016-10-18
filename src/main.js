@@ -201,7 +201,7 @@ router.map({
     component: function (resolve) {
       require(['./views/questions/Question-detail.vue'], resolve)
     },
-    title: '题目內容'
+    title: '題目詳情'
 
   },
   '/quick-quiz': {

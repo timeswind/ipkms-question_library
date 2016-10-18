@@ -56,40 +56,48 @@
             <div v-if="details.context">
               <div v-html="details.context"></div>
             </div>
-          </div>
-        </card>
-        <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
-          <div v-if="details.delta">
-            <div class="flex-row">
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="renderDelta(details.choices[0])"></div></div></card>
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="renderDelta(details.choices[1])"></div></div></card>
-            </div>
-            <div class="flex-row">
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="renderDelta(details.choices[2])"></div></div></card>
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="renderDelta(details.choices[3])"></div></div></card>
-            </div>
-          </div>
-          <div v-if="details.context">
-            <div class="flex-row">
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
-            </div>
-            <div class="flex-row">
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
-              <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
+            <div v-if="details.images">
+              <div v-for="image in details.images">
+                <div v-if="image.type === 'qiniu'">
+                  <img :src="'http://obmooknfq.bkt.clouddn.com/' + image.data + '?imageMogr2/format/webp/'"/>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        <card v-if="details.statistic">
-          <div slot="content" style="padding:16px">
-            {{details.statistic | json}}
+      </card>
+      <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
+        <div v-if="details.delta">
+          <div class="flex-row">
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="renderDelta(details.choices[0])"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="renderDelta(details.choices[1])"></div></div></card>
           </div>
-        </card>
+          <div class="flex-row">
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="renderDelta(details.choices[2])"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="renderDelta(details.choices[3])"></div></div></card>
+          </div>
+        </div>
+        <div v-if="details.context">
+          <div class="flex-row">
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
+          </div>
+          <div class="flex-row">
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
+          </div>
+        </div>
       </div>
 
+      <card v-if="details.statistic">
+        <div slot="content" style="padding:16px">
+          {{details.statistic | json}}
+        </div>
+      </card>
     </div>
+
   </div>
+</div>
 </template>
 
 <script>

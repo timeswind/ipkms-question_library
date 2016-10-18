@@ -58,14 +58,21 @@
             <span>添加圖片</span>
           </mdl-button>
         </div>
-        <div v-show="editorPreview.image.show">
+        <div v-show="editorPreview.image.show" style="border: 1px solid #3f51b5;padding:16px">
           <form v-on:change="readImg($event)">
             <input type="file" id="uploadedImg"/>
           </form>
           <div class="flex-column flex-center">
-            <canvas v-el:fabricprocess></canvas>
+            <canvas v-el:fabricprocess  style="border: 1px dashed #3f51b5;padding: 0"></canvas>
             <mdl-textfield label="圖片名字" :value.sync="editorPreview.image.label"></mdl-textfield>
-            <mdl-button primary @click="outputImg()"><i class="material-icons">photo</i> <span>输出图片</span></mdl-button>
+            <mdl-button primary @click="outputImg()"><i class="material-icons">photo</i> <span>上傳圖片</span></mdl-button>
+          </div>
+        </div>
+        <div v-if="newQuestion.images" style="text-align:center">
+          <div v-for="image in newQuestion.images" track-by="$index">
+            <div v-if="image.type === 'qiniu'">
+              <img :src="'http://obmooknfq.bkt.clouddn.com/' + image.data + '?imageMogr2/format/webp/'"/>
+            </div>
           </div>
         </div>
       </div>
@@ -173,13 +180,18 @@ export default {
     },
     readImg: function (e) {
       let c = this.$els.fabricprocess
-      var canvas = new window.fabric.Canvas(c, { width: 600, height: 300 })
-      c.fabric = canvas
+      var canvas = c.fabric || new window.fabric.Canvas(c, { width: 600, height: 300 })
+      if (!c.fabric) {
+        c.fabric = canvas
+      }
       var reader = new window.FileReader()
       reader.onload = function (event) {
         var imgObj = new window.Image()
         imgObj.src = event.target.result
         imgObj.onload = function () {
+          canvas.forEachObject(function (o) {
+            o.remove()
+          })
           var image = new window.fabric.Image(imgObj)
           image.set({
             angle: 0,
@@ -199,7 +211,6 @@ export default {
       let c = this.$els.fabricprocess
       let canvas = c.fabric
       this.$http.get('/api/qiniu/uptoken').then(function (response) {
-        console.log(response.data.uptoken)
         this.uploadImage(canvas.getObjects()[0].toDataURL(), response.data.uptoken)
       })
     },
@@ -222,6 +233,7 @@ export default {
           this.publishButton.disabled = false
           this.newQuestion.context = ''
           this.newQuestion.choices = ['', '', '', '']
+          this.newQuestion.images = []
           this.newQuestion.answer = {
             mc: 1
           }
@@ -320,10 +332,21 @@ export default {
     uploadImage: function (imageData, token) {
       imageData = imageData.split(',')[1]
       let uptoken = 'UpToken ' + token
-      this.$http.post('http://upload.qiniu.com/putb64/' + imageData.length * 0.75, imageData, {headers: {'Content-Type': 'application/octet-stream', 'Authorization': uptoken}}).then(function (response) {
+      let c = this.$els.fabricprocess
+      var canvas = c.fabric
+      canvas.forEachObject(function (o) {
+        o.remove()
+      })
+      this.$http.post('http://upload.qiniu.com/putb64/-1', imageData, {headers: {'Content-Type': 'application/octet-stream', 'Authorization': uptoken}}).then(function (response) {
         console.log(response.data)
         this.editorPreview.image.data = response.data.key
-        this.newQuestion.images.push(this.editorPreview.image)
+        this.editorPreview.image.show = false
+        let newImage = {
+          type: this.editorPreview.image.type,
+          data: response.data.key,
+          label: this.editorPreview.image.label
+        }
+        this.newQuestion.images.push(newImage)
       })
     }
   },
