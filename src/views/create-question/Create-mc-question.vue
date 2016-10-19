@@ -337,7 +337,7 @@ export default {
       canvas.forEachObject(function (o) {
         o.remove()
       })
-      this.$http.post('http://upload.qiniu.com/putb64/-1', imageData, {headers: {'Content-Type': 'application/octet-stream', 'Authorization': uptoken}}).then(function (response) {
+      this.$http.post('https://upload.qiniu.com/putb64/-1', imageData, {headers: {'Content-Type': 'application/octet-stream', 'Authorization': uptoken}}).then(function (response) {
         console.log(response.data)
         this.editorPreview.image.data = response.data.key
         this.editorPreview.image.show = false
