@@ -13,20 +13,22 @@
 
 </style>
 <template>
-  <div id="toast" v-show="show" transition="toast">
-    {{message}}
-  </div>
+  <transition name="toast">
+    <div id="toast" v-show="show">
+      {{message}}
+    </div>
+  </transition>
 </template>
 
 <script>
 export default {
-  ready () {
-    let self = this
-    setTimeout(function () {
-      self.$remove().$destroy()
-    }, 5000)
-  },
-  beforeDestroy () {
+  mounted: function () {
+    this.$nextTick(function () {
+      let self = this
+      setTimeout(function () {
+        self.$el.remove()
+      }, 5000)
+    })
   },
   props: {
     show: {

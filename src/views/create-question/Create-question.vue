@@ -1,16 +1,18 @@
 <template>
   <div id="create-question">
-
-    <router-view :is="view" transition="fade" transition-mode="out-in"></router-view>
-
+    <transition name="fade" mode="out-in">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 <script>
 export default {
-  attached () {
-    if (this.$route.path === '/create-question') {
-      this.$router.go({name: 'start-create-question'})
-    }
+  mounted: function () {
+    this.$nextTick(function () {
+      if (this.$route.path === '/create-question') {
+        this.$router.push({name: 'start-create-question'})
+      }
+    })
   }
 }
 </script>

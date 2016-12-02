@@ -36,26 +36,24 @@
 </style>
 <template>
   <div id="search-question">
-
-    <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <div class="search-zone">
       <div v-show="search.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
-        <span class="q-tag" @click="removeTag($index)" v-for="tag in search.tags" track-by="$index" style="padding:4px 8px">{{tag}}</span>
+        <span class="q-tag" v-for="(tag, index) in search.tags" @click.native="removeTag(index)" style="padding:4px 8px">{{tag}}</span>
       </div>
-      <mdl-textfield label="標籤.輸入回車" :value.sync="search.input" @keyup.enter="appendTag()"></mdl-textfield>
+      <mu-text-field label="標籤.輸入回車" v-model="search.input" @keyup.enter.native="appendTag()"></mu-text-field>
       <span class="flex-column flex-center select-difficulty-box">
         <span class="flex-row flex-center">
           <span style="margin-right:8px">最低難度</span>
-          <i v-for="n in 5" class="material-icons" @click="selectDifficulty('min', $index)" :class="{'difficulty-heighlight': search.minDifficulty > $index}">star_rate</i>
+          <i v-for="n in 5" class="material-icons" @click="selectDifficulty('min', (n - 1))" :class="{'difficulty-heighlight': search.minDifficulty > (n - 1)}">star_rate</i>
         </span>
         <span class="flex-row flex-center">
           <span style="margin-right:8px">最高難度</span>
-          <i v-for="n in 5" class="material-icons" @click="selectDifficulty('max', $index)" :class="{'difficulty-heighlight': search.maxDifficulty > $index}">star_rate</i>
+          <i v-for="n in 5" class="material-icons" @click="selectDifficulty('max', (n - 1))" :class="{'difficulty-heighlight': search.maxDifficulty > (n - 1)}">star_rate</i>
         </span>
       </span>
-      <mdl-switch v-show="search.tags.length !== 0" :checked.sync="search.options.matchAny" style="width: 130px;margin-bottom: 16px">任意條件符合</mdl-switch>
+      <mu-switch v-show="search.tags.length !== 0" v-model="search.options.matchAny" style="width: 130px;margin-bottom: 16px" label="任意條件符合"/>
       <div>
-        <mdl-button primary raised @click="query()" :disabled="search.buttonDisable">搜索</mdl-button>
+        <mdl-button primary raised @click.native="query()" :disabled="search.buttonDisable">搜索</mdl-button>
       </div>
     </div>
     <div class="results-zone">
@@ -63,12 +61,12 @@
         {{results.info}}
       </div>
       <div class="mdl-grid" id="questions-preview-container">
-        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results.questions" track-by="_id">
-          <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
+        <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in results.questions" v-bind:key="q._id">
+          <router-link tag="div" class="question-wrapper" :to="{ name: 'question-detail', params: { question_id: q._id }}">
             <span class="q-subject">{{q.subject | subject}}</span>
             <span class="q-type">{{q.type}}</span>
             <div class="q-difficulty">
-              <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
+              <i class="material-icons" v-for="i in getNumberArray(q.difficulty)">star_rate</i>
             </div>
             <div v-if="q.delta">
               <p class="q-context" v-html="renderDelta(q.delta)"></p>
@@ -77,7 +75,7 @@
               <p class="q-context" v-html="q.context"></p>
             </div>
             <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
-          </div>
+          </router-link>
           <div class="question-tools">
             <mdl-button v-on:click="showCollectionModal(q._id)"><i class="material-icons">add</i>加入題集</mdl-button>
           </div>
@@ -179,7 +177,7 @@ export default {
       }
     },
     showCollectionModal: function (qid) {
-      this.$broadcast('getMyQcollectionLists')
+      this.$emit('getMyQcollectionLists')
       this.CollectionModal.show = true
       this.CollectionModal.qid = qid
     }

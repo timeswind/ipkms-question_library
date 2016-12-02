@@ -1,18 +1,18 @@
 <template>
   <div id="all-qcollection">
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in allQcollections" track-by="_id" v-show="!(onlyShowPrivate && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+      <router-link tag="div" class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in allQcollections" v-bind:key="qc._id" :to="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-difficulty" v-show="qc.aveDifficulty">難度: {{qc.aveDifficulty}}</span>
         <p class="qc-createdby">作者：<i>{{qc.createdBy.local.name}}</i></p>
         <p class="qc-title">{{qc.name}}</p>
 
-      </div>
+      </router-link>
     </div>
 
     <div class="flex-column flex-center" style="margin:16px 0 32px 0">
-      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
+      <mdl-button raised primary @click.native="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
     </div>
   </div>
 </template>
@@ -21,8 +21,10 @@
 import Subject from '../../modules/Subjects'
 
 export default {
-  ready: function () {
-    this.getAllQcollections()
+  mounted: function () {
+    this.$nextTick(function () {
+      this.getAllQcollections()
+    })
   },
   components: {
     Subject

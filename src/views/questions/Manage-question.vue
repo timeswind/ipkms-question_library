@@ -3,14 +3,17 @@
     <topbar>
 
       <div class="tabbar">
-        <span class="tabbar-item" style="width:33.333333%" v-link="{ name: 'my-question', activeClass: 'tabbar-item-active'}">我的題目</span>
-        <span class="tabbar-item" style="width:33.333333%" v-link="{ name: 'all-question', activeClass: 'tabbar-item-active' }">所有題目</span>
-        <span class="tabbar-item" style="width:33.333333%" v-link="{ name: 'search-question', activeClass: 'tabbar-item-active' }">題目搜索</span>
+        <router-link tag="span" class="tabbar-item" style="width:33.333333%" :to="{ name: 'my-question', activeClass: 'tabbar-item-active'}">我的題目</router-link>
+        <router-link tag="span" class="tabbar-item" style="width:33.333333%" :to="{ name: 'all-question', activeClass: 'tabbar-item-active' }">所有題目</router-link>
+        <router-link tag="span" class="tabbar-item" style="width:33.333333%" :to="{ name: 'search-question', activeClass: 'tabbar-item-active' }">題目搜索</router-link>
       </div>
 
     </topbar>
-
-    <router-view :is="view"  style="margin-top:72px" transition="fade" transition-mode="out-in" keep-alive><router-view>
+    <keep-alive>
+      <transition name="fade" mode="out-in">
+        <router-view style="margin-top:72px"></router-view>
+      </transition>
+    </keep-alive>
 
   </div>
 </template>
@@ -19,10 +22,12 @@
 import topbar from '../../components/reuseable/Topbar.vue'
 
 export default {
-  attached () {
-    if (this.$route.path === '/manage-question') {
-      this.$router.go({name: 'my-question'})
-    }
+  mounted: function () {
+    this.$nextTick(function () {
+      if (this.$route.path === '/manage-question') {
+        this.$router.push({name: 'my-question'})
+      }
+    })
   },
   components: {
     topbar

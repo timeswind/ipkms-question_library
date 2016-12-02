@@ -3,13 +3,16 @@
     <topbar>
 
       <div class="tabbar">
-        <span class="tabbar-item" style="width:50%" v-link="{ name: 'prepare-quiz', activeClass: 'tabbar-item-active'}">準備小測</span>
-        <span class="tabbar-item" style="width:50%" v-link="{ name: 'quiz-results', activeClass: 'tabbar-item-active' }">數據統計</span>
+        <router-link tag="span" class="tabbar-item" style="width:50%" :to="{ name: 'prepare-quiz', activeClass: 'tabbar-item-active'}">準備小測</router-link>
+        <router-link tag="span" class="tabbar-item" style="width:50%" :to="{ name: 'quiz-results', activeClass: 'tabbar-item-active' }">數據統計</router-link>
       </div>
 
     </topbar>
-
-    <router-view :is="view" transition="fade" transition-mode="out-in" style="margin-top:52px" keep-alive><router-view>
+    <keep-alive>
+      <transition name="fade" mode="out-in">
+        <router-view style="margin-top:52px"></router-view>
+      </transition>
+    </keep-alive>
 
   </div>
 </template>
@@ -18,10 +21,12 @@
 import topbar from '../../components/reuseable/Topbar.vue'
 
 export default {
-  attached () {
-    if (this.$route.path === '/quick-quiz') {
-      this.$router.go({name: 'prepare-quiz'})
-    }
+  mounted: function () {
+    this.$nextTick(function () {
+      if (this.$route.path === '/quick-quiz') {
+        this.$router.push({name: 'prepare-quiz'})
+      }
+    })
   },
   components: {
     topbar

@@ -5,7 +5,7 @@
         <div class="flex-row">
           <div class="flex-column flex-50">
             <span class="field-title">題集名字</span>
-            <mdl-textfield label="題集名字" :value.sync="search.name" style="position: relative;top: -13px;width: 90%;"></mdl-textfield>
+            <mu-text-field label="題集名字" v-model="search.name" style="position: relative;top: -13px;width: 90%;"></mu-text-field>
           </div>
           <div class="flex-column flex-50">
             <span class="field-title">科目</span>
@@ -17,21 +17,21 @@
           </div>
         </div>
         <div class="flex-column">
-          <mdl-button primary raised @click="query()" :disabled="search.buttonDisable">搜索</mdl-button>
+          <mdl-button primary raised @click.native="query()" :disabled="search.buttonDisable">搜索</mdl-button>
         </div>
       </div>
 
     </div>
     <div class="result-zone">
       <div class="mdl-grid">
-        <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in results" track-by="_id" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+        <router-link tag="div" class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in results" v-bind:key="qc._id" :to="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
           <span class="qc-subject">{{qc.subject | subject}}</span>
           <span class="qc-public">{{qc.public | bTp}}</span>
           <p class="qc-createdby"></p>
           <p class="qc-title">{{qc.name}}</p>
 
-        </div>
+        </router-link>
       </div>
     </div>
   </div>

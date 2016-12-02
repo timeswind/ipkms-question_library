@@ -3,7 +3,8 @@
   background: #fff;
   max-width: 300px;
   margin: 80px auto 0 auto;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.35);
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  border: 1px solid rgba(0,0,0,.09);
   padding: 16px;
   border-radius: 3px;
 }
@@ -15,10 +16,10 @@
 
         <div class="login-modal-card flex-column">
           <h4 class="display-1" style="margin-top:0">登入</h4>
-          <mdl-textfield floating-label="郵箱" :value.sync="login.email" type="email"></mdl-textfield>
-          <mdl-textfield floating-label="密碼" :value.sync="login.password" type="password" @keyup.enter="login()"></mdl-textfield>
+          <mu-text-field label="郵箱" hintText="郵箱" v-model="login.email" type="email"/>
+          <mu-text-field label="密碼" hintText="密碼" v-model="login.password" type="password"/>
           <span style="color: #F44336;text-align: center;">{{login.warn}}</span>
-          <mdl-button raised primary @click="auth()" style="margin-top:16px">登入</mdl-button>
+          <mu-raised-button label="登入" v-on:click="auth()" primary/>
         </div>
 
       </div>
@@ -51,7 +52,7 @@ export default {
             this.login.email = ''
             this.login.password = ''
             this.login.warn = ''
-            this.$router.go({name: 'entry'})
+            this.$router.push({name: 'entry'})
           }
         }, function (response) {
           if (response.status === 401 && response.data === 'fail') {

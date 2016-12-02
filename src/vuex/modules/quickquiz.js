@@ -1,4 +1,5 @@
 // vuex/modules/quickquiz.js
+import Vue from 'vue'
 import {
   SET_QUICKQUIZ_ID,
   SET_QUICKQUIZ_DETAIL,
@@ -25,7 +26,7 @@ const mutations = {
     state.students = students
   },
   [UPDATE_QUICKQUIZ_STUDENT] (state, index, student) {
-    state.students.$set(index, student)
+    Vue.set(state.students, index, student)
   }
 }
 

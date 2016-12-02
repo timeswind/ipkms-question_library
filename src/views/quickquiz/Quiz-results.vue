@@ -84,11 +84,11 @@
               <h4 class="title">{{myQuickquizs[0].title}}</h4>
               <h6 class="time flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">timer</i>{{myQuickquizs[0].time}}分鐘</h6>
               <h6 class="finished flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">create</i>{{myQuickquizs[0].finished | finished}}</h6>
-              <span class="startTime">開始於: {{myQuickquizs[0].startTime | date 'YYYY[年]M[月]DD[日] h:mm a'}}</span>
-              <span class="finishTime" v-if="myQuickquizs[0].finishTime">結束于: {{myQuickquizs[0].finishTime | date 'YYYY[年]M[月]DD[日] h:mm a'}}</span>
+              <span class="startTime">開始於: {{myQuickquizs[0].startTime | date('YYYY[年]M[月]DD[日] h:mm a')}}</span>
+              <span class="finishTime" v-if="myQuickquizs[0].finishTime">結束于: {{myQuickquizs[0].finishTime | date('YYYY[年]M[月]DD[日], h:mm, a')}}</span>
               <div class="flex-column flex-start" style="margin:16px 0 16px 16px">
-                <mdl-button accent raised style="margin-bottom:8px" @click="endLatestQuickQuiz()" v-show="!myQuickquizs[0].finished">結束測驗</mdl-button>
-                <mdl-button primary raised v-link="{ name: 'quiz-detail', params: { quickquiz_id: myQuickquizs[0]._id }}">查看詳情</mdl-button>
+                <mdl-button accent raised style="margin-bottom:8px" @click.native="endLatestQuickQuiz()" v-show="!myQuickquizs[0].finished">結束測驗</mdl-button>
+                <mdl-button primary raised @click.native="this.$router.push({ name: 'quiz-detail', params: { quickquiz_id: myQuickquizs[0]._id }})">查看詳情</mdl-button>
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@
       </div>
       <div>
         <div class="mdl-grid">
-          <div class="mdl-cell mdl-cell--4-col quickquiz-card flex-column" v-for="quickquiz in myQuickquizs" track-by="_id" v-link="{ name: 'quiz-detail', params: { quickquiz_id: quickquiz._id }}">
+          <router-link tag="div" class="mdl-cell mdl-cell--4-col quickquiz-card flex-column" v-for="quickquiz in myQuickquizs" v-bind:key="quickquiz._id" :to="{ name: 'quiz-detail', params: { quickquiz_id: quickquiz._id }}">
             <div class="flex-row flex-baseline">
               <span class="title">{{quickquiz.title}}</span>
               <span class="finished">{{quickquiz.finished | finished}}</span>
@@ -109,8 +109,8 @@
             </div>
             <span class="time">{{quickquiz.time}}分鐘</span>
 
-            <span class="date">{{quickquiz.startTime | date 'YY[年]M[月]DD[日]'}}</span>
-          </div>
+            <span class="date">{{quickquiz.startTime | date('YY[年]M[月]DD[日]')}}</span>
+          </router-link>
         </div>
       </div>
 
@@ -122,8 +122,10 @@
 <script>
 import qrcode from 'qrcode-canvas'
 export default {
-  attached () {
-    this.getMyQuickQuizs()
+  mounted: function () {
+    this.$nextTick(function () {
+      this.getMyQuickQuizs()
+    })
   },
   data () {
     return {

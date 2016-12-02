@@ -19,9 +19,11 @@
         <slot name="button-subtitle"></slot>
       </div>
     </div>
-    <div id="sheet-zone" v-show="sheetshow" transition="expand">
-      <slot name="sheet-zone"></slot>
-    </div>
+    <transition name="expand">
+      <div id="sheet-zone" v-show="sheetshow">
+        <slot name="sheet-zone"></slot>
+      </div>
+    </transition>
   </div>
 </template>
 

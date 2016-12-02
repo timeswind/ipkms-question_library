@@ -1,65 +1,73 @@
 <template>
-  <div id="app" style="height:100%">
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-      <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
-          <div v-show="$route.matched.length > 1" class="flex-row flex-center">
-            <span class="mdl-layout-title">
-              {{$route.matched[0].handler.title}}
-            </span>
-            <i class="material-icons">keyboard_arrow_right</i>
-          </div>
-          <span class="mdl-layout-title">{{$route.title}}</span>
-        </div>
-      </header>
-      <div class="mdl-layout__drawer">
-        <span class="mdl-layout-title" style="cursor: pointer" v-link="{name:'entry'}">題庫</span>
-        <nav class="mdl-navigation">
-          <a class="mdl-navigation__link" v-link="{name:'start-create-question', activeClass:'active'}">創建題目</a>
-          <a class="mdl-navigation__link" v-link="{name:'manage-question', activeClass:'active'}">管理題目</a>
-          <a class="mdl-navigation__link" v-link="{name:'manage-qcollection', activeClass:'active'}">管理題集</a>
-          <a class="mdl-navigation__link" v-link="{name:'quick-quiz', activeClass:'active'}">Quick Quiz</a>
-        </nav>
+  <div>
+    <mu-linear-progress v-show="loadingIndicatorShow" style="position: absolute; top: 0;z-index: 999" :size="3" color="#ff5252"/>
+    <mu-appbar :title="$route.meta.title" class="example-appbar" :class="{'nav-hide': !navOpen}">
+      <mu-icon-button icon='menu' slot="left" @click="toggleNav"/>
+    </mu-appbar>
+    <mu-drawer :open="false" @close="toggle()">
+      <div class="flex-column">
+        <router-link :to="{name:'start-create-question', activeClass:'active'}">創建題目</router-link>
+        <router-link :to="{name:'manage-question', activeClass:'active'}">管理題目</router-link>
+        <router-link :to="{name:'manage-qcollection', activeClass:'active'}">管理題集</router-link>
+        <router-link :to="{name:'quick-quiz', activeClass:'active'}">Quick Quiz</router-link>
       </div>
-      <main class="mdl-layout__content">
-        <div class="page-content">
-          <router-view :is="view" transition="fade" transition-mode="out-in"></router-view>
-        </div>
-      </main>
+    </mu-drawer>
+    <div class="example-content" :class="{'nav-hide': !navOpen}">
+      <router-view></router-view>
     </div>
-
-    <mdl-snackbar display-on="toastOn"></mdl-snackbar>
-    <mdl-spinner id="mainLoadingIndicator" single-color :active="loadingIndicatorShow"></mdl-spinner>
-    <div v-show="loginModalShow" class="login-modal-mask" transition="modal">
-      <div class="login-modal-card flex-column">
+    <app-nav @change="handleMenuChange" @close="toggleNav" :open="navOpen" :docked="navDocked" />
+    <mu-toast v-if="toastState" :message="toastState"/>
+    <mu-dialog :open="loginModalShow" title="重新登入">
+      <div class="flex-column">
         <span style="color: #E91E63; margin-top: 4px; margin-bottom: 8px;">登入信息过期</span>
-        <h4 class="display-1" style="margin-top:0">重新登入</h4>
-        <mdl-textfield floating-label="郵箱" :value.sync="reLogin.email" type="email"></mdl-textfield>
-        <mdl-textfield floating-label="密碼" :value.sync="reLogin.password" type="password" @keyup.enter="login()"></mdl-textfield>
+        <mu-text-field label="郵箱" hintText="郵箱" v-model="reLogin.email" type="email"/>
+        <mu-text-field label="密碼" hintText="密碼" v-model="reLogin.password" type="password"/>
         <span style="color: #F44336;text-align: center;">{{reLogin.warn}}</span>
-        <mdl-button raised primary @click="login()" style="margin-top:16px">登入</mdl-button>
+        <mu-raised-button label="登入" slot="actions" primary @click.native="login()"/>
       </div>
-    </div>
+    </mu-dialog>
+    <qcollection-selector-dialog/>
   </div>
 </template>
 
 <script>
-import store from './vuex/store'
-import { hideLoginModal, hideLodingIndicator } from './vuex/actions'
-import { getLoginModalState, getLoadingIndicatorState, getToastState } from './vuex/getters'
-
+import { mapGetters, mapActions } from 'vuex'
+import qcollectionSelectorDialog from './components/QcollectionSelectorDialog/QcollectionSelectorDialog.vue'
+import AppNavDrawer from './components/AppNavDrawer'
 import './css/main.css'
 import './css/animation.css'
 
 export default {
   data () {
+    const desktop = isDesktop()
     return {
       reLogin: {
         email: '',
         password: '',
         warn: ''
-      }
+      },
+      toast: {
+        message: ''
+      },
+      navOpen: desktop,
+      navDocked: desktop,
+      desktop: desktop
     }
+  },
+  mounted () {
+    this.routes = this.$router.options.routes
+    this.changeNav()
+    this.handleResize = () => {
+      this.changeNav()
+    }
+    window.addEventListener('resize', this.handleResize)
+  },
+  destroyed () {
+    window.removeEventListener('resize', this.handleResize)
+  },
+  components: {
+    'qcollection-selector-dialog': qcollectionSelectorDialog,
+    'app-nav': AppNavDrawer
   },
   methods: {
     login: function () {
@@ -88,39 +96,58 @@ export default {
       } else {
         this.reLogin.warn = '請輸入正確的郵箱地址'
       }
-    }
-  },
-  store,
-  vuex: {
-    actions: {
-      hideLoginModal: hideLoginModal,
-      hideLodingIndicator: hideLodingIndicator
     },
-    getters: {
-      loginModalShow: getLoginModalState,
-      loadingIndicatorShow: getLoadingIndicatorState,
-      toastState: getToastState
-    }
+    changeNav () {
+      const desktop = isDesktop()
+      this.navDocked = desktop
+      if (desktop === this.desktop) return
+      if (!desktop && this.desktop && this.navOpen) {
+        this.navOpen = false
+      }
+      if (desktop && !this.desktop && !this.navOpen) {
+        this.navOpen = true
+      }
+      this.desktop = desktop
+    },
+    toggleNav () {
+      this.navOpen = !this.navOpen
+    },
+    handleMenuChange (path) {
+      if (!this.desktop) this.navOpen = false
+    },
+    ...mapActions([
+      'hideLoginModal'
+    ])
   },
+  computed: mapGetters({
+    loginModalShow: 'getLoginModalState',
+    loadingIndicatorShow: 'getLoadingIndicatorState',
+    toastState: 'getToastState'
+  }),
   watch: {
     'toastState': function (val) {
-      this.$broadcast('toastOn', { message: val })
+      console.log(val)
+      var self = this
+      this.toast.on = true
+      this.toast.message = val
+      if (this.toastTimer) clearTimeout(this.toastTimer)
+      this.toastTimer = setTimeout(() => {
+        self.toast.on = false
+        self.toast.message = ''
+      }, 2000)
     }
   }
 }
-</script>
-
-<style>
-html {
-  height: 100%;
-  background: #eee;
+function isDesktop () {
+  return window.innerWidth > 993
 }
-
+</script>
+<style>
 body {
   align-items: center;
   justify-content: center;
-  height: 100%;
-  margin:0
+  margin:0;
+  background-color: #fafafa
 }
 
 .login-modal-mask {
@@ -139,13 +166,43 @@ body {
   padding: 16px;
   border-radius: 3px;
 }
-
-@media screen and (min-width: 1025px) {
-
-  .mdl-layout__header {
-    margin-left: 240px;
-    width: calc(100% - 240px);
+.example-appbar{
+  position: fixed;
+  left: 256px;
+  right: 0;
+  top: 0;
+  width: auto;
+  transition: all .45s cubic-bezier(.23,1,.32,1);
+  z-index: 998;
+}
+.example-appbar.nav-hide {
+  left: 0;
+}
+.example-content{
+  padding-top: 56px;
+  padding-left: 256px;
+  transition: all .45s cubic-bezier(.23,1,.32,1)
+}
+.example-content .nav-hide {
+  padding-left: 0;
+}
+.content-wrapper{
+  padding: 48px 72px;
+}
+@media (min-width: 480px) {
+  .example-content{
+    padding-top: 64px;
   }
-
+}
+@media (max-width: 993px) {
+  .example-appbar {
+    left: 0;
+  }
+  .example-content{
+    padding-left: 0;
+  }
+  .content-wrapper {
+    padding: 24px 36px;
+  }
 }
 </style>

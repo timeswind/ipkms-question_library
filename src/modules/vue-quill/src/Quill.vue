@@ -1,15 +1,15 @@
 <template>
   <div>
-    <button class="c-button" type="button" @click="mathBox.show = true" v-show="!mathBox.show" style="margin: 8px">公式輸入</button>
+    <button class="c-button" type="button" @click.native="mathBox.show = true" v-show="!mathBox.show" style="margin: 8px">公式輸入</button>
     <div v-show="mathBox.show" class="math-input flex-column">
-      <span v-el:mathquillbox></span>
+      <span ref="statistic"></span>
       <div class="flex-row flex-baseline">
-        <button class="c-button"  type="button" @click="insertMath(mathBox.enteredMath)">插入公式</button>
-        <button class="c-button"  type="button" @click="mathBox.show = false">關閉</button>
+        <button class="c-button"  type="button" @click.native="insertMath(mathBox.enteredMath)">插入公式</button>
+        <button class="c-button"  type="button" @click.native="mathBox.show = false">關閉</button>
         <!-- <a style="font-size: 12px" href="https://www.udacity.com/wiki/ma006/mathquill">快捷操作</a> -->
       </div>
     </div>
-    <div class="ui attached segment" v-el:quill @click.prevent="focusEditor"></div>
+    <div class="ui attached segment" ref="quill" @click.prevent="focusEditor"></div>
   </div>
 </template>
 
@@ -57,57 +57,59 @@ export default {
       }
     }
   },
-  ready () {
-    var self = this
-    var mathinput = this.$els.mathquillbox
-    var MathField = MQ.MathField(mathinput, {
-      handlers: {
-        edit: function () {
-          self.mathBox.enteredMath = MathField.latex() // Get entered math in LaTeX format
+  mounted: function () {
+    this.$nextTick(function () {
+      var self = this
+      var mathinput = this.$refs.mathquillbox
+      var MathField = MQ.MathField(mathinput, {
+        handlers: {
+          edit: function () {
+            self.mathBox.enteredMath = MathField.latex() // Get entered math in LaTeX format
+          }
         }
+      })
+
+      this.MathField = MathField
+
+      // console.log(MathField)
+      // var toolbarOptions = ['bold', 'italic', 'underline', 'strike'];
+
+      var options = {
+        modules: {
+          formula: true,
+          toolbar: this.toolbar // Include button in toolbar
+        },
+        placeholder: this.placeholder,
+        readOnly: false,
+        theme: 'snow'
+      }
+      this.editor = new Quill(this.$refs.quill, options)
+      // this.editor = new Quill(this.$refs.quill, {
+      //   modules: { toolbar: this.$refs.toolbar, 'link-tooltip': true },
+      //   theme: 'snow'
+      // })
+      this.formats.map((format) => {
+        this.editor.addFormat(format.name, format.options)
+      })
+      if (this.output !== 'delta') {
+        this.editor.setHTML(this.content)
+      } else {
+        this.editor.setContents(this.content)
+      }
+      this.editor.on('text-change', (delta, source) => {
+        this.$emit('text-change', this.editor, delta, source)
+        this.content = this.output !== 'delta' ? this.editor.getHTML() : this.editor.getContents()
+      })
+      this.editor.on('selection-change', (range) => {
+        this.$emit('selection-change', this.editor, range)
+      })
+      if (this.keyBindings.length) {
+        const keyboard = this.editor.getModule('keyboard')
+        this.keyBindings.map((binding) => {
+          keyboard.addHotkey({ key: binding.key, metaKey: true }, binding.method.bind(this))
+        })
       }
     })
-
-    this.MathField = MathField
-
-    // console.log(MathField)
-    // var toolbarOptions = ['bold', 'italic', 'underline', 'strike'];
-
-    var options = {
-      modules: {
-        formula: true,
-        toolbar: this.toolbar // Include button in toolbar
-      },
-      placeholder: this.placeholder,
-      readOnly: false,
-      theme: 'snow'
-    }
-    this.editor = new Quill(this.$els.quill, options)
-    // this.editor = new Quill(this.$els.quill, {
-    //   modules: { toolbar: this.$els.toolbar, 'link-tooltip': true },
-    //   theme: 'snow'
-    // })
-    this.formats.map((format) => {
-      this.editor.addFormat(format.name, format.options)
-    })
-    if (this.output !== 'delta') {
-      this.editor.setHTML(this.content)
-    } else {
-      this.editor.setContents(this.content)
-    }
-    this.editor.on('text-change', (delta, source) => {
-      this.$dispatch('text-change', this.editor, delta, source)
-      this.content = this.output !== 'delta' ? this.editor.getHTML() : this.editor.getContents()
-    })
-    this.editor.on('selection-change', (range) => {
-      this.$dispatch('selection-change', this.editor, range)
-    })
-    if (this.keyBindings.length) {
-      const keyboard = this.editor.getModule('keyboard')
-      this.keyBindings.map((binding) => {
-        keyboard.addHotkey({ key: binding.key, metaKey: true }, binding.method.bind(this))
-      })
-    }
   },
   events: {
     'set-content': function (content) {

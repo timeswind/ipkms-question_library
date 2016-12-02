@@ -2,11 +2,11 @@
   <div id="quiz-detail">
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mdl-button class="icon-left-button" raised primary @click="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
+        <mdl-button class="icon-left-button" raised primary @click.native="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
         <mdl-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mdl-button>
-        <mdl-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mdl-button>
-        <mdl-button style="margin-left:16px" raised primary @click="checkQuizPaper()"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
-        <mdl-button v-if="quickquiz.finished" raised accent @click="deleteQuiz()" style="margin-left: 16px"><i class="material-icons">delete</i>刪除小測</mdl-button>
+        <mdl-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click.native="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mdl-button>
+        <mdl-button style="margin-left:16px" raised primary @click.native="checkQuizPaper()"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
+        <mdl-button v-if="quickquiz.finished" raised accent @click.native="deleteQuiz()" style="margin-left: 16px"><i class="material-icons">delete</i>刪除小測</mdl-button>
       </div>
       <div class="flex-column second-wrapper mdl-shadow--2dp">
         <div class="flex-column" style="padding:16px">
@@ -21,11 +21,11 @@
         <div class="flex-row flex-center" style="border-top:1px solid #eee;">
           <span class="flex-column flex-50" style="padding: 16px;border-right:1px solid #eee;">
             <span class="field-title">開始於</span>
-            <span class="field-content">{{quickquiz.startTime | date 'YYYY[年]M[月]DD[日] H:mm'}}</span>
+            <span class="field-content">{{quickquiz.startTime | date('YYYY[年]M[月]DD[日] H:mm')}}</span>
           </span>
           <span class="flex-column flex-50" style="padding: 16px;border-right:1px solid #eee;">
             <span class="field-title">結束於</span>
-            <span class="field-content">{{quickquiz.finishTime | date 'YYYY[年]M[月]DD[日] H:mm'}}</span>
+            <span class="field-content">{{quickquiz.finishTime | date('YYYY[年]M[月]DD[日] H:mm')}}</span>
           </span>
         </div>
 
@@ -33,22 +33,22 @@
           <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">學生 {{students.length}}名</p>
           <div class="grids">
 
-            <div class="grid-4 flex-column student" v-for="student in students" track-by="_id">
+            <div class="grid-4 flex-column student" v-for="(student, index) in students" v-bind:key="student._id">
               <div class="flex-row flex-center">
-                <div class="student-status online" v-show="students[$index].online"></div>
+                <div class="student-status online" v-show="student.online"></div>
                 <span class="student-name">{{student.name}}</span>
               </div>
-              <span class="finished-status flex-row flex-center" v-if="students[$index].status === 'finish'" @click="checkQuizPaper(student)">
-                <span style="margin-right:8px;color:#3F51B5">{{analysisSample($index, 'time')}}</span>
-                <span style="color: #E91E63;margin-right: 8px;">{{analysisSample($index, 'score')}}</span>
+              <span class="finished-status flex-row flex-center" v-if="student.status === 'finish'" @click.native="checkQuizPaper(student)">
+                <span style="margin-right:8px;color:#3F51B5">{{analysisSample(index, 'time')}}</span>
+                <span style="color: #E91E63;margin-right: 8px;">{{analysisSample(index, 'score')}}</span>
                 <span>已完成</span>
                 <i class="material-icons">keyboard_arrow_right</i>
               </span>
-              <span class="unfinish-status flex-row flex-center" v-show="!students[$index].status">
+              <span class="unfinish-status flex-row flex-center" v-show="!student.status">
                 <span>未上交</span>
                 <i class="material-icons">short_text</i>
               </span>
-              <span class="doing-status flex-row flex-center" v-show="students[$index].status === 'doing'" @click="checkQuizPaper(student)">
+              <span class="doing-status flex-row flex-center" v-show="student.status === 'doing'" @click.native="checkQuizPaper(student)">
                 <span>做卷中&nbsp;</span>
                 <i class="material-icons">keyboard_arrow_right</i>
               </span>
@@ -56,7 +56,7 @@
           </div>
         </div>
 
-        <div class="flex-column" v-el:statistic>
+        <div class="flex-column" ref="statistic">
           <p style="padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa;border-top:1px solid #eee;">數據 統計</p>
           <div class="flex-row grids" v-if="quickquiz.finished">
             <div class="grid-2 flex-column flex-center flex-50">
@@ -70,24 +70,24 @@
           </div>
           <div class="flex-row flex-center" style="margin-top: 16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">學生表現</span>
-            <mdl-button accent raised @click="drawSPChart('time')" style="background-color: #FF9800;">
+            <mdl-button accent raised @click.native="drawSPChart('time')" style="background-color: #FF9800;">
               <i class="material-icons">swap_vert</i>
               <span>時間</span>
             </mdl-button>
-            <mdl-button accent raised style="margin-left:16px" @click="drawSPChart('correct')">
+            <mdl-button accent raised style="margin-left:16px" @click.native="drawSPChart('correct')">
               <i class="material-icons">swap_vert</i>
               <span>正確題數</span>
             </mdl-button>
           </div>
-          <canvas v-el:sp-chart></canvas>
+          <canvas ref="spChart"></canvas>
           <div class="flex-row flex-center" style="margin-top:32px;border-top:1px solid #ddd;padding-top:16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">題目數據</span>
-            <mdl-button accent raised @click="drawQAChart('correct')">
+            <mdl-button accent raised @click.native="drawQAChart('correct')">
               <i class="material-icons">swap_vert</i>
               <span>正確數量</span>
             </mdl-button>
           </div>
-          <canvas width="400px" height="200" v-el:qa-chart></canvas>
+          <canvas width="400px" height="200" ref="qaChart"></canvas>
 
         </div>
 
@@ -102,9 +102,7 @@
 import _ from 'lodash'
 import Chart from 'chart.js'
 import io from 'socket.io-client'
-import store from '../../vuex/store'
-import { setQuickquizStudents, setQuickquizID, updateQuickquizStudent } from '../../vuex/actions'
-import { getQuickquizID, getQuickquizStudents } from '../../vuex/getters'
+import { mapGetters, mapActions } from 'vuex'
 import { zipSampleToStudent, studentIndex } from '../../modules/quickquiz'
 import { isMongodbId } from '../../modules/mongodb'
 
@@ -112,18 +110,22 @@ var socket = null
 var qaChart = null
 var spChart = null
 export default {
-  attached: function () {
-    let quickquiz_id = this.$route.params.quickquiz_id
-    if (isMongodbId(quickquiz_id)) {
-      this.validateURL = true
-      this.getQuickquizDetail(quickquiz_id)
-    } else {
-      console.log('invalid quickquiz id')
-    }
+  mounted: function () {
+    this.$nextTick(function () {
+      let quickquiz_id = this.$route.params.quickquiz_id
+      if (isMongodbId(quickquiz_id)) {
+        this.validateURL = true
+        this.getQuickquizDetail(quickquiz_id)
+      } else {
+        console.log('invalid quickquiz id')
+      }
+    })
   },
-  detached: function () {
-    socket.io.disconnect()
-    console.log('emit socket disconnect')
+  destroyed: function () {
+    this.$nextTick(function () {
+      socket.io.disconnect()
+      console.log('emit socket disconnect')
+    })
   },
   methods: {
     getQuickquizDetail: function (id) {
@@ -139,7 +141,7 @@ export default {
         this.quickquiz = response.data
         this.analysis('count_exception')
         if (!_.get(response.data, 'finished', false)) {
-          this.$els.statistic.style.display = 'none'
+          this.$refs.statistic.style.display = 'none'
         }
         this.listenForSocket()
       }, function (response) {
@@ -344,7 +346,7 @@ export default {
     drawSPChart: function (sort, type) {
       let self = this
       let studentCount = this.students.length
-      let student_performance_chart = this.$els.spChart
+      let student_performance_chart = this.$refs.spChart
       student_performance_chart.height = 20 * studentCount
 
       if (spChart !== null) {
@@ -425,7 +427,7 @@ export default {
     },
     drawQAChart: function (sort, type) {
       let questionCount = this.quickquiz.questions
-      let question_analysis_chart = this.$els.qaChart
+      let question_analysis_chart = this.$refs.qaChart
       question_analysis_chart.height = 30 * questionCount
 
       if (qaChart !== null) {
@@ -508,13 +510,13 @@ export default {
     checkQuizPaper: function (student) {
       if (student) {
         if (_.has(student, 'sample._id')) {
-          this.$router.go({
+          this.$router.push({
             name: 'quiz-paper',
             params: { quickquiz_id: this.$route.params.quickquiz_id, quizsample_id: student.sample._id }
           })
         }
       } else {
-        this.$router.go({
+        this.$router.push({
           name: 'quiz-paper',
           params: { quickquiz_id: this.$route.params.quickquiz_id, quizsample_id: 0 }
         })
@@ -526,14 +528,19 @@ export default {
           quickquiz_id: this.quickquiz._id
         }
         this.$http.delete('/api/manage-quickquiz/quickquiz', data).then(function (response) {
-          this.$router.go({
+          this.$router.push({
             name: 'quiz-results'
           })
         }, function (response) {
           this.$showToast(response.data)
         })
       }
-    }
+    },
+    ...mapActions({
+      setQuickquizID: 'setQuickquizID',
+      setQuickquizStudents: 'setQuickquizStudents',
+      updateQuickquizStudent: 'updateQuickquizStudent'
+    })
   },
   data () {
     return {
@@ -564,18 +571,10 @@ export default {
       }
     }
   },
-  store,
-  vuex: {
-    actions: {
-      setQuickquizID: setQuickquizID,
-      setQuickquizStudents: setQuickquizStudents,
-      updateQuickquizStudent: updateQuickquizStudent
-    },
-    getters: {
-      getQuickquizID: getQuickquizID,
-      students: getQuickquizStudents
-    }
-  }
+  computed: mapGetters({
+    getQuickquizID: 'getQuickquizID',
+    students: 'getQuickquizStudents'
+  })
 }
 </script>
 <style scoped>

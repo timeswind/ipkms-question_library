@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 
 @media screen and (max-width: 1024px) {
   #select-qcollection {
@@ -71,12 +71,13 @@
 }
 .list li {
   align-items: center;
-  padding: 15px 20px;
+  padding: 16px;
   font-size: 16px;
   cursor: pointer;
-  background-image: linear-gradient(to bottom, #9E9E9E 0%, #9E9E9E 51%, transparent 51%);
+  border-bottom: 1px solid rgba(0,0,0,.12);
+  /*background-image: linear-gradient(to bottom, #9E9E9E 0%, #9E9E9E 51%, transparent 51%);
   background-size: 100% 1px;
-  background-repeat: no-repeat;
+  background-repeat: no-repeat;*/
 }
 
 .list li:active {
@@ -93,63 +94,74 @@
 
 </style>
 <template>
-  <transition name="modal">
-    <div id="select-qcollection" class="modal-mask" v-show="show">
-      <div class="modal-container">
-        <div class="modal-header flex-row">
-          <h4>加入題集</h4>
-          <span class="flex" style="flex: 1"></span>
-          <mdl-button class="close" @click.native="closeModal()">
-            <i class="material-icons">close</i>
-          </mdl-button>
-        </div>
-        <p style="text-align:center;margin:16px 0">
-          <mdl-spinner :active="spinnerActive" v-show="spinnerActive"></mdl-spinner>
-        </p>
-        <div class="modal-body">
-          <ul class="list">
-            <li class="flex-row" v-for="qc in myQcollections" v-bind:key="qc._id" @click.native="saveOneToCollection(qc._id)">
-              <span class="subject-label">{{qc.subject | subject}}</span>
-              <span>{{qc.name}}</span>
-            </li>
-          </ul>
-          <div class="flex-column flex-center" style="margin:16px 0">
-            <mdl-button raised primary @click.native="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
-          </div>
-        </div>
-      </div>
+  <mu-dialog :open="show" title="加入題集" scrollable>
+
+    <ul class="list">
+      <li class="flex-row" v-for="qc in myQcollections" v-bind:key="qc._id" @click="collectionOnClick(qc._id)">
+        <span class="subject-label">{{qc.subject | subject}}</span>
+        <span>{{qc.name}}</span>
+      </li>
+    </ul>
+    <div class="flex-column flex-center" style="margin:16px 0">
+      <mdl-button raised primary @click.native="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
     </div>
-  </transition>
+    <mu-flat-button primary label="关闭" @click="closeModal()" slot="actions"/>
+  </mu-dialog>
+  <!-- <transition name="modal">
+  <div id="select-qcollection" class="modal-mask" v-show="show">
+  <div class="modal-container">
+  <div class="modal-header flex-row">
+  <h4>加入題集</h4>
+  <span class="flex" style="flex: 1"></span>
+  <mdl-button class="close" @click.native="closeModal()">
+  <i class="material-icons">close</i>
+</mdl-button>
+</div>
+<p style="text-align:center;margin:16px 0">
+<mdl-spinner :active="spinnerActive" v-show="spinnerActive"></mdl-spinner>
+</p>
+<div class="modal-body">
+
+</div>
+</div>
+</div>
+</transition> -->
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
+  name: 'qcollection-selector-dialog',
   data () {
     return {
       spinnerActive: true,
       myQcollections: [],
-      loadMore: false
+      loadMore: false,
+      dialogShow: this.show
     }
   },
-  props: ['show', 'qid'],
   methods: {
     closeModal: function () {
-      this.show = false
+      this.setQcollectionSelectorStatus(false, null, null)
     },
-    saveOneToCollection: function (qcollection_id) {
-      if (qcollection_id && this.qid) {
-        let data = {
-          qcollection_id: qcollection_id,
-          question_id: this.qid
+    collectionOnClick: function (qcollection_id) {
+      if (this.type === 'add-question-to-qcollection') {
+        if (qcollection_id && this.questionId) {
+          let data = {
+            qcollection_id: qcollection_id,
+            question_id: this.questionId
+          }
+          this.$http.post('/api/manage-qcollection/qcollection/question', data).then(function (response) {
+            this.show = false
+            this.$showToast('添加成功')
+            this.closeModal()
+          }, function (response) {
+            this.$showToast('失敗' + response.data)
+          })
+        } else {
+          this.$showToast('發生錯誤')
         }
-        this.$http.post('/api/manage-qcollection/qcollection/question', data).then(function (response) {
-          this.show = false
-          this.$showToast('添加成功')
-        }, function (response) {
-          this.$showToast('失敗' + response.data)
-        })
-      } else {
-        this.$showToast('發生錯誤')
       }
     },
     getMyQcollectionLists: function () {
@@ -197,12 +209,22 @@ export default {
           console.log(response)
         })
       }
-    }
+    },
+    ...mapActions({
+      setQcollectionSelectorStatus: 'setQcollectionSelectorStatus'
+    })
   },
+  computed: mapGetters({
+    show: 'qcollectionSelectorShow',
+    questionId: 'qcollectionSelectorQuestionId',
+    type: 'qcollectionSelectorType'
+  }),
   watch: {
-    'show': function (val, oldVal) {
-      if (val === true && oldVal === false) {
-        this.getMyQcollectionLists()
+    show: function (val) {
+      if (val === true) {
+        if (this.type === 'add-question-to-qcollection') {
+          this.getMyQcollectionLists()
+        }
       }
     }
   }

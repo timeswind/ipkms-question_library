@@ -59,16 +59,16 @@
 
         <div class="flex-row">
           <div class="flex-column flex-50">
-            <mdl-textfield floating-label="小測名字" :value.sync="newQuickquiz.title"></mdl-textfield>
-            <mdl-textfield floating-label="時長(分鐘)" :value.sync="newQuickquiz.time" type="number"></mdl-textfield>
+            <mu-text-field floating-label="小測名字" v-model="newQuickquiz.title"></mu-text-field>
+            <mu-text-field floating-label="時長(分鐘)" v-model="newQuickquiz.time" type="number"></mu-text-field>
             <div class="input-button-group">
               <i class="material-icons" style="margin-right:8px;color:#aaa">search</i>
-              <mdl-textfield floating-label="搜索測驗題集" :value.sync="queryQcollection.keyword"></mdl-textfield>
-              <mdl-button primary @click="queryQcollectionsByName()" :disabled="!queryQcollection.button">搜索</mdl-button>
+              <mu-text-field floating-label="搜索測驗題集" v-model="queryQcollection.keyword"></mu-text-field>
+              <mdl-button primary @click.native="queryQcollectionsByName()" :disabled="!queryQcollection.button">搜索</mdl-button>
             </div>
             <div class="flex-row" style="margin-bottom:16px">
-              <mdl-radio style="margin-left:32px;" :checked.sync="queryQcollection.type" value="mine">我的題集</mdl-radio>
-              <mdl-radio style="margin-left:16px;" :checked.sync="queryQcollection.type" value="all">公開題集</mdl-radio>
+              <mdl-radio style="margin-left:32px;" :checked="queryQcollection.type" value="mine">我的題集</mdl-radio>
+              <mdl-radio style="margin-left:16px;" :checked="queryQcollection.type" value="all">公開題集</mdl-radio>
             </div>
 
           </div>
@@ -91,7 +91,7 @@
               <mdl-spinner v-show="queryQcollection.loading" :active="queryQcollection.loading"></mdl-spinner>
             </div>
             <div class="flex-column" v-show="!queryQcollection.fail">
-              <div class="flex-column qcollection-mini-card" v-for="qcollection in queryQcollection.results" @click="newQuickquiz.qcollection = qcollection">
+              <div class="flex-column qcollection-mini-card" v-for="qcollection in queryQcollection.results" @click.native="newQuickquiz.qcollection = qcollection">
                 <span class="name">{{qcollection.name}}</span>
                 <div class="flex-row" style="align-items: baseline">
                   <span class="subject">{{qcollection.subject | subject}}</span>
@@ -106,7 +106,7 @@
           <canvas id="qrcode-canvas" class="qrcode"></canvas>
           <p style="text-align:center">掃描二維碼進行答題</p>
         </div>
-        <mdl-button primary raised @click="startQuickQuiz()" :disabled="!formCompletion && !submitButton">開始小測并生成 QR Code</mdl-button>
+        <mdl-button primary raised @click.native="startQuickQuiz()" :disabled="!formCompletion && !submitButton">開始小測并生成 QR Code</mdl-button>
       </div>
 
     </div>

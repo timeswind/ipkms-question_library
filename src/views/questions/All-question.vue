@@ -1,16 +1,15 @@
 <template>
   <div id="all-question">
-    <qcollection-selector-modal :show.sync="CollectionModal.show" :qid="CollectionModal.qid"></qcollection-selector-modal>
     <div class="filter">
-      <mdl-switch :checked.sync="filter.time">時間倒序</mdl-switch>
+      <mu-switch v-model="filter.time" label="時間倒序" />
     </div>
     <div class="mdl-grid" id="questions-preview-container">
-      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in questions" track-by="_id">
-        <div class="question-wrapper" v-link="{ name: 'question-detail', params: { question_id: q._id }}">
+      <div class="mdl-cell mdl-cell--4-col question-card" v-for="q in questions" v-bind:key="q._id">
+        <router-link tag="div" class="question-wrapper" :to="{ name: 'question-detail', params: { question_id: q._id }}">
           <span class="q-subject">{{q.subject | subject}}</span>
           <span class="q-type">{{q.type}}</span>
           <div class="q-difficulty">
-            <i class="material-icons" v-for="i in getNumberArray(q.difficulty)" track-by="$index">star_rate</i>
+            <i class="material-icons" v-for="i in getNumberArray(q.difficulty)">star_rate</i>
           </div>
           <div v-if="q.delta">
             <p class="q-context" v-html="renderDelta(q.delta)"></p>
@@ -19,14 +18,14 @@
             <p class="q-context" v-html="q.context"></p>
           </div>
           <span class="q-tag" v-for="tag in q.tags">{{tag}}</span>
-        </div>
+        </router-link>
         <div class="question-tools">
           <mdl-button v-on:click="showCollectionModal(q._id)"><i class="material-icons">add</i>加入題集</mdl-button>
         </div>
       </div>
     </div>
     <div class="flex-column flex-center" style="margin:16px 0 32px 0">
-      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
+      <mdl-button raised primary @click.native="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
     </div>
   </div>
 </template>
@@ -37,8 +36,10 @@ import topbar from '../../components/reuseable/Topbar.vue'
 import deltaRender from '../../modules/delta-render.js'
 
 export default {
-  ready: function () {
-    this.getQuestions()
+  mounted: function () {
+    this.$nextTick(function () {
+      this.getQuestions()
+    })
   },
   components: {
     qcollectionSelectorModal,
@@ -83,7 +84,7 @@ export default {
       }, 0)
     },
     showCollectionModal: function (qid) {
-      this.$broadcast('getMyQcollectionLists')
+      this.$emit('getMyQcollectionLists')
       this.CollectionModal.show = true
       this.CollectionModal.qid = qid
     },

@@ -2,7 +2,6 @@
   <div id="question-detail">
     <div id="question-body">
       <p style="margin: 8px 0;color: #9E9E9E; text-align:center">最後更新于 {{ details.updated_at | calendar}}</p>
-
       <card>
         <div slot="content">
           <div class="flex-column">
@@ -18,25 +17,25 @@
               <div class="difficulty-box flex-column flex-50">
                 <span class="field-title">難度 Difficulty</span>
                 <span class="flex-row flex-baseline" style="margin-top: 8px">
-                  <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, $index)" :class="{'difficulty-heighlight': details.difficulty > $index}">star_rate</i>
+                  <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, (n - 1))" :class="{'difficulty-heighlight': details.difficulty > (n - 1)}">star_rate</i>
                 </span>
               </div>
             </div>
             <div class="flex-column" style="padding: 16px 16px 16px 16px">
               <span class="field-title">標籤 Tags</span>
               <div class="flex-row flex-center flex-wrap" style="margin-top:8px">
-                <span class="q-d-tag" @click="modify('tag', 'remove', $index)" v-for="tag in details.tags" track-by="$index">{{tag}}</span>
-                <mdl-textfield label="輸入標籤.回車" @keyup.enter="modify('tag', 'add', edit.tag)" :value.sync="edit.tag" style="width:200px"></mdl-textfield>
+                <div class="q-d-tag" v-for="(tag, index) in details.tags" @click="modify('tag', 'remove', index)">{{tag}}</div>
+                <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="modify('tag', 'add', edit.tag)" v-model="edit.tag" style="width:200px"/>
               </div>
             </div>
           </div>
         </div>
       </card>
       <div class="flex-row" style="padding: 16px 0; justify-content: flex-end" v-if="edit.on">
-        <mdl-button @click="cancelUpdate()" v-show="edit.change">
+        <mdl-button @click.native="cancelUpdate()" v-show="edit.change">
           取消
         </mdl-button>
-        <mdl-button primary accent raised @click="updateInfo()" :disabled="!edit.change">
+        <mdl-button primary accent raised @click.native="updateInfo()" :disabled="!edit.change">
           修改
         </mdl-button>
       </div>
@@ -47,7 +46,7 @@
             <div class="q-d-info-wrapper">
               <span class="q-d-subject">{{details.subject | subject}}</span>
               <div class="q-d-difficulty">
-                <i class="material-icons" v-for="i in getNumberArray(details.difficulty)" track-by="$index">star_rate</i>
+                <i class="material-icons" v-for="i in getNumberArray(details.difficulty)">star_rate</i>
               </div>
             </div>
             <div v-if="details.delta">
@@ -69,29 +68,29 @@
       <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
         <div v-if="details.delta">
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="renderDelta(details.choices[0])"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="renderDelta(details.choices[1])"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click.native="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="renderDelta(details.choices[0])"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click.native="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="renderDelta(details.choices[1])"></div></div></card>
           </div>
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="renderDelta(details.choices[2])"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="renderDelta(details.choices[3])"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click.native="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="renderDelta(details.choices[2])"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click.native="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="renderDelta(details.choices[3])"></div></div></card>
           </div>
         </div>
         <div v-if="details.context">
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click.native="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click.native="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
           </div>
           <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click.native="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
+            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click.native="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
           </div>
         </div>
       </div>
 
       <card v-if="details.statistic">
         <div slot="content" style="padding:16px">
-          {{details.statistic | json}}
+          {{details.statistic}}
         </div>
       </card>
     </div>
@@ -106,13 +105,15 @@ import Subject from '../../modules/Subjects'
 import deltaRender from '../../modules/delta-render.js'
 
 export default {
-  ready: function () {
-    if (this.$route.params.question_id) {
-      this.validateURL = true
-      this.getQuestionDetail(this.$route.params.question_id)
-    } else {
-      this.answer.buttonDisable = true
-    }
+  mounted: function () {
+    this.$nextTick(function () {
+      if (this.$route.params.question_id) {
+        this.validateURL = true
+        this.getQuestionDetail(this.$route.params.question_id)
+      } else {
+        this.answer.buttonDisable = true
+      }
+    })
   },
   components: {
     Card
@@ -128,11 +129,9 @@ export default {
         if (response.data.type === 'mc') {
           this.answer.mc = response.data.answer.mc
         }
-        console.log(response.data.delta)
         if (response.data.delta && response.data.delta !== '') {
 
         } else {
-          console.log('old render')
           this.renderQuestions()
         }
         this.tempDetails = JSON.parse(JSON.stringify(response.data))

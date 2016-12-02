@@ -55,7 +55,7 @@
 </style>
 <template>
   <div id="create-question">
-    <sheet-pannel :sheetshow.sync="sheetshow">
+    <sheet-pannel :sheetshow="sheetshow">
       <div slot="sheet-zone">
         <div class="flex-row flex-center">
           <span>科目：</span>
@@ -68,33 +68,33 @@
         <div class="newquestion-difficulty-box flex-row flex-center">
           <span>難度：</span>
           <span class="flex-row">
-            <i class="material-icons" @click="newQuestion.difficulty = 1" :class="{'difficulty-heighlight': newQuestion.difficulty > 0}">star_rate</i>
-            <i class="material-icons" @click="newQuestion.difficulty = 2" :class="{'difficulty-heighlight': newQuestion.difficulty > 1}">star_rate</i>
-            <i class="material-icons" @click="newQuestion.difficulty = 3" :class="{'difficulty-heighlight': newQuestion.difficulty > 2}">star_rate</i>
-            <i class="material-icons" @click="newQuestion.difficulty = 4" :class="{'difficulty-heighlight': newQuestion.difficulty > 3}">star_rate</i>
-            <i class="material-icons" @click="newQuestion.difficulty = 5" :class="{'difficulty-heighlight': newQuestion.difficulty > 4}">star_rate</i>
+            <i class="material-icons" @click.native="newQuestion.difficulty = 1" :class="{'difficulty-heighlight': newQuestion.difficulty > 0}">star_rate</i>
+            <i class="material-icons" @click.native="newQuestion.difficulty = 2" :class="{'difficulty-heighlight': newQuestion.difficulty > 1}">star_rate</i>
+            <i class="material-icons" @click.native="newQuestion.difficulty = 3" :class="{'difficulty-heighlight': newQuestion.difficulty > 2}">star_rate</i>
+            <i class="material-icons" @click.native="newQuestion.difficulty = 4" :class="{'difficulty-heighlight': newQuestion.difficulty > 3}">star_rate</i>
+            <i class="material-icons" @click.native="newQuestion.difficulty = 5" :class="{'difficulty-heighlight': newQuestion.difficulty > 4}">star_rate</i>
           </span>
         </div>
 
         <div class="flex-row flex-center">
           <span>類型：</span>
-          <mdl-radio :checked.sync="newQuestion.type" value="mc" style="margin-right: 8px">多項選擇</mdl-radio>
-          <mdl-radio :checked.sync="newQuestion.type" value="reading">閱讀題</mdl-radio>
+          <mdl-radio :checked="newQuestion.type" value="mc" style="margin-right: 8px">多項選擇</mdl-radio>
+          <mdl-radio :checked="newQuestion.type" value="reading">閱讀題</mdl-radio>
         </div>
         <div class="flex-row" style="position:relative;top:-10px">
           <div v-show="newQuestion.tags.length !== 0" style="padding-top: 25px;margin-right: 10px;">
             <span>標籤：</span>
-            <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
+            <span class="q-tag" v-for="(tag, index) in newQuestion.tags" @click.native="removeTag(index)">{{tag}}</span>
           </div>
-          <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
-          <!-- <input @keyup.enter="addTag()" type="text" v-model="tag" placeholder="輸入標籤，回車"> -->
+          <mu-text-field label="輸入標籤.回車" @keyup.enter.native="addTag()" v-model="tag" style="width:200px"></mu-text-field>
+          <!-- <input @keyup.enter.native="addTag()" type="text" v-model="tag" placeholder="輸入標籤，回車"> -->
         </div>
-        <!-- <mdl-button accent raised @click="sheetshow = false">
+        <!-- <mdl-button accent raised @click.native="sheetshow = false">
         隱藏
       </mdl-button> -->
     </div>
   </sheet-pannel>
-  <mdl-button primary raised class="float-button" @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
+  <mdl-button primary raised class="float-button" @click.native="publishQuestion()" v-bind:disabled="publishButton.disabled">
     發佈
   </mdl-button>
   <div class="body-wrapper">
@@ -104,7 +104,7 @@
       <div class="flex-50">
         <card>
           <div slot="out">
-            <quill :content.sync="editorPreview.question"></quill>
+            <quill :content="editorPreview.question"></quill>
           </div>
         </card>
       </div>
@@ -122,22 +122,22 @@
     <div v-if="newQuestion.type === 'mc'" class="mc-preview-wrapper" id="mc-preview-container">
       <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
       <div class="flex-row">
-        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click="newQuestion.answer.mc = 0">
+        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" flex="true" @click.native="newQuestion.answer.mc = 0">
           <div slot="out"><span class="mc-label">A</span></div>
           <div slot="in"><div id="mc1"></div></div>
         </card>
-        <card flex="true" class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click="newQuestion.answer.mc = 1">
+        <card flex="true" class="flex-50":class="{'hightlight-answer': newQuestion.answer.mc === 1}" flex="true" @click.native="newQuestion.answer.mc = 1">
           <div slot="out"><span class="mc-label">B</span></div>
           <div slot="in"><div id="mc2"></div></div>
         </card>
 
       </div>
       <div class="flex-row">
-        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click="newQuestion.answer.mc = 2">
+        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" flex="true" @click.native="newQuestion.answer.mc = 2">
           <div slot="out"><span class="mc-label">C</span></div>
           <div slot="in"><div id="mc3"></div></div>
         </card>
-        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click="newQuestion.answer.mc = 3">
+        <card flex="true" class="flex-50" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" flex="true" @click.native="newQuestion.answer.mc = 3">
           <div slot="out"><span class="mc-label">D</span></div>
           <div slot="in"><div id="mc4"></div></div>
         </card>
@@ -149,12 +149,12 @@
 
       <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
       <div class="flex-row">
-        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
-        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
+        <card class="flex-50"><div slot="out"><quill :content="editorPreview.answer.mc[0]"></quill></div></card>
+        <card class="flex-50"><div slot="out"><quill :content="editorPreview.answer.mc[1]"></quill></div></card>
       </div>
       <div class="flex-row">
-        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
-        <card class="flex-50"><div slot="out"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+        <card class="flex-50"><div slot="out"><quill :content="editorPreview.answer.mc[2]"></quill></div></card>
+        <card class="flex-50"><div slot="out"><quill :content="editorPreview.answer.mc[3]"></quill></div></card>
       </div>
     </div>
   </div>
@@ -203,7 +203,7 @@ export default {
               long: { ops: [] }
             }
           }
-          this.$broadcast('clear-editor')
+          this.$emit('clear-editor')
         }, function (response) {
           this.$showToast('發佈失敗')
           this.publishButton.disabled = false

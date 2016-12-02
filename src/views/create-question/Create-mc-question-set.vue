@@ -178,55 +178,56 @@
 </style>
 <template>
   <div id="create-mc-question-set" >
+    <transition name="modal">
+      <div class="create-qcollection-modal" v-show="!newQcollection.id">
+        <div class="modal-container">
+          <h3 class="mdl-typography--headline" style="margin:16px 0 8px 0;padding:16px 16px 0 16px">第一步：創建題集</h3>
 
-    <div class="create-qcollection-modal" v-show="!newQcollection.id" transition="modal">
-      <div class="modal-container">
-        <h3 class="mdl-typography--headline" style="margin:16px 0 8px 0;padding:16px 16px 0 16px">第一步：創建題集</h3>
+          <div style="padding:0 16px 16px 16px" class="create-new-qcollection-form" v-show="newQcollection.myQcollections.length === 0">
+            <mdl-button primary style="margin-left:-16px" @click.native="getMyQcollections()">或選擇現有題集</mdl-button>
 
-        <div style="padding:0 16px 16px 16px" class="create-new-qcollection-form" v-show="newQcollection.myQcollections.length === 0">
-          <mdl-button primary style="margin-left:-16px" @click="getMyQcollections()">或選擇現有題集</mdl-button>
-
-          <div class="flex-column">
-            <span class="field-title" style="position: relative; top: 16px">題集名字</span>
-            <mdl-textfield floating-label="" :value.sync="newQcollection.name"></mdl-textfield>
+            <div class="flex-column">
+              <span class="field-title" style="position: relative; top: 16px">題集名字</span>
+              <mu-text-field v-model="newQcollection.name"/>
+            </div>
+            <div class="flex-column">
+              <span class="field-title">科目</span>
+              <select v-model="newQcollection.subject" style="width: 100%">
+                <option v-for="subject in subjects" v-bind:value="subject.id">
+                  {{ subject.name }}
+                </option>
+              </select>
+            </div>
+            <div style="padding:20px 0">
+              <mdl-checkbox :checked="newQcollection.public">公開</mdl-checkbox>
+            </div>
+            <div class="flex-row" style="margin-bottom: 8px;">
+              <mdl-button style="margin-left:auto;" @click.native="$goBack()">取消</mdl-button>
+              <mdl-button primary raised style="margin-left:16px" @click.native="createNewQcollection()">創建</mdl-button>
+            </div>
           </div>
-          <div class="flex-column">
-            <span class="field-title">科目</span>
-            <select v-model="newQcollection.subject" style="width: 100%">
-              <option v-for="subject in subjects" v-bind:value="subject.id">
-                {{ subject.name }}
-              </option>
-            </select>
-          </div>
-          <div style="padding:20px 0">
-            <mdl-checkbox :checked.sync="newQcollection.public">公開</mdl-checkbox>
-          </div>
-          <div class="flex-row" style="margin-bottom: 8px;">
-            <mdl-button style="margin-left:auto;" @click="$goBack()">取消</mdl-button>
-            <mdl-button primary raised style="margin-left:16px" @click="createNewQcollection()">創建</mdl-button>
-          </div>
-        </div>
 
-        <div class="my-qcollections" v-show="newQcollection.myQcollections.length > 0" style="max-height:400px; overflow:auto;">
-          <mdl-button primary style="padding-left:16px" @click="newQcollection.myQcollections = []">返回創建新題集</mdl-button>
+          <div class="my-qcollections" v-show="newQcollection.myQcollections.length > 0" style="max-height:400px; overflow:auto;">
+            <mdl-button primary style="padding-left:16px" @click.native="newQcollection.myQcollections = []">返回創建新題集</mdl-button>
 
-          <div class="flex-column" @click="createNewQcollection('from exist', qc)" v-for="qc in newQcollection.myQcollections" track-by="_id" style=" padding: 16px;border-bottom: 1px solid #eee;cursor:pointer">
-            <div class="flex-row ">
-              <span style="background: #2196F3;color: #fff;padding: 0px 8px;border-radius: 12px;margin-right: 4px;">{{qc.subject | subject}}</span>
-              <span>{{qc.name}}</span>
+            <div class="flex-column" @click.native="createNewQcollection('from exist', qc)" v-for="qc in newQcollection.myQcollections" v-bind:key="qc._id" style=" padding: 16px;border-bottom: 1px solid #eee;cursor:pointer">
+              <div class="flex-row ">
+                <span style="background: #2196F3;color: #fff;padding: 0px 8px;border-radius: 12px;margin-right: 4px;">{{qc.subject | subject}}</span>
+                <span>{{qc.name}}</span>
+              </div>
+
             </div>
 
+            <div class="flex-column flex-center" style="margin:16px 0 32px 0">
+              <mdl-button raised primary @click.native="nextPage()" :disabled="!newQcollection.loadMore">加載更多</mdl-button>
+            </div>
           </div>
 
-          <div class="flex-column flex-center" style="margin:16px 0 32px 0">
-            <mdl-button raised primary @click="nextPage()" :disabled="!newQcollection.loadMore">加載更多</mdl-button>
-          </div>
         </div>
-
       </div>
-    </div>
+    </transition>
 
-    <mdl-button accent raised class="float-button" @click="goToQCDetailView()" v-bind:disabled="publishButton.disabled">
+    <mdl-button accent raised class="float-button" @click.native="goToQCDetailView()" v-bind:disabled="publishButton.disabled">
       完成編輯
     </mdl-button>
     <div class="body-wrapper">
@@ -241,8 +242,8 @@
         </div>
 
         <div class="flex-column questions" v-show="qcollectionInbox.show">
-          <div class="flex-row flex-baseline flex-no-shrink question" v-for="q in qcollectionInbox.questions" track-by="_id">
-            <span style="margin-right:8px">{{$index + 1}}.</span>
+          <div class="flex-row flex-baseline flex-no-shrink question" v-for="(q, index) in qcollectionInbox.questions" v-bind:key="q._id">
+            <span style="margin-right:8px">{{index + 1}}.</span>
             <div v-if="q.delta">
               <p class="q-context" v-html="renderDelta(q.delta)"></p>
             </div>
@@ -253,7 +254,7 @@
           </div>
         </div>
 
-        <div class="expand-icon" @click="toggleQCInbox()">
+        <div class="expand-icon" @click.native="toggleQCInbox()">
           <i class="material-icons" v-if="qcollectionInbox.show">expand_less</i>
           <i class="material-icons" v-else>expand_more</i>
         </div>
@@ -269,7 +270,7 @@
               <div class="flex-column flex-50">
                 <span class="field-title">語言</span>
                 <select v-model="newQuestion.language" v-on:change="setUserLanguage(newQuestion.language)">
-                  <option v-for="language in languages" v-bind:value="language.id">
+                  <option v-for="(language, index) in languages" v-bind:value="language.id">
                     {{ language.name }}
                   </option>
                 </select>
@@ -277,7 +278,7 @@
               <div class="newquestion-difficulty-box flex-column flex-50">
                 <span class="field-title" style="margin-bottom:4px">難度</span>
                 <span class="flex-row">
-                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty-heighlight': newQuestion.difficulty > $index}">star_rate</i>
+                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = n" :class="{'difficulty-heighlight': newQuestion.difficulty > n}">star_rate</i>
                 </span>
               </div>
             </div>
@@ -287,10 +288,10 @@
                   <span class="field-title">標籤</span>
                 </div>
                 <div class="flex-row flex-center flex-wrap">
-                  <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
+                  <span class="q-tag" v-for="(tag, index) in newQuestion.tags" @click.native="removeTag(index)">{{tag}}</span>
                 </div>
                 <div style="position: relative;top: -12px">
-                  <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
+                  <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="addTag()" v-model="tag" style="width:200px"/>
                 </div>
               </div>
             </div>
@@ -301,7 +302,7 @@
       <div class="flex-column">
         <card>
           <div slot="content">
-            <quill :content.sync="editorPreview.question"></quill>
+            <quill :content="editorPreview.question"></quill>
           </div>
         </card>
       </div>
@@ -312,27 +313,27 @@
         <p style="margin:0;text-align:center;color:#9E9E9E">答案選項輸入</p>
         <div class="flex-row">
           <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">A</div>
-            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[0]"></quill></div></card>
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click.native="newQuestion.answer.mc = 0">A</div>
+            <card><div slot="content"><quill :content="editorPreview.answer.mc[0]"></quill></div></card>
           </div>
           <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">B</div>
-            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[1]"></quill></div></card>
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click.native="newQuestion.answer.mc = 1">B</div>
+            <card><div slot="content"><quill :content="editorPreview.answer.mc[1]"></quill></div></card>
           </div>
         </div>
         <div class="flex-row">
           <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">C</div>
-            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[2]"></quill></div></card>
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click.native="newQuestion.answer.mc = 2">C</div>
+            <card><div slot="content"><quill :content="editorPreview.answer.mc[2]"></quill></div></card>
           </div>
           <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">D</div>
-            <card><div slot="content"><quill :content.sync="editorPreview.answer.mc[3]"></quill></div></card>
+            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click.native="newQuestion.answer.mc = 3">D</div>
+            <card><div slot="content"><quill :content="editorPreview.answer.mc[3]"></quill></div></card>
           </div>
         </div>
       </div>
       <div class="flex-column" style="margin-top:16px">
-        <mdl-button primary raised @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
+        <mdl-button primary raised @click.native="publishQuestion()" v-bind:disabled="publishButton.disabled">
           添加到題集
         </mdl-button>
       </div>
@@ -342,15 +343,12 @@
 </template>
 
 <script>
-// import renderQuill from 'quill-render'
+import { mapGetters, mapActions } from 'vuex'
 import deltaRender from '../../modules/delta-render'
 import Subject from '../../modules/Subjects'
 import Language from '../../modules/Languages'
 import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
 import Card from '../../components/reuseable/Card'
-import store from '../../vuex/store'
-import { setUserLanguage } from '../../vuex/actions'
-import { getUserLanguage } from '../../vuex/getters'
 import 'quill/dist/quill.snow.css'
 
 // var delayTimer
@@ -410,7 +408,7 @@ export default {
               mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
             }
           }
-          this.$broadcast('clear-editor')
+          this.$emit('clear-editor')
         }, function (response) {
           this.$showToast('發佈失敗')
           this.publishButton.disabled = false
@@ -497,7 +495,7 @@ export default {
           qcollection_id: this.newQcollection.id
         }
       }
-      this.$router.go(path)
+      this.$router.push(path)
     },
     createNewQcollection: function (option, qcollection) {
       if (option === 'from exist' && typeof qcollection === 'object') {
@@ -566,7 +564,8 @@ export default {
         this.renderQCInbox('all')
       }
       this.qcollectionInbox.show = !this.qcollectionInbox.show
-    }
+    },
+    ...mapActions(['setUserLanguage'])
   },
   data () {
     return {
@@ -613,14 +612,8 @@ export default {
       return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
     }
   },
-  store,
-  vuex: {
-    actions: {
-      setUserLanguage: setUserLanguage
-    },
-    getters: {
-      getUserLanguage: getUserLanguage
-    }
-  }
+  computed: mapGetters({
+    getUserLanguage: 'getUserLanguage'
+  })
 }
 </script>

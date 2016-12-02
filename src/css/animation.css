@@ -1,54 +1,54 @@
-.fade-transition {
+.fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
 }
-.fade-enter, .fade-leave {
+.fade-enter, .fade-leave-active {
   opacity: 0;
 }
 
-.height-transition {
+.height-enter-active, .height-leave-active {
   transition: height 0.3s ease;
 }
-.height-enter, .height-leave {
+.height-enter, .height-leave-active {
   height: 0;
 }
 
-.toast-transition {
+.toast-enter-active, .toast-leave-active {
   transition: margin-bottom 0.2s ease;
 }
-.toast-enter, .toast-leave {
+.toast-enter, .toast-leave-active {
   margin-bottom: -40px
 }
 
-.expand-transition {
+.expand-enter-active, .expand-leave-active-active {
   max-height: 500px;
   transition: all .3s ease;
   padding: 10px;
   overflow: hidden;
 }
 
-.expand-enter, .expand-leave {
+.expand-enter, .expand-leave-active-active {
   max-height: 0;
   padding: 0 10px;
   opacity: 0;
 }
 
-.modal-transition {
+.modal-enter-active, .modal-leave-active {
   transition: all 0.2s ease;
 }
 
-.modal-enter, .modal-leave {
+.modal-enter, .modal-leave-active {
   opacity: 0;
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
 }
 
-.drawdown-transition {
+.drawdown-enter-active, .drawdown-leave-active {
   height: 100px;
   overflow: auto;
   transition: all .3s ease;
 }
 
-.drawdown-enter, .drawdown-leave {
+.drawdown-enter, .drawdown-leave-active {
   height: 0;
   overflow: auto;
   transition: all .3s ease;

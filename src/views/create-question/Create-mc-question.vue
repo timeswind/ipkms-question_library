@@ -1,174 +1,175 @@
 <template>
   <div id="create-mc-question">
-    <mdl-button primary raised class="float-button" style="bottom: 80px" @click="questionInbox.show = true" v-bind:disabled="publishButton.disabled">
-      <i class="material-icons">inbox</i> {{questionInbox.questions.length}}
-    </mdl-button>
-    <mdl-button primary raised class="float-button" @click="publishQuestion()" v-bind:disabled="publishButton.disabled">
-      發佈
-    </mdl-button>
-    <div class="body_wrapper">
-      <card>
-        <div slot="content" style="padding: 16px 16px 0 16px">
-          <div class="flex-column">
-            <div class="flex-row">
-              <div class="flex-column flex-50">
-                <span class="field-title">科目</span>
-                <select v-model="newQuestion.subject">
-                  <option v-for="subject in subjects" v-bind:value="subject.id">
-                    {{ subject.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="set_difficulty flex-column flex-50">
-                <span class="field-title" style="margin-bottom:4px">難度</span>
-                <span class="flex-row">
-                  <i v-for="n in 5" class="material-icons" @click="newQuestion.difficulty = $index + 1" :class="{'difficulty_status': newQuestion.difficulty > $index}">star_rate</i>
-                </span>
-              </div>
-            </div>
-            <div class="flex-row" style="padding-top: 25px;">
-              <div class="flex-column flex-50">
-                <div style="margin-right: 10px;">
-                  <span class="field-title">標籤</span>
-                </div>
-                <div class="flex-row flex-center flex-wrap">
-                  <span class="q-tag" @click="removeTag($index)" v-for="tag in newQuestion.tags" track-by="$index">{{tag}}</span>
-                </div>
-                <div style="position: relative;top: -12px">
-                  <mdl-textfield label="輸入標籤.回車" @keyup.enter="addTag()" :value.sync="tag" style="width:200px"></mdl-textfield>
-                </div>
-              </div>
-
-              <div class="flex-column flex-50">
-                <span class="field-title">語言</span>
-                <select v-model="newQuestion.language" v-on:change="setUserLanguage(newQuestion.language)">
-                  <option v-for="language in languages" v-bind:value="language.id">
-                    {{ language.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </card>
-      <div class="flex-column" style="margin-bottom: 16px">
-        <h5 style="margin-left:4px">編輯題目</h5>
-        <div style="background:#ddd" class="flex-column">
-          <mdl-button primary @click="editorPreview.image.show = !editorPreview.image.show"><i class="material-icons">photo</i>
-            <span>添加圖片</span>
-          </mdl-button>
-        </div>
-        <div v-show="editorPreview.image.show" style="border: 1px solid #3f51b5;padding:16px">
-          <form v-on:change="readImg($event)">
-            <input type="file" id="uploadedImg"/>
-          </form>
-          <div class="flex-column flex-center">
-            <canvas v-el:fabricprocess  style="border: 1px dashed #3f51b5;padding: 0"></canvas>
-            <mdl-textfield label="圖片名字" :value.sync="editorPreview.image.label"></mdl-textfield>
-            <mdl-button primary @click="outputImg()"><i class="material-icons">photo</i> <span>上傳圖片</span></mdl-button>
-          </div>
-        </div>
-        <div v-if="newQuestion.images" style="text-align:center">
-          <div v-for="image in newQuestion.images" track-by="$index">
-            <div v-if="image.type === 'qiniu'">
-              <img :src="'https://ofb183q1d.qnssl.com/' + image.data + '?imageMogr2/format/jpg/'"/>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="flex-column">
+    <div>
+      <mdl-button primary raised class="float-button" style="bottom: 80px" @click.native="questionInbox.show = true" v-bind:disabled="publishButton.disabled">
+        <i class="material-icons">inbox</i> {{questionInbox.questions.length}}
+      </mdl-button>
+      <mdl-button primary raised class="float-button" @click.native="publishQuestion()" v-bind:disabled="publishButton.disabled">
+        發佈
+      </mdl-button>
+      <div class="body_wrapper">
         <card>
-          <div slot="content">
-            <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.question"></quill>
+          <div slot="content" style="padding: 16px 16px 0 16px">
+            <div class="flex-column">
+              <div class="flex-row">
+                <div class="flex-column flex-50">
+                  <span class="field-title">科目</span>
+                  <select v-model="newQuestion.subject">
+                    <option v-for="subject in subjects" v-bind:value="subject.id">
+                      {{ subject.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="set_difficulty flex-column flex-50">
+                  <span class="field-title" style="margin-bottom:4px">難度</span>
+                  <span class="flex-row">
+                    <i v-for="n in 5" @click="newQuestion.difficulty = n" :class="{'difficulty_status': newQuestion.difficulty > (n - 1), 'material-icons': true}">star_rate</i>
+                  </span>
+                </div>
+              </div>
+              <div class="flex-row" style="padding-top: 25px;">
+                <div class="flex-column flex-50">
+                  <div style="margin-right: 10px;">
+                    <span class="field-title">標籤</span>
+                  </div>
+                  <div class="flex-row flex-center flex-wrap">
+                    <div class="q-tag" v-for="(tag, index) in newQuestion.tags" v-on:click="removeTag(index)">{{tag}}</div>
+                  </div>
+                  <div style="position: relative;top: -12px">
+                    <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="addTag()" v-model="tag" style="width:200px" />
+                  </div>
+                </div>
+
+                <div class="flex-column flex-50">
+                  <span class="field-title">語言</span>
+                  <select v-model="newQuestion.language" v-on:change="setUserLanguage(newQuestion.language)">
+                    <option v-for="language in languages" v-bind:value="language.id">
+                      {{ language.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </card>
-      </div>
-
-      <h5 style="margin-left:4px">編輯答案</h5>
-      <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
-      <div id="mc_input_container">
-        <div class="flex-row">
-          <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 0}" @click="newQuestion.answer.mc = 0">A</div>
-            <card>
-              <div slot="content">
-                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[0]"></quill>
-              </div>
-            </card>
+        <div class="flex-column" style="margin-bottom: 16px">
+          <h5 style="margin-left:4px">編輯題目</h5>
+          <div style="background:#ddd" class="flex-column">
+            <mdl-button primary @click.native="editorPreview.image.show = !editorPreview.image.show"><i class="material-icons">photo</i>
+              <span>添加圖片</span>
+            </mdl-button>
           </div>
-          <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 1}" @click="newQuestion.answer.mc = 1">B</div>
-            <card>
-              <div slot="content">
-                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[1]"></quill>
+          <div v-show="editorPreview.image.show" style="border: 1px solid #3f51b5;padding:16px">
+            <form v-on:change="readImg($event)">
+              <input type="file" id="uploadedImg"/>
+            </form>
+            <div class="flex-column flex-center">
+              <canvas ref="fabricprocess"  style="border: 1px dashed #3f51b5;padding: 0"></canvas>
+              <mu-text-field label="圖片名字" v-model="editorPreview.image.label"></mu-text-field>
+              <mdl-button primary @click.native="outputImg()"><i class="material-icons">photo</i> <span>上傳圖片</span></mdl-button>
+            </div>
+          </div>
+          <div v-if="newQuestion.images" style="text-align:center">
+            <div v-for="image in newQuestion.images">
+              <div v-if="image.type === 'qiniu'">
+                <img :src="'https://ofb183q1d.qnssl.com/' + image.data + '?imageMogr2/format/jpg/'"/>
               </div>
-            </card>
+            </div>
           </div>
         </div>
-        <div class="flex-row">
-          <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 2}" @click="newQuestion.answer.mc = 2">C</div>
-            <card>
-              <div slot="content">
-                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[2]"></quill>
-              </div>
-            </card>
-          </div>
-          <div class="flex-column flex-50">
-            <div class="mc_select" :class="{'hightlight-answer': newQuestion.answer.mc === 3}" @click="newQuestion.answer.mc = 3">D</div>
-            <card>
-              <div slot="content">
-                <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content.sync="editorPreview.answer.mc[3]"></quill>
-              </div>
-            </card>
-          </div>
+        <div class="flex-column">
+          <card>
+            <div slot="content">
+              <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.question"></quill>
+            </div>
+          </card>
         </div>
-      </div>
-    </div>
 
-    <div class="questions_inbox" class="flex-column" :class="{'show': questionInbox.show}">
-      <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
-        <i class="material-icons" @click="questionInbox.show = false">close</i>
-        <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
-      </div>
-
-      <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
-        <mdl-button primary raised @click="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
-      </div>
-
-      <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
-        <div class="question" v-for="q in questionInbox.questions" track-by="_id">
-          <div v-if="q.delta">
-            <div class="q-context" v-html="renderDelta(q.delta)"></div>
-          </div>
-          <div v-if="q.context">
-            <div class="q-context" v-html="q.context"></div>
+        <h5 style="margin-left:4px">編輯答案</h5>
+        <p style="margin:0;text-align:center;color:#9E9E9E">點擊選項設定正確答案</p>
+        <div id="mc_input_container">
+          <div class="flex-row">
+            <div class="flex-column flex-50">
+              <div :class="{'hightlight-answer': newQuestion.answer.mc === 0, 'mc_select': true}" @click.native="newQuestion.answer.mc = 0">A</div>
+              <card>
+                <div slot="content">
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[0]"></quill>
+                </div>
+              </card>
+            </div>
+            <div class="flex-column flex-50">
+              <div :class="{'hightlight-answer': newQuestion.answer.mc === 1, 'mc_select': true}" @click.native="newQuestion.answer.mc = 1">B</div>
+              <card>
+                <div slot="content">
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[1]"></quill>
+                </div>
+              </card>
+            </div>
           </div>
           <div class="flex-row">
-            <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
-            <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
+            <div class="flex-column flex-50">
+              <div :class="{'hightlight-answer': newQuestion.answer.mc === 2, 'mc_select': true}" @click.native="newQuestion.answer.mc = 2">C</div>
+              <card>
+                <div slot="content">
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[2]"></quill>
+                </div>
+              </card>
+            </div>
+            <div class="flex-column flex-50">
+              <div :class="{'hightlight-answer': newQuestion.answer.mc === 3, 'mc_select': true}" @click.native="newQuestion.answer.mc = 3">D</div>
+              <card>
+                <div slot="content">
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[3]"></quill>
+                </div>
+              </card>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div :class="{'show': questionInbox.show, 'flex-column': true, 'questions_inbox': true}">
+        <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
+          <i class="material-icons" @click.native="questionInbox.show = false">close</i>
+          <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
+        </div>
+
+        <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
+          <mdl-button primary raised @click.native="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
+        </div>
+
+        <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
+          <div class="question" v-for="q in questionInbox.questions" v-bind:key="q._id">
+            <div v-if="q.delta">
+              <div class="q-context" v-html="renderDelta(q.delta)"></div>
+            </div>
+            <div v-if="q.context">
+              <div class="q-context" v-html="q.context"></div>
+            </div>
+            <div class="flex-row">
+              <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
+              <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import 'fabric'
 import deltaRender from '../../modules/delta-render'
 import Subject from '../../modules/Subjects'
 import Language from '../../modules/Languages'
 import Card from '../../components/reuseable/Card'
-import store from '../../vuex/store'
-import { setUserLanguage } from '../../vuex/actions'
-import { getUserLanguage } from '../../vuex/getters'
 import 'quill/dist/quill.snow.css'
 // var delayTimer
 
 export default {
-  ready: function () {
-    this.newQuestion.language = this.getUserLanguage
+  mounted: function () {
+    this.$nextTick(function () {
+      this.newQuestion.language = this.getUserLanguage
+    })
   },
   components: {
     Subject,
@@ -179,7 +180,7 @@ export default {
       return deltaRender(delta)
     },
     readImg: function (e) {
-      let c = this.$els.fabricprocess
+      let c = this.$refs.fabricprocess
       var canvas = c.fabric || new window.fabric.Canvas(c, { width: 600, height: 300 })
       if (!c.fabric) {
         c.fabric = canvas
@@ -208,7 +209,7 @@ export default {
       reader.readAsDataURL(e.target.files[0])
     },
     outputImg: function () {
-      let c = this.$els.fabricprocess
+      let c = this.$refs.fabricprocess
       let canvas = c.fabric
       this.$http.get('/api/qiniu/uptoken').then(function (response) {
         this.uploadImage(canvas.getObjects()[0].toDataURL(), response.data.uptoken)
@@ -249,7 +250,7 @@ export default {
               mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
             }
           }
-          this.$broadcast('clear-editor')
+          this.$emit('clear-editor')
           // this.renderQuestionPreview('clear')
           // this.renderMcPreview('clear')
           this.questionInbox.questions.push(response.data)
@@ -280,6 +281,7 @@ export default {
       }
     },
     removeTag: function (index) {
+      console.log('remove tag')
       this.newQuestion.tags.splice(index, 1)
     },
     // renderQuestionPreview: function (option) {
@@ -332,7 +334,7 @@ export default {
     uploadImage: function (imageData, token) {
       imageData = imageData.split(',')[1]
       let uptoken = 'UpToken ' + token
-      let c = this.$els.fabricprocess
+      let c = this.$refs.fabricprocess
       var canvas = c.fabric
       canvas.forEachObject(function (o) {
         o.remove()
@@ -348,7 +350,10 @@ export default {
         }
         this.newQuestion.images.push(newImage)
       })
-    }
+    },
+    ...mapActions([
+      'setUserLanguage'
+    ])
   },
   data () {
     return {
@@ -395,31 +400,9 @@ export default {
       return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
     }
   },
-  // watch: {
-  //   'editorPreview.question.ops': function () {
-  //   var self = this
-  //   clearTimeout(delayTimer)
-  //   delayTimer = setTimeout(function () {
-  //     self.renderQuestionPreview()
-  //   }, 500)
-  //   },
-  //   'editorPreview.answer.mc': function () {
-  //     var self = this
-  //     clearTimeout(delayTimer)
-  //     delayTimer = setTimeout(function () {
-  //       self.renderMcPreview()
-  //     }, 500)
-  //   }
-  // },
-  store,
-  vuex: {
-    actions: {
-      setUserLanguage: setUserLanguage
-    },
-    getters: {
-      getUserLanguage: getUserLanguage
-    }
-  }
+  computed: mapGetters({
+    getUserLanguage: 'getUserLanguage'
+  })
 }
 </script>
 <style>

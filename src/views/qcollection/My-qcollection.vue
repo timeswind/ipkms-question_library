@@ -4,7 +4,7 @@
   box-shadow: 0 1px 6px rgba(0,0,0,0.35)
 }
 
-#my-qcollection .expand-transition {
+#my-qcollection .expand-enter-active, .expand-leave-active-active {
   max-height: 400px;
   transition: all .3s ease;
   padding: 16px 32px;
@@ -12,7 +12,7 @@
   overflow: hidden;
 }
 
-#my-qcollection .expand-enter, #my-qcollection .expand-leave {
+#my-qcollection .expand-enter, #my-qcollection .expand-leave-active-active {
   max-height: 0;
   padding: 0;
   opacity: 0;
@@ -22,56 +22,58 @@
 <template>
   <div id="my-qcollection">
     <div class="sheet-pannel">
-      <div class="sheet-zone" v-show="showCreatSheet" transition="expand">
-        <div class="block">
-          <mdl-textfield floating-label="題集名字" :value.sync="newQcollection.name"></mdl-textfield>
-        </div>
-        <div class="block">
-          科目：
-          <select v-model="newQcollection.subject">
-            <option v-for="subject in subjects" v-bind:value="subject.id">
-              {{ subject.name }}
-            </option>
-          </select>
-        </div>
-        <mdl-textfield floating-label="描述" textarea rows="4" :value.sync="newQcollection.description"></mdl-textfield>
+      <transition name="expend">
+        <div class="sheet-zone" v-show="showCreatSheet">
+          <div class="block">
+            <mu-text-field floating-label="題集名字" v-model="newQcollection.name"></mu-text-field>
+          </div>
+          <div class="block">
+            科目：
+            <select v-model="newQcollection.subject">
+              <option v-for="subject in subjects" v-bind:value="subject.id">
+                {{ subject.name }}
+              </option>
+            </select>
+          </div>
+          <mu-text-field floating-label="描述" textarea rows="4" v-model="newQcollection.description"></mu-text-field>
 
-        <div class="block" style="padding:20px 0">
-          <mdl-checkbox :checked.sync="newQcollection.public">公開</mdl-checkbox>
+          <div class="block" style="padding:20px 0">
+            <mdl-checkbox :checked="newQcollection.public">公開</mdl-checkbox>
+          </div>
+          <mdl-button accent raised v-on:click="createNewQcollection">
+            創建
+          </mdl-button>
+          <mdl-button v-show="showCreatSheet" @click.native="showCreatSheet = false">
+            關閉
+          </mdl-button>
         </div>
-        <mdl-button accent raised v-on:click="createNewQcollection">
-          創建
-        </mdl-button>
-        <mdl-button v-show="showCreatSheet" @click="showCreatSheet = false">
-          關閉
-        </mdl-button>
-      </div>
+      </transition>
     </div>
     <div v-show="!showCreatSheet" style="padding: 0 16px">
       <div class="flex-row">
         <div>
-          <mdl-button primary raised @click="showCreatSheet = true">
+          <mdl-button primary raised @click.native="showCreatSheet = true">
             創建新題集
           </mdl-button>
         </div>
         <div style="position: relative;top: 6px;left: 10px;">
-          <mdl-switch :checked.sync="options.private">只顯示私有題集</mdl-switch>
+          <mu-switch v-model="options.private" label="只顯示私有題集"/>
         </div>
       </div>
     </div>
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in qcollections" track-by="_id" v-show="!(options.private && qc.public)" v-link="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
+      <router-link tag="div" class="mdl-cell mdl-cell--4-col qcollection-card" v-for="qc in qcollections" v-bind:key="qc._id" v-show="!(options.private && qc.public)" :to="{ name: 'qcollection-detail', params: { qcollection_id: qc._id }}">
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-public">{{qc.public | bTp}}</span>
         <p class="qc-createdby"></p>
         <p class="qc-title">{{qc.name}}</p>
 
-      </div>
+      </router-link>
     </div>
 
     <div class="flex-column flex-center" style="margin:16px 0 32px 0">
-      <mdl-button raised primary @click="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
+      <mdl-button raised primary @click.native="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
     </div>
 
   </div>
@@ -81,8 +83,10 @@
 import Subject from '../../modules/Subjects'
 
 export default {
-  ready: function () {
-    this.getMyQcollections()
+  mounted: function () {
+    this.$nextTick(function () {
+      this.getMyQcollections()
+    })
   },
   components: {
     Subject

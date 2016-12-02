@@ -26,20 +26,20 @@
     <div class="main-wrapper">
       <div class="flex-column">
         <div class="flex-row" style="border-bottom:1px solid #eee">
-          <div v-link="{name: 'create-question'}" class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
+          <router-link tag="div" :to="{name: 'create-question'}" class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
             <span>創建題目</span>
-          </div>
-          <div v-link="{name: 'manage-question'}" class="flex-column flex-50 flex-center nav-card">
+          </router-link>
+          <router-link tag="div" :to="{name: 'manage-question'}" class="flex-column flex-50 flex-center nav-card">
             <span>管理題目</span>
-          </div>
+          </router-link>
         </div>
         <div class="flex-row">
-          <div v-link="{name: 'manage-qcollection'}" class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
+          <router-link tag="div" :to="{name: 'manage-qcollection'}" class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
             <span>管理題集</span>
-          </div>
-          <div v-link="{name: 'quick-quiz'}" class="flex-column flex-50 flex-center nav-card">
+          </router-link>
+          <router-link tag="div" :to="{name: 'quick-quiz'}" class="flex-column flex-50 flex-center nav-card">
             <span>Quick Quiz</span>
-          </div>
+          </router-link>
         </div>
         <div class="flex-row">
           <div class="flex-column flex-50 flex-center nav-card" style="border-top:1px solid #eee">

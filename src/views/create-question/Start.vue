@@ -27,12 +27,12 @@
     <div class="main-wrapper">
       <div class="flex-column">
         <div class="flex-row" style="border-bottom:1px solid #eee">
-          <div class="flex-column flex-50 flex-center nav-card" v-link="{name:'create-mc-question'}" style="border-right:1px solid #eee">
+          <router-link tag="div" class="flex-column flex-50 flex-center nav-card" :to="{name:'create-mc-question'}" style="border-right:1px solid #eee">
             <span>單項選擇</span>
-          </div>
-          <div class="flex-column flex-50 flex-center nav-card" v-link="{name:'create-mc-question-set'}">
+          </router-link>
+          <router-link tag="div" class="flex-column flex-50 flex-center nav-card" :to="{name:'create-mc-question-set'}">
             <span>單項選擇-題集</span>
-          </div>
+          </router-link>
         </div>
         <div class="flex-row">
           <div class="flex-column flex-50 flex-center nav-card">

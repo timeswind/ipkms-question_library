@@ -21,3 +21,7 @@ export function getQuickquizID (state) {
 export function getQuickquizStudents (state) {
   return state.quickquiz.students
 }
+
+export function getSubjects (state) {
+  return state.utilities.subjects
+}

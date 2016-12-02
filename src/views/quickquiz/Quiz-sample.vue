@@ -15,11 +15,13 @@
 <script>
 import Card from '../../components/reuseable/Card'
 export default {
-  attached: function () {
-    if (this.$route.params.quizsample_id) {
-      this.validateURL = true
-      this.getQuizSample(this.$route.params.quizsample_id)
-    }
+  mounted: function () {
+    this.$nextTick(function () {
+      if (this.$route.params.quizsample_id) {
+        this.validateURL = true
+        this.getQuizSample(this.$route.params.quizsample_id)
+      }
+    })
   },
   components: {
     Card
