@@ -1,11 +1,11 @@
 <template>
   <div>
-    <button class="c-button" type="button" @click.native="mathBox.show = true" v-show="!mathBox.show" style="margin: 8px">公式輸入</button>
+    <button class="c-button" type="button" @click="mathBox.show = true" v-show="!mathBox.show" style="margin: 8px">公式輸入</button>
     <div v-show="mathBox.show" class="math-input flex-column">
-      <span ref="statistic"></span>
+      <span ref="mathquillbox"></span>
       <div class="flex-row flex-baseline">
-        <button class="c-button"  type="button" @click.native="insertMath(mathBox.enteredMath)">插入公式</button>
-        <button class="c-button"  type="button" @click.native="mathBox.show = false">關閉</button>
+        <button class="c-button" type="button" @click="insertMath(mathBox.enteredMath)">插入公式</button>
+        <button class="c-button" type="button" @click="mathBox.show = false">關閉</button>
         <!-- <a style="font-size: 12px" href="https://www.udacity.com/wiki/ma006/mathquill">快捷操作</a> -->
       </div>
     </div>
@@ -16,9 +16,10 @@
 <script>
 const Quill = require('quill')
 const MQ = window.MathQuill.getInterface(2)
+import './Quill.css'
 export default {
   props: {
-    content: {},
+    content: '',
     placeholder: {
       type: String,
       default: ''
@@ -40,9 +41,6 @@ export default {
       default () {
         return ['bold', 'italic', 'underline', 'strike']
       }
-    },
-    output: {
-      default: 'delta'
     },
     keyup: {
       default: null
@@ -68,12 +66,7 @@ export default {
           }
         }
       })
-
       this.MathField = MathField
-
-      // console.log(MathField)
-      // var toolbarOptions = ['bold', 'italic', 'underline', 'strike'];
-
       var options = {
         modules: {
           formula: true,
@@ -84,25 +77,15 @@ export default {
         theme: 'snow'
       }
       this.editor = new Quill(this.$refs.quill, options)
-      // this.editor = new Quill(this.$refs.quill, {
-      //   modules: { toolbar: this.$refs.toolbar, 'link-tooltip': true },
-      //   theme: 'snow'
-      // })
+      this.editor.on('text-change', function (delta, oldDelta, source) {
+        self.$emit('text-change', self.editor.getContents())
+      })
       this.formats.map((format) => {
         this.editor.addFormat(format.name, format.options)
       })
-      if (this.output !== 'delta') {
-        this.editor.setHTML(this.content)
-      } else {
+      if (this.content) {
         this.editor.setContents(this.content)
       }
-      this.editor.on('text-change', (delta, source) => {
-        this.$emit('text-change', this.editor, delta, source)
-        this.content = this.output !== 'delta' ? this.editor.getHTML() : this.editor.getContents()
-      })
-      this.editor.on('selection-change', (range) => {
-        this.$emit('selection-change', this.editor, range)
-      })
       if (this.keyBindings.length) {
         const keyboard = this.editor.getModule('keyboard')
         this.keyBindings.map((binding) => {
@@ -111,25 +94,33 @@ export default {
       }
     })
   },
-  events: {
-    'set-content': function (content) {
-      this.editor.setContents(content)
-    },
-    'set-html': function (html) {
-      this.editor.pasteHTML(html)
-    },
-    'focus-editor': function () {
-      this.focusEditor()
-    },
-    'clear-editor': function () {
-      this.editor.setContents([])
-    }
-  },
   methods: {
     insertMath (latex) {
-      if (latex.trim() !== '') {
-        var oldDalta = this.editor.getContents()
-        oldDalta.ops.push({ insert: { formula: latex } })
+      var oldDalta = this.editor.getContents()
+      var oldOps = oldDalta.ops
+      let oldOpsLength = oldOps.length
+      console.log(oldOpsLength > 0)
+      console.log(oldOps[oldOpsLength - 1].insert)
+      console.log(oldOps[oldOpsLength - 1].insert.split(/\r\n|\r|\n/g).length > 0 && oldOps[oldOpsLength - 1].insert.split(/\r\n|\r|\n/g))
+      if (latex.trim() !== '' && oldOps) {
+        if (oldOps.length === 1 && oldOps[0].insert && oldOps[0].insert.charCodeAt(0) === 10) {
+          oldDalta.ops[0] = { insert: { formula: latex } }
+          oldDalta.ops.push({ insert: ' ' })
+        } else if (oldOpsLength > 0 && oldOps[oldOpsLength - 1].insert) {
+          var lastInsertSplit = oldOps[oldOpsLength - 1].insert.split(/\r\n|\r|\n/g)
+          if (lastInsertSplit.length > 0 && lastInsertSplit[lastInsertSplit.length - 1] === '') {
+            lastInsertSplit.pop()
+            oldDalta.ops[oldOpsLength - 1].insert = lastInsertSplit.join('') + ' '
+            oldDalta.ops.push({ insert: { formula: latex } })
+            oldDalta.ops.push({ insert: ' ' })
+          } else {
+            oldDalta.ops.push({ insert: { formula: latex } })
+            oldDalta.ops.push({ insert: ' ' })
+          }
+        } else {
+          oldDalta.ops.push({ insert: { formula: latex } })
+          oldDalta.ops.push({ insert: ' ' })
+        }
         this.editor.setContents(oldDalta)
         this.MathField.latex('')
         this.mathBox.enteredMath = ''
@@ -150,6 +141,13 @@ export default {
       this.editor.focus()
       this.editor.setSelection(this.editor.getLength() - 1, this.editor.getLength())
     }
+  },
+  watch: {
+    content (val) {
+      if (val === '' || typeof val === 'undefined') {
+        this.editor.setContents([])
+      }
+    }
   }
 }
 </script>
@@ -157,9 +155,9 @@ export default {
 .c-button {
   cursor: pointer;
   margin: 8px 8px 0 0;
-  padding: 8px;
-  background-color: #eee;
-  border: 1px solid #ddd
+  padding: 4px 8px;
+  background-color: #fff;
+  border: 1px solid #ddd;
 }
 .math-input {
   padding: 8px

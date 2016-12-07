@@ -2,13 +2,13 @@
   <div id="quiz-detail">
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mdl-button class="icon-left-button" raised primary @click.native="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
-        <mdl-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mdl-button>
-        <mdl-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click.native="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mdl-button>
-        <mdl-button style="margin-left:16px" raised primary @click.native="checkQuizPaper()"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mdl-button>
-        <mdl-button v-if="quickquiz.finished" raised accent @click.native="deleteQuiz()" style="margin-left: 16px"><i class="material-icons">delete</i>刪除小測</mdl-button>
+        <mu-raised-button raised primary @click.native="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mu-raised-button>
+        <mu-raised-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mu-raised-button>
+        <mu-raised-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click.native="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mu-raised-button>
+        <mu-raised-button style="margin-left:16px" raised primary @click.native="checkQuizPaper()"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mu-raised-button>
+        <mu-raised-button v-if="quickquiz.finished" raised accent @click.native="deleteQuiz()" style="margin-left: 16px"><i class="material-icons">delete</i>刪除小測</mu-raised-button>
       </div>
-      <div class="flex-column second-wrapper mdl-shadow--2dp">
+      <div class="flex-column second-wrapper light-card">
         <div class="flex-column" style="padding:16px">
           <div class="flex-row flex-baseline">
             <h4 class="quiz-title">{{quickquiz.title}}</h4>
@@ -33,12 +33,12 @@
           <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">學生 {{students.length}}名</p>
           <div class="grids">
 
-            <div class="grid-4 flex-column student" v-for="(student, index) in students" v-bind:key="student._id">
+            <div class="grid-4 flex-column student" v-for="(student, index) in students" v-bind:key="student._id" @click="checkQuizPaper(student)">
               <div class="flex-row flex-center">
                 <div class="student-status online" v-show="student.online"></div>
                 <span class="student-name">{{student.name}}</span>
               </div>
-              <span class="finished-status flex-row flex-center" v-if="student.status === 'finish'" @click.native="checkQuizPaper(student)">
+              <span class="finished-status flex-row flex-center" v-if="student.status === 'finish'">
                 <span style="margin-right:8px;color:#3F51B5">{{analysisSample(index, 'time')}}</span>
                 <span style="color: #E91E63;margin-right: 8px;">{{analysisSample(index, 'score')}}</span>
                 <span>已完成</span>
@@ -56,7 +56,7 @@
           </div>
         </div>
 
-        <div class="flex-column" ref="statistic">
+        <div class="flex-column" v-show="statisticShow">
           <p style="padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa;border-top:1px solid #eee;">數據 統計</p>
           <div class="flex-row grids" v-if="quickquiz.finished">
             <div class="grid-2 flex-column flex-center flex-50">
@@ -70,22 +70,22 @@
           </div>
           <div class="flex-row flex-center" style="margin-top: 16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">學生表現</span>
-            <mdl-button accent raised @click.native="drawSPChart('time')" style="background-color: #FF9800;">
+            <mu-raised-button accent raised @click.native="drawSPChart('time')" style="background-color: #FF9800;">
               <i class="material-icons">swap_vert</i>
               <span>時間</span>
-            </mdl-button>
-            <mdl-button accent raised style="margin-left:16px" @click.native="drawSPChart('correct')">
+            </mu-raised-button>
+            <mu-raised-button accent raised style="margin-left:16px" @click.native="drawSPChart('correct')">
               <i class="material-icons">swap_vert</i>
               <span>正確題數</span>
-            </mdl-button>
+            </mu-raised-button>
           </div>
           <canvas ref="spChart"></canvas>
           <div class="flex-row flex-center" style="margin-top:32px;border-top:1px solid #ddd;padding-top:16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">題目數據</span>
-            <mdl-button accent raised @click.native="drawQAChart('correct')">
+            <mu-raised-button accent raised @click.native="drawQAChart('correct')">
               <i class="material-icons">swap_vert</i>
               <span>正確數量</span>
-            </mdl-button>
+            </mu-raised-button>
           </div>
           <canvas width="400px" height="200" ref="qaChart"></canvas>
 
@@ -129,9 +129,9 @@ export default {
   },
   methods: {
     getQuickquizDetail: function (id) {
+      console.log('getQuickquizDetail')
       let apiURL = '/api/manage-quickquiz/teacher/quickquiz/' + '?id=' + id
       this.$http.get(apiURL).then(function (response) {
-        console.log(response)
         let students = _.get(response.data, 'students', [])
         this.setQuickquizStudents(students)
         this.samples = _.get(response.data, 'samples', [])
@@ -141,7 +141,9 @@ export default {
         this.quickquiz = response.data
         this.analysis('count_exception')
         if (!_.get(response.data, 'finished', false)) {
-          this.$refs.statistic.style.display = 'none'
+          this.statisticShow = false
+        } else {
+          this.statisticShow = true
         }
         this.listenForSocket()
       }, function (response) {
@@ -548,6 +550,7 @@ export default {
         joined: false,
         authenticated: false
       },
+      statisticShow: false,
       validateURL: false,
       quickquiz: {},
       charts: {
@@ -559,15 +562,6 @@ export default {
           correct: 0,
           wrong: 0
         }
-      }
-    }
-  },
-  filters: {
-    finished: function (value) {
-      if (value === false) {
-        return '測試進行中'
-      } else {
-        return '已結束'
       }
     }
   },
@@ -636,7 +630,8 @@ export default {
 }
 
 .student {
-  padding: 8px 16px
+  padding: 8px 16px;
+  cursor: pointer;
 }
 
 .student .student-name {

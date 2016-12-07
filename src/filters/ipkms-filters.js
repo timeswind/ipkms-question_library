@@ -20,6 +20,14 @@ module.exports = {
       }
     })
 
+    Vue.filter('finished', function (boolean) {
+      if (boolean === false) {
+        return '未收卷'
+      } else {
+        return '已結束'
+      }
+    })
+
     Vue.filter('date', function (value, formate) {
       return moment(value).format(formate)
     })

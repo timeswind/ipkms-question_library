@@ -1,18 +1,20 @@
 <template>
   <mu-drawer @hide="handleHide" @close="handleClose" :open="open" :docked="docked" class="app-drawer" :zDepth="1">
     <mu-appbar class="exmaples-nav-appbar" :zDepth="0">
-      <a class="exmaples-appbar-title" @click="handleMenuChange('#/index')" href="#/index" style="display:inline-block;">IPKMS-題庫</a>
+      <a class="exmaples-appbar-title" @click="handleMenuChange('entry')" style="display:inline-block;">IPKMS-題庫</a>
       <mu-badge content="bata" class="exmaples-version" secondary/>
     </mu-appbar>
     <mu-divider/>
     <mu-list @change="handleMenuChange" :value="menuVal">
-      <!-- <mu-list-item title="目錄" toggleNested>
-      <mu-list-item slot="nested" value="#/create-question" title="創建題目"/>
-      </mu-list-item> -->
-      <mu-list-item value="#/create-question" title="創建題目"/>
-      <mu-list-item value="#/manage-question" title="管理題目"/>
-      <mu-list-item value="#/manage-qcollection" title="管理題集"/>
-      <mu-list-item value="#/quick-quiz" title="Quick quiz"/>
+      <div v-if="userRole === 'teacher'">
+        <mu-list-item value="create-question" title="創建題目"/>
+        <mu-list-item value="manage-question" title="管理題目"/>
+        <mu-list-item value="manage-qcollection" title="管理題集"/>
+        <mu-list-item value="manage-quiz" title="Quick quiz"/>
+      </div>
+      <div v-if="userRole === 'admin'">
+        <mu-list-item value="admin" title="Admin Panel"/>
+      </div>
     </mu-list>
     <mu-divider/>
   </mu-drawer>
@@ -42,7 +44,7 @@ export default {
     handleMenuChange (val) {
       this.menuVal = val
       if (this.docked) {
-        window.location.hash = this.menuVal
+        this.$router.push({name: this.menuVal})
       } else {
         this.changeHref = true
       }
@@ -56,6 +58,11 @@ export default {
   },
   mounted () {
     this.menuVal = window.location.hash
+  },
+  computed: {
+    userRole () {
+      return this.$store.getters.getUserRole
+    }
   }
 }
 </script>

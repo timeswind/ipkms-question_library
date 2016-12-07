@@ -1,106 +1,77 @@
 <template>
   <div id="question-detail">
-    <div id="question-body">
-      <p style="margin: 8px 0;color: #9E9E9E; text-align:center">最後更新于 {{ details.updated_at | calendar}}</p>
-      <card>
-        <div slot="content">
-          <div class="flex-column">
-            <div class="flex-row flex-center" style="padding: 16px 16px 0 16px">
-              <div class="flex-column flex-50">
-                <span class="field-title">科目 Subject</span>
-                <select v-model="details.subject">
-                  <option v-for="subject in subjects" v-bind:value="subject.id">
-                    {{ subject.name }}
-                  </option>
-                </select>
-              </div>
-              <div class="difficulty-box flex-column flex-50">
-                <span class="field-title">難度 Difficulty</span>
-                <span class="flex-row flex-baseline" style="margin-top: 8px">
-                  <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, (n - 1))" :class="{'difficulty-heighlight': details.difficulty > (n - 1)}">star_rate</i>
-                </span>
-              </div>
-            </div>
-            <div class="flex-column" style="padding: 16px 16px 16px 16px">
-              <span class="field-title">標籤 Tags</span>
-              <div class="flex-row flex-center flex-wrap" style="margin-top:8px">
-                <div class="q-d-tag" v-for="(tag, index) in details.tags" @click="modify('tag', 'remove', index)">{{tag}}</div>
-                <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="modify('tag', 'add', edit.tag)" v-model="edit.tag" style="width:200px"/>
-              </div>
-            </div>
-          </div>
+    <p style="margin: 8px 0;color: #9E9E9E; text-align:center">最後更新于 {{ details.updated_at | calendar}}</p>
+    <div class="flex-column light-card">
+      <div class="flex-row flex-center" style="padding: 16px 16px 0 16px">
+        <div class="flex-column flex-50">
+          <span class="field-title">科目 Subject</span>
+          <select v-model="details.subject">
+            <option v-for="subject in subjects" v-bind:value="subject.id">
+              {{ subject.name }}
+            </option>
+          </select>
         </div>
-      </card>
-      <div class="flex-row" style="padding: 16px 0; justify-content: flex-end" v-if="edit.on">
-        <mdl-button @click.native="cancelUpdate()" v-show="edit.change">
-          取消
-        </mdl-button>
-        <mdl-button primary accent raised @click.native="updateInfo()" :disabled="!edit.change">
-          修改
-        </mdl-button>
-      </div>
-
-      <div v-if="details.type === 'mc'">
-        <card>
-          <div slot="content" style="padding:16px">
-            <div class="q-d-info-wrapper">
-              <span class="q-d-subject">{{details.subject | subject}}</span>
-              <div class="q-d-difficulty">
-                <i class="material-icons" v-for="i in getNumberArray(details.difficulty)">star_rate</i>
-              </div>
-            </div>
-            <div v-if="details.delta">
-              <div v-html="renderDelta(details.delta)"></div>
-            </div>
-            <div v-if="details.context">
-              <div v-html="details.context"></div>
-            </div>
-            <div v-if="details.images">
-              <div v-for="image in details.images">
-                <div v-if="image.type === 'qiniu'">
-                  <img :src="'https://ofb183q1d.qnssl.com/' + image.data + '?imageMogr2/format/jpg/'"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </card>
-      <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
-        <div v-if="details.delta">
-          <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click.native="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="renderDelta(details.choices[0])"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click.native="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="renderDelta(details.choices[1])"></div></div></card>
-          </div>
-          <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click.native="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="renderDelta(details.choices[2])"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click.native="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="renderDelta(details.choices[3])"></div></div></card>
-          </div>
-        </div>
-        <div v-if="details.context">
-          <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 0}" @click.native="modify('rightAnswer', 'mc', 0)"><div slot="content"><span class="mc-choice-label">A</span><div v-html="details.choices[0]"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 1}" @click.native="modify('rightAnswer', 'mc', 1)"><div slot="content"><span class="mc-choice-label">B</span><div v-html="details.choices[1]"></div></div></card>
-          </div>
-          <div class="flex-row">
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 2}" @click.native="modify('rightAnswer', 'mc', 2)"><div slot="content"><span class="mc-choice-label">C</span><div v-html="details.choices[2]"></div></div></card>
-            <card class="flex-50" :class="{'hightlight-answer': answer.mc === 3}" @click.native="modify('rightAnswer', 'mc', 3)"><div slot="content"><span class="mc-choice-label">D</span><div v-html="details.choices[3]"></div></div></card>
-          </div>
+        <div class="difficulty-box flex-column flex-50">
+          <span class="field-title">難度 Difficulty</span>
+          <span class="flex-row flex-baseline" style="margin-top: 8px">
+            <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, (n - 1))" :class="{'difficulty-heighlight': details.difficulty > (n - 1)}">star_rate</i>
+          </span>
         </div>
       </div>
-
-      <card v-if="details.statistic">
-        <div slot="content" style="padding:16px">
-          {{details.statistic}}
+      <div class="flex-column" style="padding: 16px 16px 16px 16px">
+        <span class="field-title">標籤 Tags</span>
+        <div class="flex-row flex-center flex-wrap" style="margin-top:8px">
+          <div class="q-d-tag" v-for="(tag, index) in details.tags" @click="modify('tag', 'remove', index)">{{tag}}</div>
+          <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="modify('tag', 'add', edit.tag)" v-model="edit.tag" style="width:200px"/>
         </div>
-      </card>
+      </div>
+    </div>
+    <div class="flex-row" style="padding: 16px 0; justify-content: flex-end" v-if="edit.on">
+      <mu-flat-button label="取消" @click="cancelUpdate()" v-show="edit.change" />
+      <mu-raised-button label="修改" primary raised @click="updateInfo()" :disabled="!edit.change" />
     </div>
 
+    <div v-if="details.type === 'mc'" class="light-card default-pending">
+      <div class="q-d-info-wrapper">
+        <span class="q-d-subject">{{details.subject | subject}}</span>
+        <div class="q-d-difficulty">
+          <i class="material-icons" v-for="i in getNumberArray(details.difficulty)">star_rate</i>
+        </div>
+      </div>
+      <div v-if="details.delta">
+        <div v-html="renderDelta(details.delta)"></div>
+      </div>
+      <div v-if="details.context">
+        <div v-html="details.context"></div>
+      </div>
+      <div v-if="details.images">
+        <div v-for="image in details.images">
+          <div v-if="image.type === 'qiniu'">
+            <img :src="'https://ofb183q1d.qnssl.com/' + image.data + '?imageMogr2/format/jpg/'"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
+      <div v-if="details.delta">
+        <mu-row>
+          <mu-col width="100" tablet="50" desktop="50" v-for="(choice, index) in details.choices">
+            <div :class="{'hightlight-answer': details.answers.indexOf(index.toString()) > -1, 'light-card default-pending': true}" @click="modify('rightAnswer', 'mc', index)">
+              <span class="mc-choice-label">{{alphabet[index]}}</span>
+              <div v-html="renderDelta(details.choices[index])"></div>
+            </div>
+          </mu-col>
+        </mu-row>
+      </div>
+    </div>
+    <div class="light-card default-pending">
+      {{details.statistic}}
+    </div>
   </div>
 </div>
 </template>
 
 <script>
-import Card from '../../components/reuseable/Card'
 import Subject from '../../modules/Subjects'
 import deltaRender from '../../modules/delta-render.js'
 
@@ -115,9 +86,6 @@ export default {
       }
     })
   },
-  components: {
-    Card
-  },
   methods: {
     renderDelta: function (delta) {
       return deltaRender(delta)
@@ -126,9 +94,6 @@ export default {
       let apiURL = '/api/manage-question/question/' + question_id
       this.$http.get(apiURL).then(function (response) {
         this.details = response.data
-        if (response.data.type === 'mc') {
-          this.answer.mc = response.data.answer.mc
-        }
         if (response.data.delta && response.data.delta !== '') {
 
         } else {
@@ -180,10 +145,9 @@ export default {
         } else if (type === 'rightAnswer') {
           let answerType = option
           if (answerType === 'mc') {
-            let newMcRightChoiceIndex = data
-            if (this.details.answer.mc !== newMcRightChoiceIndex) {
-              this.details.answer.mc = newMcRightChoiceIndex
-              this.answer.mc = newMcRightChoiceIndex
+            let newMcRightChoiceIndex = [data.toString()]
+            if (this.details.answers !== newMcRightChoiceIndex) {
+              this.details.answers = newMcRightChoiceIndex
               this.edit.change = true
             }
           }
@@ -191,12 +155,12 @@ export default {
       }
     },
     updateInfo: function () {
-      if (this.details.subject !== this.tempDetails.subject || this.details.difficulty !== this.tempDetails.difficulty || JSON.stringify(this.details.tags) !== JSON.stringify(this.tempDetails.tags) || this.details.answer !== this.tempDetails.answer) {
+      if (this.details.subject !== this.tempDetails.subject || this.details.difficulty !== this.tempDetails.difficulty || JSON.stringify(this.details.tags) !== JSON.stringify(this.tempDetails.tags) || this.details.answers !== this.tempDetails.answers) {
         let data = {
           subject: this.details.subject,
           difficulty: this.details.difficulty,
           tags: this.details.tags,
-          answer: this.details.answer
+          answers: this.details.answers
         }
         let apiURL = '/api/manage-question/question/' + this.$route.params.question_id
         this.$http.put(apiURL, data).then(function (response) {
@@ -212,9 +176,6 @@ export default {
     cancelUpdate: function () {
       this.sheetshow = false
       this.details = JSON.parse(JSON.stringify(this.tempDetails))
-      if (this.details.type === 'mc') {
-        this.answer.mc = this.details.answer.mc
-      }
       this.edit.change = false
     },
     getNumberArray: function (num) {
@@ -227,9 +188,6 @@ export default {
       choice: Number,
       details: {},
       tempDetails: {},
-      answer: {
-        mc: null
-      },
       subjects: Subject.subjects,
       edit: {
         on: false,
@@ -237,10 +195,15 @@ export default {
         tag: ''
       }
     }
+  },
+  computed: {
+    alphabet () {
+      return this.$store.getters.getAlphabet
+    }
   }
 }
 </script>
-<style>
+<style scoped>
 .q-d-subject {
   float: left;
   padding: 4px 8px;
@@ -276,13 +239,13 @@ export default {
   cursor: pointer;
 }
 
-#question-detail #question-body {
+#question-detail {
   max-width: 800px;
   margin: 0 auto;
   margin-top: 8px
 }
 
-#question-detail #question-body p {
+#question-detail p {
   margin: 0
 }
 
@@ -293,7 +256,7 @@ export default {
   padding: 16px
 }
 
-.q-d-mc-wrapper .hightlight-answer .card {
+.q-d-mc-wrapper .hightlight-answer {
   background-color: #009688;
   color: #fff
 }

@@ -4,7 +4,7 @@
       <span class="subject">{{qcollection.subject | subject}}</span>
       <span class="public">{{qcollection.public | bTp}}</span>
       <span class="difficulty" v-if="qcollection.aveDifficulty">難度: {{qcollection.aveDifficulty}}</span>
-      <p class="createdby" v-if="!mine && qcollection.createdBy && qcollection.createdBy.local && qcollection.createdBy.local.name">作者：<i>{{qcollection.createdBy.local.name}}</i></p>
+      <p class="createdby" v-if="!mine && qcollection.createdBy && qcollection.createdBy.local && qcollection.createdBy.name">作者：<i>{{qcollection.createdBy.name}}</i></p>
       <p class="createdby" v-else></p>
       <p class="title">{{qcollection.name}}</p>
     </router-link>

@@ -14,6 +14,7 @@ import 'material-design-lite/material.min.css'
 import 'material-design-lite/material.min.js'
 
 import App from './App'
+import auth from './auth'
 Vue.use(MuseUI)
 
 Vue.use(VueRouter)
@@ -92,41 +93,63 @@ Vue.http.interceptors.push((request, next) => {
 // })
 const EntryView = resolve => require(['./views/Entry.vue'], resolve)
 const LoginView = resolve => require(['./views/Login.vue'], resolve)
-const CreateQuestionView = resolve => require(['./views/create-question/Create-question.vue'], resolve)
+const CreateQuestionView = resolve => require(['./views/create-question/Create-mc-question.vue'], resolve)
+const AdminPanelView = resolve => require(['./views/AdminPanel/AdminPanel.vue'], resolve)
+const AdminPanelUserDetailView = resolve => require(['./views/AdminPanel/UserDetail.vue'], resolve)
 
 var router = new VueRouter({
   routes: [
-    { path: '/', component: EntryView, name: 'entry', meta: { title: '題庫' }},
+    { path: '/', component: EntryView, name: 'entry', meta: { title: '題庫' }, beforeEnter: requireAuthTeacher},
     { path: '/login', component: LoginView, name: 'login', meta: { title: '登入'}},
-    { path: '/create-question', component: CreateQuestionView, name: 'create-question', meta: { title: '創建題目'}, children: [
-      { path: 'start', name: 'start-create-question', component: resolve => require(['./views/create-question/Start.vue'], resolve), meta: { title: 'Start'} },
-      { path: 'mc', name: 'create-mc-question', component: resolve => require(['./views/create-question/Create-mc-question.vue'], resolve), meta: { title: '多項選擇題'} },
-      { path: 'mc_question_set', name: 'create-mc-question-set', component: resolve => require(['./views/create-question/Create-mc-question-set.vue'], resolve), meta: { title: '多項選擇題 題集'} }
-    ]},
-    { path: '/manage-qcollection', component: resolve => require(['./views/ManageQcollection/ManageQcollection.vue'], resolve), name: 'manage-qcollection', meta: { title: '管理題集'}},
-    { path: '/manage-qcollection-legacy', component: resolve => require(['./views/qcollection/manage-qcollection.vue'], resolve), name: 'manage-qcollection-legacy', meta: { title: '管理題集'}, children: [
-      { path: 'my', name: 'my-qcollection', component: resolve => require(['./views/qcollection/My-qcollection.vue'], resolve), meta: { title: '我的題集'} },
-      { path: 'all', name: 'all-qcollection', component: resolve => require(['./views/qcollection/All-qcollection.vue'], resolve), meta: { title: '所有題集'} },
-      { path: 'search', name: 'search-qcollection', component: resolve => require(['./views/qcollection/Search-qcollection.vue'], resolve), meta: { title: '搜索題集'} }
-    ]},
-    { path: '/manage-qcollection/detail/:qcollection_id', component: resolve => require(['./views/qcollection/Qcollection-detail.vue'], resolve), name: 'qcollection-detail', meta: { title: '題集內容'}},
-    { path: '/manage-question', component: resolve => require(['./views/ManageQuestion/ManageQuestion.vue'], resolve), name: 'manage-question', meta: { title: '管理題目'}},
-    { path: '/manage-question/detail/:question_id', component: resolve => require(['./views/questions/Question-detail.vue'], resolve), name: 'question-detail', meta: { title: '題目詳情'}},
+    { path: '/create-question', component: CreateQuestionView, name: 'create-question', meta: { title: '創建題目'}, beforeEnter: requireAuthTeacher},
+    { path: '/manage-qcollection', component: resolve => require(['./views/ManageQcollection/ManageQcollection.vue'], resolve), name: 'manage-qcollection', meta: { title: '管理題集'}, beforeEnter: requireAuthTeacher},
+    { path: '/manage-qcollection/detail/:qcollection_id', component: resolve => require(['./views/qcollection/Qcollection-detail.vue'], resolve), name: 'qcollection-detail', meta: { title: '題集內容'}, beforeEnter: requireAuthTeacher},
+    { path: '/manage-question', component: resolve => require(['./views/ManageQuestion/ManageQuestion.vue'], resolve), name: 'manage-question', meta: { title: '管理題目'}, beforeEnter: requireAuthTeacher},
+    { path: '/manage-question/detail/:question_id', component: resolve => require(['./views/questions/Question-detail.vue'], resolve), name: 'question-detail', meta: { title: '題目詳情'}, beforeEnter: requireAuthTeacher},
+    { path: '/manage-quiz', component: resolve => require(['./views/ManageQuickquiz/ManageQuickquiz.vue'], resolve), name: 'manage-quiz', meta: { title: '管理小測'}, beforeEnter: requireAuthTeacher},
     { path: '/quick-quiz', component: resolve => require(['./views/quickquiz/Quick-quiz.vue'], resolve), name: 'quick-quiz', meta: { title: 'Quick Quiz'}, children: [
       { path: 'prepare', name: 'prepare-quiz', component: resolve => require(['./views/quickquiz/Prepare-quiz.vue'], resolve), meta: { title: '準備小測'} },
       { path: 'results', name: 'quiz-results', component: resolve => require(['./views/quickquiz/Quiz-results.vue'], resolve), meta: { title: '數據統計'} },
-    ]},
+    ], beforeEnter: requireAuthTeacher},
     { path: '/quick-quiz/detail/:quickquiz_id', component: resolve => require(['./views/quickquiz/Quiz-detail.vue'], resolve), name: 'quiz-detail', meta: { title: 'Quiz Detail'}},
-    { path: '/quick-quiz/paper/:quickquiz_id/:quizsample_id', component: resolve => require(['./views/quickquiz/Quiz-paper.vue'], resolve), name: 'quiz-paper', meta: { title: 'Quiz Paper'}}
+    { path: '/quick-quiz/paper/:quickquiz_id/:quizsample_id', component: resolve => require(['./views/quickquiz/Quiz-paper.vue'], resolve), name: 'quiz-paper', meta: { title: 'Quiz Paper'}, beforeEnter: requireAuthTeacher},
+    { path: '/admin', component: AdminPanelView, name: 'admin', meta: { title: 'Admin'}, beforeEnter: requireAuthAdmin},
+    { path: '/admin/user/:id', component: AdminPanelUserDetailView, name: 'admin-user-detail', meta: { title: '用戶信息'}, beforeEnter: requireAuthAdmin}
   ]
 })
 
+function requireAuthAdmin (to, from, next) {
+  if (auth.loggedIn() && auth.getRole() === 'admin') {
+    next()
+  } else {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    })
+  }
+}
+
+function requireAuthTeacher (to, from, next) {
+  console.log(auth.loggedIn())
+  if (auth.loggedIn() && auth.getRole() === 'teacher') {
+    next()
+  } else {
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    })
+  }
+}
+
 router.beforeEach((to, from, next) => {
   if (to.path !== '/login') {
-    if (window.sessionStorage.token) {
-      next()
+    if (!auth.loggedIn()) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
     } else {
-      router.push({name: 'login'})
+      next()
     }
   } else {
     next()

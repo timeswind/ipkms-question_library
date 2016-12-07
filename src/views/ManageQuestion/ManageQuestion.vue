@@ -7,7 +7,7 @@
     </mu-tabs>
     <div v-if="activeTab === 'my-questions'">
       <div class="filter">
-        <mu-switch v-model="filter.time" label="時間倒序" v-on:change="handleTimeSortChange()"/>
+        <mu-switch v-model="filter.time" label="時間倒序"/>
       </div>
       <mu-row>
         <mu-col width="100" tablet="50" desktop="33" v-for="(question, index) in questions">
@@ -20,7 +20,7 @@
     </div>
     <div v-if="activeTab === 'all-questions'">
       <div class="filter">
-        <mu-switch v-model="filter.time" label="時間倒序" v-on:change="handleTimeSortChange()"/>
+        <mu-switch v-model="filter.time" label="時間倒序"/>
       </div>
       <mu-row>
         <mu-col width="100" tablet="50" desktop="33" v-for="(question, index) in questions">
@@ -208,15 +208,6 @@ export default {
         this.search.buttonDisable = false
       })
     },
-    handleTimeSortChange () {
-      if (this.activeTab) {
-        if (this.activeTab === 'my-questions') {
-          this.getMyQuestions()
-        } else if (this.activeTab === 'all-questions') {
-          this.getAllQuestions()
-        }
-      }
-    },
     handleTabChange (tab) {
       this.questions = []
       if (tab === 'my-questions') {
@@ -255,6 +246,20 @@ export default {
           this.search.maxDifficulty = difficulty
         }
       }
+    }
+  },
+  watch: {
+    'filter': {
+      handler: function (val, oldVal) {
+        if (this.activeTab) {
+          if (this.activeTab === 'my-questions') {
+            this.getMyQuestions()
+          } else if (this.activeTab === 'all-questions') {
+            this.getAllQuestions()
+          }
+        }
+      },
+      deep: true
     }
   }
 }

@@ -422,3 +422,21 @@ select {
   background-color: #009688;
   color: #fff
 }
+
+.light-card {
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .04);
+  border: 1px solid rgba(0, 0, 0, .09);
+}
+
+.light-shadow {
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .04);
+  border: 1px solid rgba(0, 0, 0, .09);
+}
+
+.default-pending {
+  padding: 16px;
+}

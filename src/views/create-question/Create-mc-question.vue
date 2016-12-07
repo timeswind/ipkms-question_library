@@ -1,12 +1,10 @@
 <template>
   <div id="create-mc-question">
     <div>
-      <mdl-button primary raised class="float-button" style="bottom: 80px" @click.native="questionInbox.show = true" v-bind:disabled="publishButton.disabled">
+      <mu-raised-button primary class="float-button" style="bottom: 80px" @click="questionInbox.show = true" :disabled="publishButton.disabled">
         <i class="material-icons">inbox</i> {{questionInbox.questions.length}}
-      </mdl-button>
-      <mdl-button primary raised class="float-button" @click.native="publishQuestion()" v-bind:disabled="publishButton.disabled">
-        發佈
-      </mdl-button>
+      </mu-raised-button>
+      <mu-raised-button label="發佈" primary class="float-button" @click="publishQuestion()" :disabled="publishButton.disabled" />
       <div class="body_wrapper">
         <card>
           <div slot="content" style="padding: 16px 16px 0 16px">
@@ -14,7 +12,7 @@
               <div class="flex-row">
                 <div class="flex-column flex-50">
                   <span class="field-title">科目</span>
-                  <select v-model="newQuestion.subject">
+                  <select :value="newQuestionState.subject" @input="newQuestionSubjectOnChange($event.target.value)">
                     <option v-for="subject in subjects" v-bind:value="subject.id">
                       {{ subject.name }}
                     </option>
@@ -23,7 +21,7 @@
                 <div class="set_difficulty flex-column flex-50">
                   <span class="field-title" style="margin-bottom:4px">難度</span>
                   <span class="flex-row">
-                    <i v-for="n in 5" @click="newQuestion.difficulty = n" :class="{'difficulty_status': newQuestion.difficulty > (n - 1), 'material-icons': true}">star_rate</i>
+                    <i v-for="n in 5" @click="newQuestionDifficultyOnChange(n)" :class="{'difficulty_status': newQuestionState.difficulty > (n - 1), 'material-icons': true}">star_rate</i>
                   </span>
                 </div>
               </div>
@@ -33,21 +31,20 @@
                     <span class="field-title">標籤</span>
                   </div>
                   <div class="flex-row flex-center flex-wrap">
-                    <div class="q-tag" v-for="(tag, index) in newQuestion.tags" v-on:click="removeTag(index)">{{tag}}</div>
+                    <div class="q-tag" v-for="(tag, index) in newQuestionState.tags" v-on:click="removeTag(index)">{{tag}}</div>
                   </div>
-                  <div style="position: relative;top: -12px">
+                  <div style="position: relative;top: -6px">
                     <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="addTag()" v-model="tag" style="width:200px" />
                   </div>
                 </div>
-
-                <div class="flex-column flex-50">
+                <!-- <div class="flex-column flex-50">
                   <span class="field-title">語言</span>
                   <select v-model="newQuestion.language" v-on:change="setUserLanguage(newQuestion.language)">
                     <option v-for="language in languages" v-bind:value="language.id">
                       {{ language.name }}
                     </option>
                   </select>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -55,9 +52,9 @@
         <div class="flex-column" style="margin-bottom: 16px">
           <h5 style="margin-left:4px">編輯題目</h5>
           <div style="background:#ddd" class="flex-column">
-            <mdl-button primary @click.native="editorPreview.image.show = !editorPreview.image.show"><i class="material-icons">photo</i>
+            <mu-flat-button primary @click="editorPreview.image.show = !editorPreview.image.show"><i class="material-icons">photo</i>
               <span>添加圖片</span>
-            </mdl-button>
+            </mu-flat-button>
           </div>
           <div v-show="editorPreview.image.show" style="border: 1px solid #3f51b5;padding:16px">
             <form v-on:change="readImg($event)">
@@ -65,12 +62,12 @@
             </form>
             <div class="flex-column flex-center">
               <canvas ref="fabricprocess"  style="border: 1px dashed #3f51b5;padding: 0"></canvas>
-              <mu-text-field label="圖片名字" v-model="editorPreview.image.label"></mu-text-field>
-              <mdl-button primary @click.native="outputImg()"><i class="material-icons">photo</i> <span>上傳圖片</span></mdl-button>
+              <mu-text-field hintText="圖片名字" v-model="editorPreview.image.label"></mu-text-field>
+              <mu-flat-button primary @click="outputImg()"><i class="material-icons">photo</i> <span>上傳圖片</span></mu-flat-button>
             </div>
           </div>
-          <div v-if="newQuestion.images" style="text-align:center">
-            <div v-for="image in newQuestion.images">
+          <div v-if="newQuestionState.images" style="text-align:center">
+            <div v-for="image in newQuestionState.images">
               <div v-if="image.type === 'qiniu'">
                 <img :src="'https://ofb183q1d.qnssl.com/' + image.data + '?imageMogr2/format/jpg/'"/>
               </div>
@@ -80,7 +77,7 @@
         <div class="flex-column">
           <card>
             <div slot="content">
-              <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.question"></quill>
+              <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="newQuestionState.delta" @text-change="(delta)=>{handleDeltaChange(delta, 'question')}"></quill>
             </div>
           </card>
         </div>
@@ -90,36 +87,36 @@
         <div id="mc_input_container">
           <div class="flex-row">
             <div class="flex-column flex-50">
-              <div :class="{'hightlight-answer': newQuestion.answer.mc === 0, 'mc_select': true}" @click.native="newQuestion.answer.mc = 0">A</div>
+              <div :class="{'hightlight-answer': newQuestionState.answers.indexOf('0') > -1, 'mc_select': true}" @click="updateMcCorrectAnswer(0)">A</div>
               <card>
                 <div slot="content">
-                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[0]"></quill>
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="newQuestionState.choices[0]" @text-change="(delta)=>{handleDeltaChange(delta, 'choice', 0)}"></quill>
                 </div>
               </card>
             </div>
             <div class="flex-column flex-50">
-              <div :class="{'hightlight-answer': newQuestion.answer.mc === 1, 'mc_select': true}" @click.native="newQuestion.answer.mc = 1">B</div>
+              <div :class="{'hightlight-answer': newQuestionState.answers.indexOf('1') > -1, 'mc_select': true}" @click="updateMcCorrectAnswer(1)">B</div>
               <card>
                 <div slot="content">
-                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[1]"></quill>
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="newQuestionState.choices[1]" @text-change="(delta)=>{handleDeltaChange(delta, 'choice', 1)}"></quill>
                 </div>
               </card>
             </div>
           </div>
           <div class="flex-row">
             <div class="flex-column flex-50">
-              <div :class="{'hightlight-answer': newQuestion.answer.mc === 2, 'mc_select': true}" @click.native="newQuestion.answer.mc = 2">C</div>
+              <div :class="{'hightlight-answer': newQuestionState.answers.indexOf('2') > -1, 'mc_select': true}" @click="updateMcCorrectAnswer(2)">C</div>
               <card>
                 <div slot="content">
-                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[2]"></quill>
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="newQuestionState.choices[2]" @text-change="(delta)=>{handleDeltaChange(delta, 'choice', 2)}"></quill>
                 </div>
               </card>
             </div>
             <div class="flex-column flex-50">
-              <div :class="{'hightlight-answer': newQuestion.answer.mc === 3, 'mc_select': true}" @click.native="newQuestion.answer.mc = 3">D</div>
+              <div :class="{'hightlight-answer': newQuestionState.answers.indexOf('3') > -1, 'mc_select': true}" @click="updateMcCorrectAnswer(3)">D</div>
               <card>
                 <div slot="content">
-                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="editorPreview.answer.mc[3]"></quill>
+                  <quill :toolbar="['italic', 'underline', { 'list': 'ordered'}, { 'list': 'bullet' }]" :content="newQuestionState.choices[3]" @text-change="(delta)=>{handleDeltaChange(delta, 'choice', 3)}"></quill>
                 </div>
               </card>
             </div>
@@ -129,12 +126,12 @@
 
       <div :class="{'show': questionInbox.show, 'flex-column': true, 'questions_inbox': true}">
         <div class="flex-row" style="margin-top: 26px;padding-left: 16px;cursor: pointer;padding-bottom: 15px;width: 100%;border-bottom: 1px solid #E0E0E0;">
-          <i class="material-icons" @click.native="questionInbox.show = false">close</i>
+          <i class="material-icons" @click="questionInbox.show = false">close</i>
           <span style="font-size: 20px;padding-top: 2px;padding-left: 16px;">創建題集記錄</span>
         </div>
 
         <div class="flex-column flex-center" style="margin: 8px 0;" id="getLatestQuestionsButton">
-          <mdl-button primary raised @click.native="getLatestQuestionsCreatedByMe()">獲取我最近創建的題目</mdl-button>
+          <mu-raised-button label="獲取我最近創建的題目" primary @click="getLatestQuestionsCreatedByMe()"/>
         </div>
 
         <div class="flex-column" style="overflow-y: auto;margin-bottom:60px; flex: 1">
@@ -146,7 +143,7 @@
               <div class="q-context" v-html="q.context"></div>
             </div>
             <div class="flex-row">
-              <span style="color: #9E9E9E">{{q._id | timestamp}}</span>
+              <!-- <span style="color: #9E9E9E">{{q._id | timestamp}}</span> -->
               <span class="flex-row flex-center" style="color:#FFC107;margin-left:auto">{{q.difficulty}}<i class="material-icons" style="font-size: 18px">star</i></span>
             </div>
           </div>
@@ -156,26 +153,41 @@
   </div>
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex'
 import 'fabric'
+import { mapGetters, mapActions } from 'vuex'
 import deltaRender from '../../modules/delta-render'
-import Subject from '../../modules/Subjects'
-import Language from '../../modules/Languages'
 import Card from '../../components/reuseable/Card'
-import 'quill/dist/quill.snow.css'
-// var delayTimer
 
 export default {
   mounted: function () {
     this.$nextTick(function () {
+      if (this.newQuestionState.answers.length === 0) {
+        this.setNewQuestionAnswers(['0'])
+      }
       this.newQuestion.language = this.getUserLanguage
     })
   },
   components: {
-    Subject,
     Card
   },
   methods: {
+    updateMcCorrectAnswer (newCorrectAnswer) {
+      let answers = [newCorrectAnswer.toString()]
+      this.setNewQuestionAnswers(answers)
+    },
+    newQuestionDifficultyOnChange (newDifficulty) {
+      this.setNewQuestionMeta({difficulty: newDifficulty})
+    },
+    newQuestionSubjectOnChange (newSubject) {
+      this.setNewQuestionMeta({subject: newSubject})
+    },
+    handleDeltaChange (delta, source, index) {
+      if (source === 'question') {
+        this.setNewQuestionDelta(delta)
+      } else if (source === 'choice') {
+        this.setNewQuestionChoice({index, delta})
+      }
+    },
     renderDelta: function (delta) {
       return deltaRender(delta)
     },
@@ -218,41 +230,25 @@ export default {
     publishQuestion: function () {
       this.publishButton.disabled = true
       if (this.checkComplete()) {
-        // this.newQuestion.context = renderQuill(this.editorPreview.question.ops)
-        this.newQuestion.delta = JSON.stringify(this.editorPreview.question.ops)
-        // this.newQuestion.choices[0] = renderQuill(this.editorPreview.answer.mc[0].ops)
-        // this.newQuestion.choices[1] = renderQuill(this.editorPreview.answer.mc[1].ops)
-        // this.newQuestion.choices[2] = renderQuill(this.editorPreview.answer.mc[2].ops)
-        // this.newQuestion.choices[3] = renderQuill(this.editorPreview.answer.mc[3].ops)
-        this.newQuestion.choices[0] = JSON.stringify(this.editorPreview.answer.mc[0].ops)
-        this.newQuestion.choices[1] = JSON.stringify(this.editorPreview.answer.mc[1].ops)
-        this.newQuestion.choices[2] = JSON.stringify(this.editorPreview.answer.mc[2].ops)
-        this.newQuestion.choices[3] = JSON.stringify(this.editorPreview.answer.mc[3].ops)
+        var newQuestionData = JSON.parse(JSON.stringify(this.newQuestionState))
 
-        this.$http.post('/api/manage-question/questions', this.newQuestion).then(function (response) {
+        newQuestionData.delta = JSON.stringify(newQuestionData.delta.ops)
+        newQuestionData.choices = newQuestionData.choices.map((choice) => {
+          return JSON.stringify(choice.ops)
+        })
+
+        this.$http.post('/api/manage-question/questions', newQuestionData).then(function (response) {
           this.$showToast('發佈成功')
           this.publishButton.disabled = false
-          this.newQuestion.context = ''
-          this.newQuestion.choices = ['', '', '', '']
-          this.newQuestion.images = []
-          this.newQuestion.answer = {
-            mc: 1
-          }
+          this.resetNewQuestion()
           this.editorPreview = {
             image: {
               label: '',
               type: 'qiniu',
               data: '',
               show: false
-            },
-            question: { ops: [] },
-            answer: {
-              mc: [ { ops: [] }, { ops: [] }, { ops: [] }, { ops: [] } ]
             }
           }
-          this.$emit('clear-editor')
-          // this.renderQuestionPreview('clear')
-          // this.renderMcPreview('clear')
           this.questionInbox.questions.push(response.data)
         }, function (response) {
           this.$showToast('發佈失敗')
@@ -265,15 +261,18 @@ export default {
       }
     },
     checkComplete: function () {
-      let contentComplete = this.editorPreview.question.ops.length !== 0
-      let answerComplete = this.editorPreview.answer.mc[0].ops.length !== 0 && this.editorPreview.answer.mc[1].ops.length !== 0 && this.editorPreview.answer.mc[2].ops.length !== 0 && this.editorPreview.answer.mc[3].ops.length !== 0
+      const { delta, choices } = this.newQuestionState
+      let contentComplete = (delta.ops && delta.ops.length > 0)
+      let answerComplete = (choices.length === 4) && (choices[0].ops && choices[0].ops.length > 0) && (choices[1].ops && choices[1].ops.length > 0) && (choices[2].ops && choices[2].ops.length > 0) && (choices[3].ops && choices[3].ops.length > 0)
 
       return (contentComplete && answerComplete)
     },
     addTag: function () {
       if (this.tag.trim() !== '') {
-        if (this.newQuestion.tags.indexOf(this.tag) === -1) {
-          this.newQuestion.tags.push(this.tag)
+        if (this.newQuestionState.tags.indexOf(this.tag) === -1) {
+          var newTags = JSON.parse(JSON.stringify(this.newQuestionState.tags))
+          newTags.push(this.tag)
+          this.setNewQuestionMeta({tags: newTags})
           this.tag = ''
         } else {
           this.tag = ''
@@ -281,50 +280,10 @@ export default {
       }
     },
     removeTag: function (index) {
-      console.log('remove tag')
-      this.newQuestion.tags.splice(index, 1)
+      var newTags = JSON.parse(JSON.stringify(this.newQuestionState.tags))
+      newTags.splice(index, 1)
+      this.setNewQuestionMeta({tags: newTags})
     },
-    // renderQuestionPreview: function (option) {
-    // if (option === 'clear') {
-    //   window.document.querySelector('.question_preview').innerHTML = '<p></p>'
-    // } else {
-    //   window.document.querySelector('.question_preview').innerHTML = renderQuill(this.editorPreview.question.ops)
-    //   setTimeout(function renderQuestionPreview () {
-    //     window.renderMathInElement(
-    //       document.querySelector('.question_preview'),
-    //       {
-    //         delimiters: [
-    //           {left: '$$', right: '$$', display: false}
-    //         ]
-    //       }
-    //     )
-    //   }, 0)
-    // }
-    // },
-    // renderMcPreview: function (option) {
-    //   if (option === 'clear') {
-    //     window.document.getElementById('mc1').innerHTML = '<p></p>'
-    //     window.document.getElementById('mc2').innerHTML = '<p></p>'
-    //     window.document.getElementById('mc3').innerHTML = '<p></p>'
-    //     window.document.getElementById('mc4').innerHTML = '<p></p>'
-    //   } else {
-    //     window.document.getElementById('mc1').innerHTML = renderQuill(this.editorPreview.answer.mc[0].ops)
-    //     window.document.getElementById('mc2').innerHTML = renderQuill(this.editorPreview.answer.mc[1].ops)
-    //     window.document.getElementById('mc3').innerHTML = renderQuill(this.editorPreview.answer.mc[2].ops)
-    //     window.document.getElementById('mc4').innerHTML = renderQuill(this.editorPreview.answer.mc[3].ops)
-    //
-    //     setTimeout(function renderMcPreview () {
-    //       window.renderMathInElement(
-    //         document.getElementById('mc_preview'),
-    //         {
-    //           delimiters: [
-    //             {left: '$$', right: '$$', display: false}
-    //           ]
-    //         }
-    //       )
-    //     }, 0)
-    //   }
-    // },
     getLatestQuestionsCreatedByMe: function () {
       this.$http.get('/api/manage-question/mine').then(function (response) {
         document.getElementById('getLatestQuestionsButton').style.display = 'none'
@@ -348,11 +307,19 @@ export default {
           data: response.data.key,
           label: this.editorPreview.image.label
         }
-        this.newQuestion.images.push(newImage)
+        var newImages = JSON.parse(JSON.stringify(this.newQuestionState.images))
+        newImages.push(newImage)
+        this.setNewQuestionImages(newImages)
       })
     },
     ...mapActions([
-      'setUserLanguage'
+      'setUserLanguage',
+      'setNewQuestionMeta',
+      'setNewQuestionDelta',
+      'setNewQuestionChoice',
+      'setNewQuestionImages',
+      'setNewQuestionAnswers',
+      'resetNewQuestion'
     ])
   },
   data () {
@@ -364,11 +331,8 @@ export default {
         questions: [],
         show: false
       },
-      subjects: Subject.subjects,
-      languages: Language.languages,
       tag: '',
       newQuestion: {
-        language: '',
         type: 'mc',
         subject: 'math',
         tags: [],
@@ -395,14 +359,14 @@ export default {
       }
     }
   },
-  filters: {
-    'timestamp': function (input) {
-      return this.$options.filters.calendar(new Date(parseInt(input.toString().substring(0, 8), 16) * 1000), '')
-    }
-  },
-  computed: mapGetters({
-    getUserLanguage: 'getUserLanguage'
-  })
+  computed: {
+    ...mapGetters({
+      subjects: 'getSubjects',
+      languages: 'getLanguages',
+      getUserLanguage: 'getUserLanguage',
+      newQuestionState: 'newQuestionState'
+    })
+  }
 }
 </script>
 <style>

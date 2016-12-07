@@ -5,7 +5,7 @@
 
         <span class="qc-subject">{{qc.subject | subject}}</span>
         <span class="qc-difficulty" v-show="qc.aveDifficulty">難度: {{qc.aveDifficulty}}</span>
-        <p class="qc-createdby">作者：<i>{{qc.createdBy.local.name}}</i></p>
+        <p class="qc-createdby">作者：<i>{{qc.createdBy.name}}</i></p>
         <p class="qc-title">{{qc.name}}</p>
 
       </router-link>

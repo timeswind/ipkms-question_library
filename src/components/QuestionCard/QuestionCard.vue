@@ -59,6 +59,7 @@ export default {
   },
   methods: {
     renderDelta (delta) {
+      console.log(delta)
       return deltaRender(delta)
     },
     deleteQuestion (question_id) {

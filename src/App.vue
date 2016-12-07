@@ -6,7 +6,7 @@
     </mu-appbar>
     <mu-drawer :open="false" @close="toggle()">
       <div class="flex-column">
-        <router-link :to="{name:'start-create-question', activeClass:'active'}">創建題目</router-link>
+        <router-link :to="{name:'create-question', activeClass:'active'}">創建題目</router-link>
         <router-link :to="{name:'manage-question', activeClass:'active'}">管理題目</router-link>
         <router-link :to="{name:'manage-qcollection', activeClass:'active'}">管理題集</router-link>
         <router-link :to="{name:'quick-quiz', activeClass:'active'}">Quick Quiz</router-link>
@@ -123,20 +123,7 @@ export default {
     loginModalShow: 'getLoginModalState',
     loadingIndicatorShow: 'getLoadingIndicatorState',
     toastState: 'getToastState'
-  }),
-  watch: {
-    'toastState': function (val) {
-      console.log(val)
-      var self = this
-      this.toast.on = true
-      this.toast.message = val
-      if (this.toastTimer) clearTimeout(this.toastTimer)
-      this.toastTimer = setTimeout(() => {
-        self.toast.on = false
-        self.toast.message = ''
-      }, 2000)
-    }
-  }
+  })
 }
 function isDesktop () {
   return window.innerWidth > 993
@@ -183,7 +170,7 @@ body {
   padding-left: 256px;
   transition: all .45s cubic-bezier(.23,1,.32,1)
 }
-.example-content .nav-hide {
+.example-content.nav-hide {
   padding-left: 0;
 }
 .content-wrapper{

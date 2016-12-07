@@ -1,5 +1,9 @@
 import * as types from './mutation-types'
 
+export const setUserRole = function ({ commit, state }, role) {
+  commit(types.SET_USER_ROLE, role)
+}
+
 export const setUserLanguage = function ({ commit, state }, language) {
   commit(types.SET_USER_LANGUAGE, language)
 }

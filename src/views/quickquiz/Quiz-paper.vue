@@ -157,19 +157,13 @@
 </style>
 <template>
   <div id="quiz-paper">
-    <div class="flex-column" v-show="modalShow">
-      question analysis model
-    </div>
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mdl-button class="icon-left-button" raised primary @click.native="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mdl-button>
-        <mdl-button class="icon-left-button" raised accent v-show="!sampleMode || observeMode" @click.native="showAnswers()" style="margin-left:16px;">
-          <i class="material-icons" style="margin-right: 8px">visibility</i>
-          <span>顯示 / 隱藏答案</span>
-        </mdl-button>
+        <mu-raised-button label="返回" primary @click="$goBack()"/>
+        <mu-raised-button label="顯示 / 隱藏答案" primary v-show="quizPaperMode === 'paper' || quizPaperMode === 'observe'" @click="showAnswers()" style="margin-left:16px;" />
       </div>
 
-      <div v-if="observeMode" class="obserMode_flag flex-column flex-center">
+      <div v-if="quizPaperMode === 'observe'" class="obserMode_flag flex-column flex-center">
         <span style="font-size:18px;color:#FFFFFF" class="flex-row flex-center">
           <i class="material-icons">visibility</i>
           <span>&nbsp;觀察模式</span>
@@ -178,7 +172,7 @@
 
       <div class="second-wrapper">
         <div class="third-wrapper">
-          <card v-if="sampleMode && !quickquiz.finished">
+          <card v-if="quizPaperMode === 'sample' && !quickquiz.finished">
             <div slot="content" class="flex-column" style="padding:16px;text-align:center;font-size: 16px;color: #FF9800;">
               測驗尚未結束，未統計數據
             </div>
@@ -186,12 +180,12 @@
           <card>
             <div slot="content" class="flex-column" style="padding:16px" v-if="quickquiz.title">
               <span class="flex-row flex-center">
-                <span v-show="sampleMode" style="font-size:16px;padding: 4px 8px;margin-right:8px;background:#2196F3;color:#fff">答卷</span>
+                <span v-show="quizPaperMode === 'sample'" style="font-size:16px;padding: 4px 8px;margin-right:8px;background:#2196F3;color:#fff">答卷</span>
                 <span class="title">{{quickquiz.title}}</span>
                 <span class="time flex-row" style="margin-left:auto"><i class="material-icons">timer</i>{{quickquiz.time}}分鐘</span>
               </span>
               <span class="author">出卷人: {{quickquiz.createdBy.name}}</span>
-              <div v-if="sampleMode && quizsample.student" style=" border-top:1px solid #ddd;margin-top:16px;padding-top: 16px">
+              <div v-if="quizPaperMode === 'sample' && quizsample.student" style=" border-top:1px solid #ddd;margin-top:16px;padding-top: 16px">
                 <span class="flex-row flex-center">
                   <span class="flex-column" style="margin-right: 16px">
                     <span class="field-title">姓名</span>
@@ -201,7 +195,7 @@
                     <span class="field-title">學號</span>
                     <span class="field-content">{{quizsample.student.schoolId}}</span>
                   </span>
-                  <span class="flex-row" style="margin-left: auto" v-if="!observeMode">
+                  <span class="flex-row" style="margin-left: auto" v-if="quizPaperMode === 'sample'">
                     <span class="flex-column" style="margin-right: 32px">
                       <span class="field-title">正確題數</span>
                       <span class="field-content">{{getQuizScore()}}</span>
@@ -233,7 +227,7 @@
             </div>
           </card>
 
-          <card v-if="sampleMode && !observeMode && quizsample.finishTime">
+          <card v-if="quizPaperMode === 'sample' && quizsample.finishTime">
             <div slot="content" class="flex-row flex-wrap" style="padding:16px">
               <div class="flex-row question-checkbox flex-center" v-for="i in quickquiz.questions.length">
                 <span style="margin-right: 8px; font-weight:bold; font-size: 16px">{{i}}.</span>
@@ -244,9 +238,9 @@
                   <span v-if="checks[i - 1] === false" style="color:#F44336"><i class="material-icons">cancel</i></span>
                   <span style="margin-left: 8px; color: #009688;">{{accuracy[i - 1]}}</span>
                 </div>
-                <mdl-tooltip :for="'qchecks_' + (i - 1)" large class="flex-column">
+                <!-- <mdl-tooltip :for="'qchecks_' + (i - 1)" large class="flex-column">
                   題目被刪除或者缺少答案
-                </mdl-tooltip>
+                </mdl-tooltip> -->
               </div>
 
             </div>
@@ -256,9 +250,9 @@
               <div v-if="typeof question === 'object'" slot="content" class="flex-column">
                 <div class="overlay flex-column" :class="{'overlay_show': overlay.on === index}">
                   <div class="flex-row" style="justify-content: flex-end">
-                    <mdl-button icon @click.native="hideOverlay()">
+                    <mu-raised-button icon @click="hideOverlay()">
                       <i class="material-icons">close</i>
-                    </mdl-button>
+                    </mu-raised-button>
                   </div>
                   <div v-if="overlay.type === 0">
                     <div class="flex-row">
@@ -282,7 +276,7 @@
                     <span class="index-label">{{index + 1}}</span>
                     <div class="flex-column flex-center" v-if="quickquiz.finished">
                       <span class="accuracy" :id="'analysis_' + index" @click.native="showOverlay(index, 1)">{{accuracy[index]}}</span>
-                      <mdl-tooltip :for="'analysis_' + index" large class="flex-column">
+                      <!-- <mdl-tooltip :for="'analysis_' + index" large class="flex-column">
                         <div class="flex-row" style="margin-bottom:8px">
                           <span style="margin-right:4px">正確: {{quickquiz.analysis.questions[index][0]}}</span>
                           <span>錯誤: {{quickquiz.analysis.questions[index][1]}}</span>
@@ -291,7 +285,7 @@
                           <span style="margin-right:4px">留空: {{quickquiz.analysis.questions[index][2]}}</span>
                           <span>例外: {{quickquiz.analysis.questions[index][3]}}</span>
                         </div>
-                      </mdl-tooltip>
+                      </mdl-tooltip> -->
                     </div>
                   </div>
                   <div v-if="question.delta">
@@ -301,13 +295,13 @@
                     <div class="question_body" v-html="question.context"></div>
                   </div>
                   <div class="flex-row" style="margin-left:auto;flex-shrink: 0" v-if="quickquiz.finished">
-                    <mdl-button accent @click.native="showAnswer(index)" v-show="quickquiz.correctAnswers[index] !== null && !sampleMode">
+                    <mu-raised-button accent @click="showAnswer(index)" v-show="quickquiz.correctAnswers[index] !== null && quizPaperMode !== 'sample'">
                       <span v-if="typeof correctAnswers[index] === 'number'">隱藏答案</span>
                       <span v-else="correctAnswers[index] === undefined || correctAnswers[index] === null">顯示答案</span>
-                    </mdl-button>
-                    <mdl-button :id="'menu_' + index" icon>
+                    </mu-raised-button>
+                    <mu-raised-button :id="'menu_' + index" icon>
                       <i class="material-icons">more_vert</i>
-                    </mdl-button>
+                    </mu-raised-button>
                     <mdl-menu :for="'menu_' + index">
                       <mdl-menu-item @click.native="showOverlay(index, 1)">數據分析</mdl-menu-item>
                       <mdl-menu-item @click.native="showOverlay(index, 0)">學生表現</mdl-menu-item>
@@ -319,21 +313,21 @@
                 <div class="choices flex-column" style="width: 100%">
                   <div v-if="question.delta">
                     <div class="flex-row">
-                      <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose(index, 0), 'right': showRight(index, 0), 'wrong': showWrong(index, 0), 'blank': showBlank(index, 0), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 0)">
+                      <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose(index, 0), 'right': showRight(index, 0), 'wrong': showWrong(index, 0), 'blank': showBlank(index, 0), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 0)">
                         <span class="choice-label">A</span>
                         <div v-html="renderDelta(question.choices[0])"></div>
                       </div>
-                      <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose(index, 1), 'right': showRight(index, 1), 'wrong': showWrong(index, 1), 'blank': showBlank(index, 1), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 1)">
+                      <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose(index, 1), 'right': showRight(index, 1), 'wrong': showWrong(index, 1), 'blank': showBlank(index, 1), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 1)">
                         <span class="choice-label">B</span>
                         <div v-html="renderDelta(question.choices[1])"></div>
                       </div>
                     </div>
                     <div class="flex-row">
-                      <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose(index, 2), 'right': showRight(index, 2), 'wrong': showWrong(index, 2), 'blank': showBlank(index, 2), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 2)">
+                      <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose(index, 2), 'right': showRight(index, 2), 'wrong': showWrong(index, 2), 'blank': showBlank(index, 2), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 2)">
                         <span class="choice-label">C</span>
                         <div v-html="renderDelta(question.choices[2])"></div>
                       </div>
-                      <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose(index, 3), 'right': showRight(index, 3), 'wrong': showWrong(index, 3), 'blank': showBlank(index, 3), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 3)">
+                      <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose(index, 3), 'right': showRight(index, 3), 'wrong': showWrong(index, 3), 'blank': showBlank(index, 3), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 3)">
                         <span class="choice-label">D</span>
                         <div v-html="renderDelta(question.choices[3])"></div>
                       </div>
@@ -341,21 +335,21 @@
                   </div>
                   <div v-if="question.context">
                     <div class="flex-row">
-                      <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose(index, 0), 'right': showRight(index, 0), 'wrong': showWrong(index, 0), 'blank': showBlank(index, 0), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 0)">
+                      <div class="choice choice-a flex-50 flex-row" :class="{'choose': checkChoose(index, 0), 'right': showRight(index, 0), 'wrong': showWrong(index, 0), 'blank': showBlank(index, 0), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 0)">
                         <span class="choice-label">A</span>
                         <div v-html="question.choices[0]"></div>
                       </div>
-                      <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose(index, 1), 'right': showRight(index, 1), 'wrong': showWrong(index, 1), 'blank': showBlank(index, 1), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 1)">
+                      <div class="choice choice-b flex-50 flex-row" :class="{'choose': checkChoose(index, 1), 'right': showRight(index, 1), 'wrong': showWrong(index, 1), 'blank': showBlank(index, 1), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 1)">
                         <span class="choice-label">B</span>
                         <div v-html="question.choices[1]"></div>
                       </div>
                     </div>
                     <div class="flex-row">
-                      <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose(index, 2), 'right': showRight(index, 2), 'wrong': showWrong(index, 2), 'blank': showBlank(index, 2), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 2)">
+                      <div class="choice choice-c flex-50 flex-row" :class="{'choose': checkChoose(index, 2), 'right': showRight(index, 2), 'wrong': showWrong(index, 2), 'blank': showBlank(index, 2), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 2)">
                         <span class="choice-label">C</span>
                         <div v-html="question.choices[2]"></div>
                       </div>
-                      <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose(index, 3), 'right': showRight(index, 3), 'wrong': showWrong(index, 3), 'blank': showBlank(index, 3), 'chooseable': !sampleMode && !observeMode}" @click.native="answerOnChoose(index, 3)">
+                      <div class="choice choice-d flex-50 flex-row" :class="{'choose': checkChoose(index, 3), 'right': showRight(index, 3), 'wrong': showWrong(index, 3), 'blank': showBlank(index, 3), 'chooseable': quizPaperMode === 'paper'}" @click.native="answerOnChoose(index, 3)">
                         <span class="choice-label">D</span>
                         <div v-html="question.choices[3]"></div>
                       </div>
@@ -385,6 +379,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import _ from 'lodash'
 import Chart from 'chart.js'
 import Card from '../../components/reuseable/Card'
@@ -410,6 +405,29 @@ export default {
       }
     })
   },
+  data () {
+    return {
+      socket: {
+        joined: false,
+        authenticated: false
+      },
+      correctAnswers: [],
+      accuracy: [],
+      checks: [],
+      answers: [],
+      rights: [],
+      wrongs: [],
+      blanks: [],
+      SQPanalysis: [], // [question_id: {}]
+      validateURL: false,
+      quickquiz: {},
+      quizsample: {},
+      overlay: {
+        on: -1,
+        type: -1
+      }
+    }
+  },
   components: {
     Card
   },
@@ -430,16 +448,15 @@ export default {
       this.$http.get(apiURL).then(function (response) {
         this.quickquiz = response.data
         if (this.quickquiz.finished) {
+          this.setQuizPaperQuestions(this.quickquiz.questions)
           this.quickquiz.questions = this.analysisSingleQuestionPerformance(this.quickquiz.questions, this.getQuickquizStudents)
         }
-        if (this.$route.params.quizsample_id !== '0') {
+        if (this.$route.params.quizsample_id.toString() !== '0') {
           this.getSampleDetail(this.$route.params.quizsample_id)
         } else {
-          this.sampleMode = false
           this.correctAnswers = _.times(response.data.questions.length, _.constant(null))
           this.answers = _.times(response.data.questions.length, _.constant(null))
         }
-        this.renderQuestions()
         this.computeAccuracy()
       }, function (response) {
         console.log(response.data)
@@ -471,9 +488,9 @@ export default {
           this.quizsample = response.data
           this.showAnswers()
         } else {
-          console.log('enable observeMode')
+          console.log('set observe mode')
           this.quizsample = response.data
-          this.observeMode = true
+          this.setQuizPaperMode('observe')
           this.answers = _.times(self.quickquiz.questions.length, _.constant(null))
           this.listenForSocket()
           // this.showAnswers()
@@ -505,25 +522,13 @@ export default {
       })
       return questions
     },
-    renderQuestions: function () {
-      setTimeout(function () {
-        window.renderMathInElement(
-          document.getElementById('question-body'),
-          {
-            delimiters: [
-              {left: '$$', right: '$$', display: false}
-            ]
-          }
-        )
-      }, 0)
-    },
     answerOnChoose: function (index, pos) {
-      if (!this.sampleMode) {
+      if (this.quizPaperMode === 'paper') {
         if (this.answers[index] === pos) {
           this.answers[index] = null
-          this.$set(this.answers, index, null)
+          Vue.set(this.answers, index, null)
         } else {
-          this.$set(this.answers, index, pos)
+          Vue.set(this.answers, index, pos)
         }
       }
     },
@@ -562,9 +567,9 @@ export default {
     showAnswer: function (index) {
       if (this.quickquiz.correctAnswers[index] !== null) {
         if (this.correctAnswers[index] !== null && this.correctAnswers[index] !== undefined) {
-          this.$set(this.correctAnswers, index, null)
+          Vue.set(this.correctAnswers, index, null)
         } else {
-          this.$set(this.correctAnswers, index, this.quickquiz.correctAnswers[index])
+          Vue.set(this.correctAnswers, index, this.quickquiz.correctAnswers[index])
         }
       } else {
         window.alert('這題沒有設置答案')
@@ -587,24 +592,6 @@ export default {
       } else {
         this.correctAnswers = _.times(this.quickquiz.questions.length, _.constant(null))
       }
-
-      if (this.sampleMode) {
-        this.checkQuestions()
-      }
-    },
-    checkQuestions: function () {
-      var self = this
-      _(this.rights).forEach(function (value) {
-        self.checks[value] = true
-      })
-
-      _(this.wrongs).forEach(function (value) {
-        self.checks[value] = false
-      })
-
-      _(this.blanks).forEach(function (value) {
-        self.checks[value] = false
-      })
     },
     computeAccuracy: function () {
       if (this.quickquiz.finished) {
@@ -714,38 +701,17 @@ export default {
       })
     },
     ...mapActions({
+      setQuizPaperMode: 'setQuizPaperMode',
       setQuickquizID: 'setQuickquizID',
-      setQuickquizStudents: 'setQuickquizStudents'
+      setQuickquizStudents: 'setQuickquizStudents',
+      setQuizPaperQuestions: 'setQuizPaperQuestions'
     })
-  },
-  data () {
-    return {
-      socket: {
-        joined: false,
-        authenticated: false
-      },
-      correctAnswers: [],
-      accuracy: [],
-      checks: [],
-      answers: [],
-      rights: [],
-      wrongs: [],
-      blanks: [],
-      SQPanalysis: [], // [question_id: {}]
-      validateURL: false,
-      quickquiz: {},
-      quizsample: {},
-      sampleMode: true,
-      observeMode: false,
-      overlay: {
-        on: -1,
-        type: -1
-      }
-    }
   },
   computed: mapGetters({
     getQuickquizID: 'getQuickquizID',
-    getQuickquizStudents: 'getQuickquizStudents'
+    getQuickquizStudents: 'getQuickquizStudents',
+    quizPaperQuestions: 'quizPaperQuestions',
+    quizPaperMode: 'quizPaperMode'
   })
 }
 </script>
