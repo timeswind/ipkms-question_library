@@ -7,11 +7,8 @@
         <div class="q-difficulty">
           <i class="material-icons" v-for="i in question.difficulty">star_rate</i>
         </div>
-        <div v-if="question.delta">
-          <p class="q-context" v-html="renderDelta(question.delta)"></p>
-        </div>
-        <div v-if="question.context">
-          <p class="q-context" v-html="question.context"></p>
+        <div v-if="question.content">
+          <p class="q-context" v-html="renderDelta(question.content)"></p>
         </div>
         <span class="q-tag" v-for="tag in question.tags">{{tag}}</span>
       </router-link>

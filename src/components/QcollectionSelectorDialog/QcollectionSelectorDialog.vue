@@ -103,7 +103,7 @@
       </li>
     </ul>
     <div class="flex-column flex-center" style="margin:16px 0">
-      <mdl-button raised primary @click.native="nextPage()" :disabled="!loadMore">加載更多</mdl-button>
+      <mu-raised-button primary label="加載更多" @click="nextPage()" :disabled="!loadMore"/>
     </div>
     <mu-flat-button primary label="关闭" @click="closeModal()" slot="actions"/>
   </mu-dialog>
@@ -152,7 +152,7 @@ export default {
             qcollection_id: qcollection_id,
             question_id: this.questionId
           }
-          this.$http.post('/api/manage-qcollection/qcollection/question', data).then(function (response) {
+          this.$http.post('/api/manage-qcollection/question', data).then(function (response) {
             this.show = false
             this.$showToast('添加成功')
             this.closeModal()

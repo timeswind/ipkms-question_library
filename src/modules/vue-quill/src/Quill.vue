@@ -1,12 +1,11 @@
 <template>
-  <div>
+  <div :class="className">
     <button class="c-button" type="button" @click="mathBox.show = true" v-show="!mathBox.show" style="margin: 8px">公式輸入</button>
     <div v-show="mathBox.show" class="math-input flex-column">
       <span ref="mathquillbox"></span>
       <div class="flex-row flex-baseline">
         <button class="c-button" type="button" @click="insertMath(mathBox.enteredMath)">插入公式</button>
         <button class="c-button" type="button" @click="mathBox.show = false">關閉</button>
-        <!-- <a style="font-size: 12px" href="https://www.udacity.com/wiki/ma006/mathquill">快捷操作</a> -->
       </div>
     </div>
     <div class="ui attached segment" ref="quill" @click.prevent="focusEditor"></div>
@@ -20,6 +19,10 @@ import './Quill.css'
 export default {
   props: {
     content: '',
+    className: {
+      type: String,
+      default: ''
+    },
     placeholder: {
       type: String,
       default: ''
@@ -39,7 +42,7 @@ export default {
     toolbar: {
       type: Array,
       default () {
-        return ['bold', 'italic', 'underline', 'strike']
+        return ['italic', 'underline', {'list': 'ordered'}, {'list': 'bullet'}]
       }
     },
     keyup: {
@@ -74,7 +77,7 @@ export default {
         },
         placeholder: this.placeholder,
         readOnly: false,
-        theme: 'snow'
+        theme: 'bubble'
       }
       this.editor = new Quill(this.$refs.quill, options)
       this.editor.on('text-change', function (delta, oldDelta, source) {
@@ -154,10 +157,12 @@ export default {
 <style scoped>
 .c-button {
   cursor: pointer;
+  font-size: 13px;
   margin: 8px 8px 0 0;
-  padding: 4px 8px;
+  padding: 2px 4px;
   background-color: #fff;
   border: 1px solid #ddd;
+  border-radius: 3px;
 }
 .math-input {
   padding: 8px

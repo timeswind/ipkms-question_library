@@ -42,9 +42,6 @@
 import Subject from '../../modules/Subjects'
 
 export default {
-  components: {
-
-  },
   methods: {
     query: function () {
       if (this.search.name.trim() !== '' && this.search.subject.trim() !== '') {
@@ -53,7 +50,7 @@ export default {
           name: this.search.name,
           subject: this.search.subject
         }
-        this.$http.post('/api/manage-qcollection/query', data).then(function (response) {
+        this.$http.get(`/api/manage-qcollection/query?name=${this.search.name}&subject=${this.search.subject}`).then(function (response) {
           console.log(response.data)
           this.results = response.data
           this.search.buttonDisable = false
@@ -69,10 +66,7 @@ export default {
       search: {
         buttonDisable: false,
         name: '',
-        subject: '',
-        options: {
-
-        }
+        subject: ''
       },
       results: {},
       subjects: Subject.subjects

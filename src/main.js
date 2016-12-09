@@ -4,14 +4,14 @@ import VueRouter from 'vue-router'
 import VueResource from 'vue-resource'
 import VueQuill from './modules/vue-quill/vue-quill.js'
 import Filters from './filters/ipkms-filters.js'
-import VueMdl from 'vue-mdl'
+// import VueMdl from 'vue-mdl'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
 import 'muse-ui/dist/theme-carbon.css' // 使用 carbon 主题
 import store from './vuex/store'
 
-import 'material-design-lite/material.min.css'
-import 'material-design-lite/material.min.js'
+// import 'material-design-lite/material.min.css'
+// import 'material-design-lite/material.min.js'
 
 import App from './App'
 import auth from './auth'
@@ -21,7 +21,7 @@ Vue.use(VueRouter)
 Vue.use(VueResource)
 Vue.use(VueQuill)
 Vue.use(Filters)
-Vue.use(VueMdl)
+// Vue.use(VueMdl)
 
 var language = (window.navigator.userLanguage || window.navigator.language).substring(0, 2)
 if (language !== 'zh') {
@@ -30,6 +30,10 @@ if (language !== 'zh') {
   language = 'cht'
 }
 store.commit('SET_USER_LANGUAGE', language)
+
+if (window.sessionStorage.role) {
+  store.commit('SET_USER_ROLE', window.sessionStorage.role)
+}
 
 
 var hideToastTimer = null
@@ -57,7 +61,7 @@ Vue.prototype.$goBack = function () {
 Vue.http.interceptors.push((request, next) => {
   // modify request
   store.commit('SHOW_LOADING_INDICATOR')
-  if (request.url.charAt(0) === '/' && window.sessionStorage.token) {
+  if (request.url && request.url.charAt(0) === '/' && window.sessionStorage.token) {
     request.headers.set('x-access-token',window.sessionStorage.token)
   }
   // continue to next interceptor
@@ -71,31 +75,11 @@ Vue.http.interceptors.push((request, next) => {
   })
 })
 
-// Vue.http.interceptors.push({
-//
-//   request: function (request) {
-//     store.commit('SHOW_LOADING_INDICATOR')
-//     if (request.url.charAt(0) === '/' && window.sessionStorage.token) {
-//       request.headers['x-access-token'] = window.sessionStorage.token
-//     }
-//     return request
-//   },
-//   response: function (response) {
-//     clearTimeout(stopReceivingResponseTimer)
-//     stopReceivingResponseTimer = setTimeout(hideLoginIncicator, 1500)
-//     if (response.status === 401 && response.data.authorize === false) {
-//       store.commit('SHOW_LOGIN_MODAL')
-//     }
-//
-//     return response
-//   }
-//
-// })
 const EntryView = resolve => require(['./views/Entry.vue'], resolve)
 const LoginView = resolve => require(['./views/Login.vue'], resolve)
 const CreateQuestionView = resolve => require(['./views/create-question/Create-mc-question.vue'], resolve)
-const AdminPanelView = resolve => require(['./views/AdminPanel/AdminPanel.vue'], resolve)
-const AdminPanelUserDetailView = resolve => require(['./views/AdminPanel/UserDetail.vue'], resolve)
+const AdminPanelView = r => require.ensure([], () => r(require('./views/AdminPanel/AdminPanel.vue')), 'admin-panel')
+const AdminPanelUserDetailView = r => require.ensure([], () => r(require('./views/AdminPanel/UserDetail.vue')), 'admin-panel')
 
 var router = new VueRouter({
   routes: [
@@ -130,7 +114,6 @@ function requireAuthAdmin (to, from, next) {
 }
 
 function requireAuthTeacher (to, from, next) {
-  console.log(auth.loggedIn())
   if (auth.loggedIn() && auth.getRole() === 'teacher') {
     next()
   } else {

@@ -1,11 +1,12 @@
 // vuex/modules/qcollection-selector.js
+import Vue from 'vue'
 import {
   RESER_NEW_QUESTION,
   SET_NEW_QUESTION_META,
-  SET_NEW_QUESTION_DELTA,
+  SET_NEW_QUESTION_CONTENT,
   SET_NEW_QUESTION_IMAGES,
   SET_NEW_QUESTION_CHOICE,
-  SET_NEW_QUESTION_ANSWERS
+  REMOVE_NEW_QUESTION_CHOICE
 } from '../mutation-types'
 
 // initial state
@@ -14,9 +15,8 @@ const state = {
   subject: 'math',
   tags: [],
   difficulty: 1,
-  delta: '',
+  content: '',
   choices: [],
-  answers: [],
   images: []
 }
 
@@ -33,24 +33,26 @@ const actions = {
   setNewQuestionMeta ({ commit }, payload) {
     commit(SET_NEW_QUESTION_META, payload)
   },
-  setNewQuestionDelta ({ commit }, delta) {
-    commit(SET_NEW_QUESTION_DELTA, delta)
+  setNewQuestionContent ({ commit }, content) {
+    commit(SET_NEW_QUESTION_CONTENT, content)
   },
   setNewQuestionImages ({ commit }, images) {
     commit(SET_NEW_QUESTION_IMAGES, images)
   },
   setNewQuestionChoice ({ commit }, payload) {
-    commit(SET_NEW_QUESTION_CHOICE, payload)
+    if ('index' in payload) {
+      commit(SET_NEW_QUESTION_CHOICE, payload)
+    }
   },
-  setNewQuestionAnswers ({ commit }, answers) {
-    commit(SET_NEW_QUESTION_ANSWERS, answers)
+  removeNewQuestionChoice ({ commit }, index) {
+    commit(REMOVE_NEW_QUESTION_CHOICE, index)
   }
 }
 
 // mutations
 const mutations = {
   [RESER_NEW_QUESTION] (state) {
-    state.delta = ''
+    state.content = ''
     state.choices = []
     state.answers = []
     state.images = []
@@ -61,16 +63,37 @@ const mutations = {
     state.tags = payload.tags || state.tags
     state.difficulty = payload.difficulty || state.difficulty
   },
-  [SET_NEW_QUESTION_DELTA] (state, delta) {
-    state.delta = delta || ''
+  [SET_NEW_QUESTION_CONTENT] (state, content) {
+    state.content = content || ''
   },
   [SET_NEW_QUESTION_CHOICE] (state, payload) {
-    if ('index' in payload) {
-      state.choices[payload.index] = payload.delta || ''
+    var oldChoice
+    if (state.choices[payload.index]) {
+      oldChoice = JSON.parse(JSON.stringify(state.choices[payload.index]))
+    } else {
+      oldChoice = {
+        content: '',
+        clue: '',
+        correct: false
+      }
+    }
+    if ('correct' in payload) {
+      Vue.set(state.choices, payload.index, {
+        content: payload.content || oldChoice.content || '',
+        clue: payload.clue || oldChoice.clue || '',
+        correct: payload.correct
+      })
+    } else {
+      Vue.set(state.choices, payload.index, {
+        content: payload.content || oldChoice.content || '',
+        clue: payload.clue || oldChoice.clue || '',
+        correct: oldChoice.correct
+      })
     }
   },
-  [SET_NEW_QUESTION_ANSWERS] (state, answers) {
-    state.answers = answers || []
+  [REMOVE_NEW_QUESTION_CHOICE] (state, index) {
+    state.choices.splice(index, 1)
+    // Vue.delete(state.choices, index)
   },
   [SET_NEW_QUESTION_IMAGES] (state, images) {
     state.images = images || []

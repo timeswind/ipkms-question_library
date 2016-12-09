@@ -56,16 +56,22 @@
         <mu-text-field hintText="題集名字" v-model="newQcollection.name"></mu-text-field>
       </div>
       <div class="block">
-        科目：
-        <select v-model="newQcollection.subject">
-          <option v-for="subject in subjects" v-bind:value="subject.id">
-            {{ subject.name }}
-          </option>
-        </select>
+        <mu-select-field v-model="newQcollection.subject" label="科目">
+          <mu-menu-item v-for="subject in subjects" :value="subject.id" :title="subject.name"/>
+        </mu-select-field>
       </div>
       <mu-text-field hintText="描述" multiLine :rows="3" :rowsMax="6" v-model="newQcollection.description"></mu-text-field>
-      <div class="block" style="padding:20px 0">
-        <mu-checkbox label="公開" v-model="newQcollection.public"/>
+      <div class="block" style="padding: 0">
+        <mu-checkbox label="開放編輯" v-model="newQcollection.openForEdit"/>
+      </div>
+      <div class="block" style="padding: 0">
+        <mu-checkbox label="對教師公開" v-model="newQcollection.openInSchool"/>
+      </div>
+      <div class="block" style="padding: 0">
+        <mu-checkbox label="對學生公開" v-model="newQcollection.openToStudent"/>
+      </div>
+      <div class="block" style="padding: 0">
+        <mu-checkbox label="校外公開" v-model="newQcollection.openOutSchool"/>
       </div>
       <mu-flat-button slot="actions" label="取消" @click="closeNewCollectionDialog"/>
       <mu-raised-button primary slot="actions" label="創建" @click="createNewQcollection"/>
@@ -91,13 +97,15 @@ export default {
         name: '',
         subject: 'math',
         description: '',
-        public: true
+        openForEdit: true,
+        openInSchool: true,
+        openToStudent: false,
+        openOutSchool: false
       },
       search: {
         buttonDisable: false,
         name: '',
-        subject: '',
-        options: {}
+        subject: ''
       }
     }
   },
@@ -140,24 +148,9 @@ export default {
         console.log(response)
       })
     },
-    query () {
-      if (this.search.name.trim() !== '' && this.search.subject.trim() !== '') {
-        this.search.buttonDisable = true
-        let data = {
-          name: this.search.name,
-          subject: this.search.subject
-        }
-        this.$http.post('/api/manage-qcollection/query', data).then(function (response) {
-          this.qcollections = response.data
-          this.search.buttonDisable = false
-        }, function (response) {
-          this.search.buttonDisable = false
-        })
-      }
-    },
     createNewQcollection () {
       if (this.newQcollection.name) {
-        this.$http.post('/api/manage-qcollection/qcollection', this.newQcollection).then(function (response) {
+        this.$http.post('/api/manage-qcollection/qcollections', this.newQcollection).then(function (response) {
           this.newQcollectionDialogOpen = false
           this.getMyQcollections()
           this.$showToast('創建成功')
@@ -179,6 +172,19 @@ export default {
         this.qcollections = []
       }
       this.activeTab = val
+    },
+    query () {
+      if (this.search.name.trim() !== '' && this.search.subject.trim() !== '') {
+        this.search.buttonDisable = true
+        this.$http.get(`/api/manage-qcollection/query?name=${this.search.name}&subject=${this.search.subject}`).then(function (response) {
+          console.log(response.data)
+          this.qcollections = response.data
+          this.search.buttonDisable = false
+        }, function (response) {
+          console.log(response.data)
+          this.search.buttonDisable = false
+        })
+      }
     }
   }
 }

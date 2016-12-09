@@ -37,14 +37,17 @@
           <div class="flex-column flex-50">
             <mu-text-field hintText="小測名字" v-model="newQuickquiz.title"></mu-text-field>
             <mu-text-field hintText="時長(分鐘)" v-model="newQuickquiz.time" type="number"></mu-text-field>
+            <mu-select-field v-model="queryQcollection.subject" label="科目">
+              <mu-menu-item v-for="subject in subjects" :value="subject.id" :title="subject.name"/>
+            </mu-select-field>
             <div class="input-button-group">
               <i class="material-icons" style="margin-right:8px;color:#aaa">search</i>
               <mu-text-field hintText="搜索測驗題集" v-model="queryQcollection.keyword"></mu-text-field>
-              <mu-raised-button label="搜索" primary @click.native="queryQcollectionsByName()" :disabled="!queryQcollection.button"/>
+              <mu-raised-button label="搜索" primary @click.native="queryQcollectionsByName()" :disabled="!queryQcollection.button" style="margin: 0 0 8px 16px"/>
             </div>
             <div class="flex-row" style="margin-bottom:16px">
               <mu-radio label="我的題集" name="qcollectiontype" nativeValue="mine" v-model="queryQcollection.type"/>
-              <mu-radio label="公開題集" name="qcollectiontype" nativeValue="all" v-model="queryQcollection.type"/>
+              <mu-radio label="公開題集" name="qcollectiontype" nativeValue="all" v-model="queryQcollection.type" style="margin-left: 16px"/>
             </div>
 
           </div>
@@ -67,7 +70,7 @@
               <mu-circular-progress v-show="queryQcollection.loading" :size="40"/>
             </div>
             <div class="flex-column" v-show="!queryQcollection.fail">
-              <div class="flex-column qcollection-mini-card" v-for="qcollection in queryQcollection.results" @click="newQuickquiz.qcollection = qcollection">
+              <div class="flex-column qcollection-mini-card" v-for="(qcollection, index) in queryQcollection.results" @click="handleQcollectionSelect(index)">
                 <span class="name">{{qcollection.name}}</span>
                 <div class="flex-row" style="align-items: baseline">
                   <span class="subject">{{qcollection.subject | subject}}</span>
@@ -111,6 +114,7 @@ export default {
       },
       queryQcollection: {
         type: 'mine',
+        subject: 'math',
         keyword: '',
         loading: false,
         button: true,
@@ -122,6 +126,11 @@ export default {
     }
   },
   methods: {
+    handleQcollectionSelect (index) {
+      let qcollection = this.queryQcollection.results[index]
+      this.newQuickquiz.qcollection = qcollection
+      this.queryQcollection.subject = qcollection.subject
+    },
     getMyQuickquizzes () {
       this.$http.get('/api/manage-quickquiz/teacher/quickquizs').then(function (response) {
         if (response.data.length > 0) {
@@ -156,6 +165,7 @@ export default {
       if (this.queryQcollection.keyword.trim() !== '') {
         this.queryQcollection.loading = true
         let data = {
+          subject: this.queryQcollection.subject,
           type: this.queryQcollection.type,
           name: this.queryQcollection.keyword
         }
@@ -188,30 +198,33 @@ export default {
         let data = {
           title: this.newQuickquiz.title,
           time: this.newQuickquiz.time,
+          subject: this.queryQcollection.subject,
           qcollection_id: this.newQuickquiz.qcollection._id
         }
 
         this.$http.post('/api/manage-quickquiz/teacher/quickquizs', data).then(function (response) {
-          let quickquiz_id = response.data
-          this.newQuickquiz.title = ''
-          this.newQuickquiz.time = null
-          this.newQuickquiz.qcollection = {}
-          this.queryQcollection.type = 'mine'
-          this.queryQcollection.results = []
-          this.queryQcollection.keyword = ''
-          this.queryQcollection.button = true
-          this.queryQcollection.fail = false
+          if (response.data.success && response.data.id) {
+            let quickquiz_id = response.data.id
+            this.newQuickquiz.title = ''
+            this.newQuickquiz.time = null
+            this.newQuickquiz.qcollection = {}
+            this.queryQcollection.type = 'mine'
+            this.queryQcollection.results = []
+            this.queryQcollection.keyword = ''
+            this.queryQcollection.button = true
+            this.queryQcollection.fail = false
 
-          let qrcodeData = 'quickquiz' + '|' + quickquiz_id
+            let qrcodeData = 'quickquiz' + '|' + quickquiz_id
 
-          var qrcodedraw = new qrcode.QRCodeDraw()
-          qrcodedraw.draw(document.getElementById('qrcode-canvas-2'), qrcodeData, {scale: 10}, function (error, canvas) {
-            if (error) {
-              return console.log('Error =( ', error)
-            } else {
-              self.qrcode = true
-            }
-          })
+            var qrcodedraw = new qrcode.QRCodeDraw()
+            qrcodedraw.draw(document.getElementById('qrcode-canvas-2'), qrcodeData, {scale: 10}, function (error, canvas) {
+              if (error) {
+                return console.log('Error =( ', error)
+              } else {
+                self.qrcode = true
+              }
+            })
+          }
         }, function (response) {
           this.submitButton = true
           console.log(response.data)
@@ -222,6 +235,9 @@ export default {
   computed: {
     formCompletion: function () {
       return (this.newQuickquiz.title.trim() !== '' && this.newQuickquiz.time > 0 && this.newQuickquiz.qcollection._id)
+    },
+    subjects: function () {
+      return this.$store.getters.getSubjects
     }
   }
 }

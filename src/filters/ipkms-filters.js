@@ -20,6 +20,14 @@ module.exports = {
       }
     })
 
+    Vue.filter('bTw', function (boolean) {
+      if (boolean) {
+        return '是'
+      } else {
+        return '否'
+      }
+    })
+
     Vue.filter('finished', function (boolean) {
       if (boolean === false) {
         return '未收卷'

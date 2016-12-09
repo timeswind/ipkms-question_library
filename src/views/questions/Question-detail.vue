@@ -1,11 +1,11 @@
 <template>
   <div id="question-detail">
-    <p style="margin: 8px 0;color: #9E9E9E; text-align:center">最後更新于 {{ details.updated_at | calendar}}</p>
+    <p style="margin: 8px 0;color: #9E9E9E; text-align:center">最後更新于 {{ question.updated_at | calendar}}</p>
     <div class="flex-column light-card">
       <div class="flex-row flex-center" style="padding: 16px 16px 0 16px">
         <div class="flex-column flex-50">
           <span class="field-title">科目 Subject</span>
-          <select v-model="details.subject">
+          <select v-model="question.subject">
             <option v-for="subject in subjects" v-bind:value="subject.id">
               {{ subject.name }}
             </option>
@@ -14,15 +14,15 @@
         <div class="difficulty-box flex-column flex-50">
           <span class="field-title">難度 Difficulty</span>
           <span class="flex-row flex-baseline" style="margin-top: 8px">
-            <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, (n - 1))" :class="{'difficulty-heighlight': details.difficulty > (n - 1)}">star_rate</i>
+            <i class="material-icons" v-for="n in 5" @click="modify('difficulty', null, (n - 1))" :class="{'difficulty-heighlight': question.difficulty > (n - 1)}">star_rate</i>
           </span>
         </div>
       </div>
       <div class="flex-column" style="padding: 16px 16px 16px 16px">
         <span class="field-title">標籤 Tags</span>
         <div class="flex-row flex-center flex-wrap" style="margin-top:8px">
-          <div class="q-d-tag" v-for="(tag, index) in details.tags" @click="modify('tag', 'remove', index)">{{tag}}</div>
-          <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="modify('tag', 'add', edit.tag)" v-model="edit.tag" style="width:200px"/>
+          <div class="q-d-tag" v-for="(tag, index) in question.tags" @click="modify('tag', 'remove', index)">{{tag}}</div>
+          <mu-text-field hintText="輸入標籤.回車" @keyup.enter.native="modify('tag', 'add', tag)" v-model="tag" style="width:200px"/>
         </div>
       </div>
     </div>
@@ -31,55 +31,58 @@
       <mu-raised-button label="修改" primary raised @click="updateInfo()" :disabled="!edit.change" />
     </div>
 
-    <div v-if="details.type === 'mc'" class="light-card default-pending">
+    <div v-if="question.type === 'mc'" class="light-card default-pending">
       <div class="q-d-info-wrapper">
-        <span class="q-d-subject">{{details.subject | subject}}</span>
+        <span class="q-d-subject">{{question.subject | subject}}</span>
         <div class="q-d-difficulty">
-          <i class="material-icons" v-for="i in getNumberArray(details.difficulty)">star_rate</i>
+          <i class="material-icons" v-for="i in getNumberArray(question.difficulty)">star_rate</i>
         </div>
       </div>
-      <div v-if="details.delta">
-        <div v-html="renderDelta(details.delta)"></div>
+      <div v-if="question.content">
+        <div v-html="renderDelta(question.content)"></div>
       </div>
-      <div v-if="details.context">
-        <div v-html="details.context"></div>
-      </div>
-      <div v-if="details.images">
-        <div v-for="image in details.images">
+      <div v-if="question.images">
+        <div v-for="image in question.images">
           <div v-if="image.type === 'qiniu'">
             <img :src="'https://ofb183q1d.qnssl.com/' + image.data + '?imageMogr2/format/jpg/'"/>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="details.type === 'mc'" class="q-d-mc-wrapper flex-column">
-      <div v-if="details.delta">
+    <div v-if="question.type === 'mc'" class="q-d-mc-wrapper flex-column">
+      <div v-if="question.content">
         <mu-row>
-          <mu-col width="100" tablet="50" desktop="50" v-for="(choice, index) in details.choices">
-            <div :class="{'hightlight-answer': details.answers.indexOf(index.toString()) > -1, 'light-card default-pending': true}" @click="modify('rightAnswer', 'mc', index)">
-              <span class="mc-choice-label">{{alphabet[index]}}</span>
-              <div v-html="renderDelta(details.choices[index])"></div>
+          <mu-col width="100" tablet="100" desktop="100" v-for="(choice, index) in question.choices">
+            <div :class="{'light-card default-pending flex-row': true}" @click="modify('rightAnswer', 'mc', index)">
+              <mu-checkbox name="correctList" class="mc-choice-label" :value="choice.correct" :disabled="!edit.on" @input="(bool) => { handleCheckboxInput(index, bool) }"/>
+              <div v-html="renderDelta(choice.content)"></div>
             </div>
           </mu-col>
         </mu-row>
       </div>
-    </div>
-    <div class="light-card default-pending">
-      {{details.statistic}}
     </div>
   </div>
 </div>
 </template>
 
 <script>
-import Subject from '../../modules/Subjects'
+import { mapGetters } from 'vuex'
 import deltaRender from '../../modules/delta-render.js'
-
 export default {
+  data () {
+    return {
+      question: {},
+      tempQuestion: {},
+      edit: {
+        on: false,
+        change: false
+      },
+      tag: ''
+    }
+  },
   mounted: function () {
     this.$nextTick(function () {
       if (this.$route.params.question_id) {
-        this.validateURL = true
         this.getQuestionDetail(this.$route.params.question_id)
       } else {
         this.answer.buttonDisable = true
@@ -87,67 +90,54 @@ export default {
     })
   },
   methods: {
+    handleCheckboxInput (index, bool) {
+      this.question.choices[index].correct = bool
+      this.edit.change = true
+    },
     renderDelta: function (delta) {
       return deltaRender(delta)
     },
     getQuestionDetail: function (question_id) {
       let apiURL = '/api/manage-question/question/' + question_id
       this.$http.get(apiURL).then(function (response) {
-        this.details = response.data
-        if (response.data.delta && response.data.delta !== '') {
-
-        } else {
-          this.renderQuestions()
-        }
-        this.tempDetails = JSON.parse(JSON.stringify(response.data))
-        if (this.details.createdBy && this.details.createdBy === 'self') {
+        this.question = response.data
+        this.tempQuestion = JSON.parse(JSON.stringify(response.data))
+        if (this.question.createdBy && this.question.createdBy === 'self') {
           this.edit.on = true
         }
       }, function (response) {
         console.log(response)
       })
     },
-    renderQuestions: function () {
-      setTimeout(function renderQuestions () {
-        window.renderMathInElement(
-          document.getElementById('question-body'),
-          {
-            delimiters: [
-              {left: '$$', right: '$$', display: false}
-            ]
-          }
-        )
-      }, 0)
-    },
     modify: function (type, option, data) {
-      if (this.details.createdBy === 'self') {
+      if (this.question.createdBy === 'self') {
         if (type === 'difficulty') {
           let newDifficulty = data + 1
-          if (this.details.difficulty !== newDifficulty) {
-            this.details.difficulty = data + 1
+          if (this.question.difficulty !== newDifficulty) {
+            this.question.difficulty = data + 1
             this.edit.change = true
           }
         } else if (type === 'tag') {
           if (option === 'add' && data) {
             if (data.trim() !== '') {
-              if (this.details.tags.indexOf(data) === -1) {
+              if (this.question.tags.indexOf(data) === -1) {
                 this.edit.change = true
-                this.details.tags.push(data)
-                this.edit.tag = ''
+                this.question.tags.push(data)
+                this.tag = ''
               } else {
-                this.edit.tag = ''
+                this.tag = ''
               }
             }
           } else if (option === 'remove' && data >= 0) {
             this.edit.change = true
-            this.details.tags.splice(data, 1)
+            this.question.tags.splice(data, 1)
           }
         } else if (type === 'rightAnswer') {
           let answerType = option
           if (answerType === 'mc') {
             let newMcRightChoiceIndex = [data.toString()]
-            if (this.details.answers !== newMcRightChoiceIndex) {
-              this.details.answers = newMcRightChoiceIndex
+            if (this.question.answers !== newMcRightChoiceIndex) {
+              this.question.answers = newMcRightChoiceIndex
               this.edit.change = true
             }
           }
@@ -155,51 +145,42 @@ export default {
       }
     },
     updateInfo: function () {
-      if (this.details.subject !== this.tempDetails.subject || this.details.difficulty !== this.tempDetails.difficulty || JSON.stringify(this.details.tags) !== JSON.stringify(this.tempDetails.tags) || this.details.answers !== this.tempDetails.answers) {
+      if (this.question.subject !== this.tempQuestion.subject || this.question.difficulty !== this.tempQuestion.difficulty || JSON.stringify(this.question.tags) !== JSON.stringify(this.tempQuestion.tags) || this.question.choices !== this.tempQuestion.choices) {
         let data = {
-          subject: this.details.subject,
-          difficulty: this.details.difficulty,
-          tags: this.details.tags,
-          answers: this.details.answers
+          subject: this.question.subject,
+          difficulty: this.question.difficulty,
+          tags: this.question.tags,
+          choices: this.question.choices
         }
         let apiURL = '/api/manage-question/question/' + this.$route.params.question_id
         this.$http.put(apiURL, data).then(function (response) {
           this.$showToast('修改成功')
           this.edit.change = false
-          this.details.updated_at = new Date()
-          this.tempDetails = JSON.parse(JSON.stringify(this.details))
+          this.question.updated_at = new Date()
+          this.tempQuestion = JSON.parse(JSON.stringify(this.question))
         }, function (response) {
-          console.log(response)
+          if (response.data.message) {
+            this.$showToast(response.data.message)
+          } else {
+            this.$showToast('操作失敗')
+          }
         })
       }
     },
     cancelUpdate: function () {
       this.sheetshow = false
-      this.details = JSON.parse(JSON.stringify(this.tempDetails))
+      this.question = JSON.parse(JSON.stringify(this.tempQuestion))
       this.edit.change = false
     },
     getNumberArray: function (num) {
       return new Array(num)
     }
   },
-  data () {
-    return {
-      validateURL: false,
-      choice: Number,
-      details: {},
-      tempDetails: {},
-      subjects: Subject.subjects,
-      edit: {
-        on: false,
-        change: false,
-        tag: ''
-      }
-    }
-  },
   computed: {
-    alphabet () {
-      return this.$store.getters.getAlphabet
-    }
+    ...mapGetters({
+      alphabet: 'getAlphabet',
+      subjects: 'getSubjects'
+    })
   }
 }
 </script>

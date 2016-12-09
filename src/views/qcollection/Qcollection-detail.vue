@@ -4,13 +4,13 @@
       <div slot="content" style="padding: 16px" class="flex-column">
         <div class="flex-row flex-center" style="padding-bottom: 8px; border-bottom: 1px solid #eee">
           <span style="font-size: 20px">題集信息</span>
-          <div v-if="!editMode">
-            <mdl-button primary style="margin-left: 8px" @click.native="editMode = true">修改</mdl-button>
-            <mdl-button accent style="margin-left: 8px" @click.native="deleteCollection()">刪除題集</mdl-button>
+          <div v-if="!editMode" style="margin-left: auto">
+            <mu-flat-button label="修改" primary style="margin-left: 16px; color: #3F51B5" @click="editMode = true" />
+            <mu-flat-button label="刪除題集" style="margin-left: 8px; color: #f44336" @click="deleteCollection()" />
           </div>
-          <div v-else>
-            <mdl-button accent style="margin-left: 8px" @click.native="updateQcollectionInfo()">提交</mdl-button>
-            <mdl-button primary style="margin-left: 8px" @click.native="editMode = false">取消</mdl-button>
+          <div v-else style="margin-left: auto">
+            <mu-raised-button primary label="提交" style="margin-left: 16px" @click="updateQcollectionInfo()" />
+            <mu-flat-button label="取消" primary style="margin-left: 8px" @click="editMode = false" />
           </div>
         </div>
         <div class="flex-column" v-if="!editMode" style="margin-top: 16px">
@@ -26,17 +26,33 @@
           </div>
           <div class="flex-row" style="margin-top: 16px">
             <div class="flex-column flex-50">
-              <span class="field-title">是否公開</span>
-              <span class="field-content">{{qcinfo.public | bTp}}</span>
+              <span class="field-title">開放編輯</span>
+              <span class="field-content">{{qcinfo.openForEdit | bTw}}</span>
             </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">學生可見</span>
+              <span class="field-content">{{qcinfo.openToStudent | bTw}}</span>
+            </div>
+          </div>
+          <div class="flex-row" style="margin-top: 16px">
+            <div class="flex-column flex-50">
+              <span class="field-title">校内公開</span>
+              <span class="field-content">{{qcinfo.openInSchool | bTw}}</span>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">校外公開</span>
+              <span class="field-content">{{qcinfo.openOutSchool | bTw}}</span>
+            </div>
+          </div>
+          <div class="flex-row" style="margin-top: 16px">
             <div class="flex-column flex-50">
               <span class="field-title">平均難度</span>
               <span class="field-content">{{averageDifficulty}}</span>
             </div>
-          </div>
-          <div class="flex-column" style="margin-top: 16px">
-            <span class="field-title">描述</span>
-            <span class="field-content">{{qcinfo.description}}</span>
+            <div class="flex-column flex-50">
+              <span class="field-title">描述</span>
+              <span class="field-content">{{qcinfo.description}}</span>
+            </div>
           </div>
         </div>
 
@@ -47,25 +63,37 @@
               <mu-text-field v-model="qcinfo.name"/>
             </div>
             <div class="flex-column flex-50">
-              <span class="field-title">科目</span>
-              <select v-model="qcinfo.subject">
-                <option v-for="subject in subjects" v-bind:value="subject.id">
-                  {{ subject.name }}
-                </option>
-              </select>
+              <mu-select-field v-model="qcinfo.subject" label="科目">
+                <mu-menu-item v-for="subject in subjects" :value="subject.id" :title="subject.name"/>
+              </mu-select-field>
             </div>
           </div>
-          <div class="flex-row" style="margin-top: -16px">
+          <div class="flex-row">
+            <div class="flex-column flex-50">
+              <span class="field-title">開放編輯</span>
+              <mu-switch v-model="qcinfo.openForEdit"/>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">學生可見</span>
+              <mu-switch v-model="qcinfo.openToStudent"/>
+            </div>
+          </div>
+          <div class="flex-row">
+            <div class="flex-column flex-50">
+              <span class="field-title">校內公開</span>
+              <mu-switch v-model="qcinfo.openInSchool"/>
+            </div>
+            <div class="flex-column flex-50">
+              <span class="field-title">校外公開</span>
+              <mu-switch v-model="qcinfo.openOutSchool"/>
+            </div>
+          </div>
+          <div class="flex-row" style="margin-top: 8px">
             <div class="flex-column flex-50">
               <span class="field-title">描述</span>
-              <mu-text-field v-model="qcinfo.description" multiline :rows="3" :rowsMax="6"/>
-            </div>
-            <div class="flex-column flex-50">
-              <span class="field-title">公開</span>
-              <mu-switch v-model="qcinfo.public"/>
+              <mu-text-field v-model="qcinfo.description" multiLine :rows="3" :rowsMax="6"/>
             </div>
           </div>
-
         </div>
 
       </div>
@@ -88,9 +116,6 @@
 
 <script>
 import _ from 'lodash'
-import qcollectionSelectorModal from '../../components/reuseable/Select-qcollection.vue'
-import sheetPannel from '../../components/reuseable/Sheet-pannel.vue'
-import Subject from '../../modules/Subjects'
 import Card from '../../components/reuseable/Card.vue'
 import QuestionCard from '../../components/QuestionCard/QuestionCard'
 import deltaRender from '../../modules/delta-render.js'
@@ -102,9 +127,6 @@ export default {
     })
   },
   components: {
-    Subject,
-    qcollectionSelectorModal,
-    sheetPannel,
     Card,
     'question-card': QuestionCard
   },
@@ -115,21 +137,19 @@ export default {
     deleteCollection: function () {
       let comfirmDelete = window.confirm('你確定要刪除這個題集？')
       if (comfirmDelete) {
-        let data = {
-          qcollection_id: this.qcinfo._id
-        }
-        var apiURL = '/api/manage-qcollection/qcollection'
-        this.$http.delete(apiURL, data).then(function (response) {
+        var apiURL = '/api/manage-qcollection/qcollection/' + this.qcinfo._id
+        this.$http.delete(apiURL).then(function (response) {
           this.$showToast('操作成功')
-          this.$router.push({ name: 'my-qcollection' })
+          this.$router.push({ name: 'manage-qcollection' })
         }, function (response) {
+          this.$showToast('fail to delete this qcollection')
           console.log('fail to delete this qcollection')
         })
       }
     },
     getQcollection: function () {
       let qcollection_id = this.$route.params.qcollection_id
-      let apiURL = '/api/manage-qcollection/qcollection' + '?id=' + qcollection_id
+      let apiURL = '/api/manage-qcollection/qcollection/' + qcollection_id
       this.$http.get(apiURL).then(function (response) {
         this.questions = response.data.questions
         delete response.data.questions
@@ -142,18 +162,10 @@ export default {
         console.log(response)
       })
     },
-    showCollectionModal: function (qid) {
-      this.$emit('getMyQcollectionLists')
-      this.CollectionModal.show = true
-      this.CollectionModal.qid = qid
-    },
-    showSheetZone: function () {
-      this.sheetshow = true
-    },
     removeOneQuestion: function (question_id, index) {
       let comfirmDelete = window.confirm('你確定要從題集里移除這個題目？')
       if (comfirmDelete) {
-        let apiURL = `/api/manage-qcollection/qcollection/question?qcollection_id=${this.qcinfo._id}&question_id=${question_id}`
+        let apiURL = `/api/manage-qcollection/question?qcollection_id=${this.qcinfo._id}&question_id=${question_id}`
         this.$http.delete(apiURL).then(function (response) {
           this.questions.splice(index, 1)
           this.$showToast('操作成功')
@@ -164,14 +176,16 @@ export default {
     },
     updateQcollectionInfo: function () {
       let data = {
-        qcollection_id: this.qcinfo._id,
         name: this.qcinfo.name,
         subject: this.qcinfo.subject,
-        public: this.qcinfo.public,
+        openForEdit: this.qcinfo.openForEdit,
+        openInSchool: this.qcinfo.openInSchool,
+        openOutSchool: this.qcinfo.openOutSchool,
+        openToStudent: this.qcinfo.openToStudent,
         description: this.qcinfo.description
       }
 
-      let apiURL = '/api/manage-qcollection/qcollection'
+      let apiURL = '/api/manage-qcollection/qcollection/' + this.qcinfo._id
       this.$http.put(apiURL, data).then(function (response) {
         this.editMode = false
         this.$showToast('更新成功')
@@ -226,18 +240,15 @@ export default {
   },
   data () {
     return {
-      sheetshow: false,
       editMode: false,
-      CollectionModal: {
-        show: false,
-        qid: undefined
-      },
-      qcinfo: {
-        public: false
-      },
+      qcinfo: {},
       questions: [],
-      averageDifficulty: 0,
-      subjects: Subject.subjects
+      averageDifficulty: 0
+    }
+  },
+  computed: {
+    subjects () {
+      return this.$store.getters.getSubjects
     }
   }
 }

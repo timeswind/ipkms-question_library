@@ -20,6 +20,7 @@
     <mu-dialog :open="loginModalShow" title="重新登入">
       <div class="flex-column">
         <span style="color: #E91E63; margin-top: 4px; margin-bottom: 8px;">登入信息过期</span>
+        <mu-text-field label="學校" hintText="學校" v-model="reLogin.school" type="email"/>
         <mu-text-field label="郵箱" hintText="郵箱" v-model="reLogin.email" type="email"/>
         <mu-text-field label="密碼" hintText="密碼" v-model="reLogin.password" type="password"/>
         <span style="color: #F44336;text-align: center;">{{reLogin.warn}}</span>
@@ -42,12 +43,10 @@ export default {
     const desktop = isDesktop()
     return {
       reLogin: {
+        school: '',
         email: '',
         password: '',
         warn: ''
-      },
-      toast: {
-        message: ''
       },
       navOpen: desktop,
       navDocked: desktop,
@@ -74,18 +73,24 @@ export default {
       var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
       if (re.test(this.reLogin.email)) {
         let data = {
+          school: this.reLogin.school,
           email: this.reLogin.email,
           password: this.reLogin.password
         }
-        this.$http.post('/login', data).then(function (response) {
-          console.log(response)
+        this.$http.post('/api/login', data).then(function (response) {
           if (response.status === 200 && response.data && response.data.token) {
             window.sessionStorage.token = response.data.token
+            window.sessionStorage.role = response.data.role
+            this.setUserRole(response.data.role)
+            this.hideLoginModal()
             this.reLogin.email = ''
             this.reLogin.password = ''
             this.reLogin.warn = ''
-            this.hideLoginModal()
-            window.location.reload()
+            if (response.data.role === 'admin') {
+              this.$router.push({name: 'admin'})
+            } else {
+              this.$router.push({name: 'entry'})
+            }
           }
         }, function (response) {
           if (response.status === 401 && response.data === 'fail') {
@@ -115,9 +120,10 @@ export default {
     handleMenuChange (path) {
       if (!this.desktop) this.navOpen = false
     },
-    ...mapActions([
-      'hideLoginModal'
-    ])
+    ...mapActions({
+      hideLoginModal: 'hideLoginModal',
+      setUserRole: 'setUserRole'
+    })
   },
   computed: mapGetters({
     loginModalShow: 'getLoginModalState',

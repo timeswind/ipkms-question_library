@@ -1,4 +1,5 @@
 exports = module.exports = function (delta) {
+  console.log(delta)
   delta = JSON.parse(delta)
   var result = delta.map(function (op) {
     var html = op.insert
