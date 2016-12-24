@@ -2,79 +2,52 @@
   <div id="quiz-detail">
     <div class="wrapper flex-column">
       <div class="flex-row">
-        <mu-raised-button raised primary @click.native="$goBack()"><i class="material-icons">keyboard_arrow_left</i>返回</mu-raised-button>
-        <mu-raised-button v-if="quickquiz.finished" style="margin-left:16px" raised><i class="material-icons" style="font-size:20px;margin-right:4px">redo</i>再測一次</mu-raised-button>
-        <mu-raised-button v-if="!quickquiz.finished" style="margin-left:16px" raised accent @click.native="endQuiz()"><i class="material-icons" style="font-size:20px;margin-right:4px">gavel</i>結束小測</mu-raised-button>
-        <mu-raised-button style="margin-left:16px" raised primary @click.native="checkQuizPaper()"><i class="material-icons" style="font-size:20px;margin-right:4px">description</i>查看试卷</mu-raised-button>
-        <mu-raised-button v-if="quickquiz.finished" raised accent @click.native="deleteQuiz()" style="margin-left: 16px"><i class="material-icons">delete</i>刪除小測</mu-raised-button>
+        <mu-raised-button label="返回" icon="keyboard_arrow_left" primary @click="$goBack()" />
+        <mu-raised-button v-if="finished" style="margin-left:16px" icon="redo" label="再測一次" />
+        <mu-raised-button v-if="!finished" label="結束小測" icon="gavel" style="margin-left:16px" raised accent @click="endQuiz()" />
+        <mu-raised-button label="查看试卷" icon="description" style="margin-left:16px" raised primary />
+        <mu-raised-button label="刪除小測" icon="delete" v-if="finished" raised accent @click="deleteQuiz()" style="margin-left: 16px" />
       </div>
       <div class="flex-column second-wrapper light-card">
         <div class="flex-column" style="padding:16px">
           <div class="flex-row flex-baseline">
-            <h4 class="quiz-title">{{quickquiz.title}}</h4>
-            <span class="quiz-finished">{{quickquiz.finished | finished}}</span>
-            <span class="flex-row flex-center quiz-questions-count"><i class="material-icons">description</i><span>{{quickquiz.questions}}題</span></span>
-            <span class="flex-row flex-center quiz-time"><i class="material-icons">timer</i><span>{{quickquiz.time}}分鐘</span></span>
+            <h2 class="quiz-title">{{quickquiz.title}}</h2>
+            <span class="quiz-finished">{{finished ? '已結束' : '進行中'}}</span>
+            <span class="flex-row flex-center quiz-questions-count"><i class="material-icons">description</i><span>{{quickquiz.questions && quickquiz.questions.length}}題</span></span>
+            <span class="flex-row flex-center quiz-time"><i class="material-icons">timer</i><span>{{quickquiz.duration}}分鐘</span></span>
           </div>
         </div>
 
         <div class="flex-row flex-center" style="border-top:1px solid #eee;">
           <span class="flex-column flex-50" style="padding: 16px;border-right:1px solid #eee;">
             <span class="field-title">開始於</span>
-            <span class="field-content">{{quickquiz.startTime | date('YYYY[年]M[月]DD[日] H:mm')}}</span>
+            <span class="field-content">{{quickquiz.startAt | date('YYYY[年]M[月]DD[日] H:mm')}}</span>
           </span>
-          <span class="flex-column flex-50" style="padding: 16px;border-right:1px solid #eee;">
+          <span class="flex-column flex-50" style="padding: 16px;border-right:1px solid #eee;" v-if="finished">
             <span class="field-title">結束於</span>
-            <span class="field-content">{{quickquiz.finishTime | date('YYYY[年]M[月]DD[日] H:mm')}}</span>
+            <span class="field-content">{{finished | date('YYYY[年]M[月]DD[日] H:mm')}}</span>
           </span>
         </div>
-
-        <div class="flex-column" v-show="students && students.length > 0">
-          <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">學生 {{students.length}}名</p>
-          <div class="grids">
-
-            <div class="grid-4 flex-column student" v-for="(student, index) in students" v-bind:key="student._id" @click="checkQuizPaper(student)">
-              <div class="flex-row flex-center">
-                <div class="student-status online" v-show="student.online"></div>
-                <span class="student-name">{{student.name}}</span>
-              </div>
-              <span class="finished-status flex-row flex-center" v-if="student.status === 'finish'">
-                <span style="margin-right:8px;color:#3F51B5">{{analysisSample(index, 'time')}}</span>
-                <span style="color: #E91E63;margin-right: 8px;">{{analysisSample(index, 'score')}}</span>
-                <span>已完成</span>
-                <i class="material-icons">keyboard_arrow_right</i>
-              </span>
-              <span class="unfinish-status flex-row flex-center" v-show="!student.status">
-                <span>未上交</span>
-                <i class="material-icons">short_text</i>
-              </span>
-              <span class="doing-status flex-row flex-center" v-show="student.status === 'doing'" @click.native="checkQuizPaper(student)">
-                <span>做卷中&nbsp;</span>
-                <i class="material-icons">keyboard_arrow_right</i>
-              </span>
+        <canvas width="400px" height="200" ref="realtimeChart"></canvas>
+        <p style="border-top:1px solid #eee;padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa">學生 {{Object.keys(students).length}}名</p>
+        <mu-row gutter>
+          <mu-col width="100" tablet="50" desktop="33" class="student" v-for="(student, key, index) in students" v-bind:key="key">
+            <div class="flex-row flex-center">
+              <div class="student-status online" v-show="student.online"></div>
+              <span class="student-name">{{student.name}}</span>
             </div>
-          </div>
-        </div>
-
-        <div class="flex-column" v-show="statisticShow">
+            <quiz-progress-bar :correct="student.correct" :incorrect="student.incorrect" :unstarted="student.unstarted"/>
+          </mu-col>
+        </mu-row>
+        <div class="flex-column" v-show="finished">
           <p style="padding:8px 0 8px 0;margin:0;text-align:center;color:#aaa;border-top:1px solid #eee;">數據 統計</p>
-          <div class="flex-row grids" v-if="quickquiz.finished">
-            <div class="grid-2 flex-column flex-center flex-50">
-              <span class="field-title">平均分</span>
-              <span class="field-content">{{analysis('average_score')}}</span>
-            </div>
-            <div class="grid-2 flex-column flex-center flex-50">
-              <span class="field-title">平均用時</span>
-              <span class="field-content">{{analysis('average_time')}}</span>
-            </div>
-          </div>
           <div class="flex-row flex-center" style="margin-top: 16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">學生表現</span>
-            <mu-raised-button accent raised @click.native="drawSPChart('time')" style="background-color: #FF9800;">
+            <mu-raised-button accent raised @click="drawSPChart('time')" style="background-color: #FF9800;">
               <i class="material-icons">swap_vert</i>
               <span>時間</span>
             </mu-raised-button>
-            <mu-raised-button accent raised style="margin-left:16px" @click.native="drawSPChart('correct')">
+            <mu-raised-button accent raised style="margin-left:16px" @click="drawSPChart('correct')">
               <i class="material-icons">swap_vert</i>
               <span>正確題數</span>
             </mu-raised-button>
@@ -82,18 +55,14 @@
           <canvas ref="spChart"></canvas>
           <div class="flex-row flex-center" style="margin-top:32px;border-top:1px solid #ddd;padding-top:16px">
             <span style="margin: 16px 16px 16px 32px; font-size: 26px;">題目數據</span>
-            <mu-raised-button accent raised @click.native="drawQAChart('correct')">
+            <mu-raised-button accent raised @click="drawQAChart('correct')">
               <i class="material-icons">swap_vert</i>
               <span>正確數量</span>
             </mu-raised-button>
           </div>
           <canvas width="400px" height="200" ref="qaChart"></canvas>
-
         </div>
-
-
       </div>
-
     </div>
   </div>
 </template>
@@ -103,60 +72,75 @@ import _ from 'lodash'
 import Chart from 'chart.js'
 import io from 'socket.io-client'
 import { mapGetters, mapActions } from 'vuex'
-import { zipSampleToStudent, studentIndex } from '../../modules/quickquiz'
-import { isMongodbId } from '../../modules/mongodb'
+import QuizProgressBar from '../../components/QuizProgressBar/QuizProgressBar'
+// import scoreQuiz from '../../modules/score-quiz'
 
-var socket = null
 var qaChart = null
 var spChart = null
 export default {
+  components: {
+    'quiz-progress-bar': QuizProgressBar
+  },
+  data () {
+    return {
+      socket: null,
+      reconnecting: false,
+      quickquiz: {},
+      finished: false,
+      realtimeChart: null,
+      realtimeChartDic: {},
+      charts: {
+        sp: {
+          time: 0,
+          correct: 0
+        },
+        qa: {
+          correct: 0,
+          wrong: 0
+        }
+      }
+    }
+  },
   mounted: function () {
     this.$nextTick(function () {
       let quickquiz_id = this.$route.params.quickquiz_id
-      if (isMongodbId(quickquiz_id)) {
-        this.validateURL = true
-        this.getQuickquizDetail(quickquiz_id)
-      } else {
-        console.log('invalid quickquiz id')
-      }
+      this.getQuickquizDetail(quickquiz_id)
     })
   },
   destroyed: function () {
     this.$nextTick(function () {
-      socket.io.disconnect()
+      this.socket.io.disconnect()
       console.log('emit socket disconnect')
     })
   },
   methods: {
     getQuickquizDetail: function (id) {
       console.log('getQuickquizDetail')
-      let apiURL = '/api/manage-quickquiz/teacher/quickquiz/' + '?id=' + id
+      let apiURL = `/api/manage-quickquiz/teacher/quickquiz/${id}`
       this.$http.get(apiURL).then(function (response) {
-        let students = _.get(response.data, 'students', [])
-        this.setQuickquizStudents(students)
-        this.samples = _.get(response.data, 'samples', [])
-        console.log()
-        delete response.data.students
-        delete response.data.samples
-        this.quickquiz = response.data
-        this.analysis('count_exception')
-        if (!_.get(response.data, 'finished', false)) {
-          this.statisticShow = false
-        } else {
-          this.statisticShow = true
+        if (response.data.success && response.data.quickquiz) {
+          this.setQuizDashboardQuiz(response.data.quickquiz)
+          if (response.data.quickquiz.students) {
+            this.mountJoinedStudents(response.data.quickquiz.students)
+          }
+          this.listenForSocket()
         }
-        this.listenForSocket()
       }, function (response) {
         this.$showToast('Error:' + response.data)
       })
     },
+    mountJoinedStudents (students) {
+      let self = this
+      _.forEach(students, function (student, index) {
+        self.updateQuizDashboardStudent({id: student._id, student: student})
+      })
+    },
     endQuiz: function () {
-      if (this.quickquiz.finished === false) {
+      if (!this.finished) {
         let data = {
           quickquiz_id: this.quickquiz._id
         }
         this.$http.post('/api/manage-quickquiz/teacher/quickquiz/end', data).then(function (response) {
-          this.quickquiz.finished = true
           window.location.reload()
         }, function (response) {
           this.$showToast('Error:' + response.data)
@@ -165,177 +149,162 @@ export default {
     },
     listenForSocket: function () {
       var self = this
-      socket = io.connect('/quickquiz')
-
-      socket.on('connect', function () {
-        socket
-        .emit('authenticate', { token: window.sessionStorage.token }) // send the jwt
-        .on('authenticated', function () {
-          self.socket.authenticated = true
-          socket.emit('user join', { quickquizId: self.$route.params.quickquiz_id })
-          console.log('socket auth success')
+      if (this.socket === null) {
+        this.socket = io.connect('/quickquiz', {
+          'reconnection': true,
+          'reconnectionDelay': 500,
+          'reconnectionAttempts': 10
         })
-        .on('unauthorized', function (msg) {
-          console.log('unauthorized: ' + JSON.stringify(msg.data))
-          throw new Error(msg.data.type)
+        this.socket.on('connect', function () {
+          self.socket.emit('authenticate', { token: window.sessionStorage.token, quickquiz_id: self.$route.params.quickquiz_id }) // send the jwt
         })
-      })
-
-      // socket.on('authenticated', function () {
-      //   self.socket.authenticated = true
-      //   socket.emit('user join', {quickquizId: self.$route.params.quickquiz_id})
-      //   console.log('socket auth success')
-      // })
-
-      socket.on('joined', function (data) {
-        self.socket.joined = true
-      })
-
-      socket.on('student list', function (data) {
-        // @param data = { id: String, status: String } , array of student who are doing the quickquiz
-        let students = data
-        console.log('on receiving Student List')
-
-        for (var i = 0; i < students.length; i++) {
-          let index = studentIndex(self.students, students[i].id)
-          if (index > -1) {
-            let student = self.students[index]
-            student['online'] = true
-            if (students[i].status !== '') {
-              student['status'] = students[i].status
+        this.socket.on('joined', function () {
+          self.$showToast('服務連接成功')
+        })
+        this.socket.on('studentJoin', function (studentPayload) {
+          console.log('studentJoin')
+          _.forEach(studentPayload, function (value, key) {
+            var student
+            if (self.students[key]) {
+              student = JSON.parse(JSON.stringify(self.students[key]))
+            } else {
+              student = JSON.parse(value)
             }
-            if (students[i].quizsample !== '' && !_.has(student, 'sample._id')) {
-              let sample = {
-                _id: students[i].quizsample
+            student.online = true
+            self.updateQuizDashboardStudent({id: key, student: student})
+          })
+        })
+        this.socket.on('studentLeave', function (student_id) {
+          var student = JSON.parse(JSON.stringify(self.students[student_id]))
+          student.online = false
+          self.updateQuizDashboardStudent({id: student_id, student: student})
+        })
+        this.socket.on('studentList', function (data) {
+          console.log(data)
+          if (data.studentList && data.studentAnswerReports) {
+            let studentList = data.studentList
+            let studentAnswerReports = data.studentAnswerReports
+            _.forEach(studentList, function (value, student_id) {
+              var student
+              if (self.students[student_id]) {
+                student = JSON.parse(JSON.stringify(self.students[student_id]))
+              } else {
+                student = JSON.parse(value)
               }
-              student['sample'] = sample
-            }
-            self.updateQuickquizStudent(index, student)
-          }
-        }
-      })
-
-      socket.on('student joined', function (data) {
-        console.log('on Student Joined')
-        // let student_name = _.get(data, 'name', null)
-        let student_id = _.get(data, 'id', null)
-        let student_name = _.get(data, 'name', null)
-
-        let index = studentIndex(self.students, student_id)
-        if (index > -1) {
-          let student = self.students[index]
-          student['online'] = true
-          self.updateQuickquizStudent(index, student)
-        } else {
-          let student = {
-            _id: student_id,
-            name: student_name,
-            online: true
-          }
-          self.updateQuickquizStudent(self.students.length, student)
-        }
-      })
-
-      socket.on('student leaved', function (data) {
-        console.log('on Student Leaved')
-        let index = studentIndex(self.students, data)
-        if (data && index > -1) {
-          let student = self.students[index]
-          student['online'] = false
-          if (_.get(student, 'status', null) !== 'finish') {
-            student['status'] = null
-          }
-          self.updateQuickquizStudent(index, student)
-        }
-      })
-
-      socket.on('start doing', function (data) {
-        if (data) {
-          let index = studentIndex(self.students, data.student)
-          if (data && index > -1) {
-            let student = self.students[index]
-            student['status'] = 'doing'
-            if (!_.has(student, 'sample._id')) {
-              let sample = {
-                _id: data.quizsample
+              student.online = true
+              if (studentAnswerReports[student_id]) {
+                let report = JSON.parse(studentAnswerReports[student_id])
+                console.log(studentAnswerReports[student_id])
+                student.correct = report.correct
+                student.incorrect = report.incorrect
+                student.unstarted = report.unstarted
+                student.started = report.correct + report.incorrect
               }
-              student['sample'] = sample
-            }
-            self.updateQuickquizStudent(index, student)
-          }
-        }
-        console.log('student ' + data + ' just start doing the quiz')
-      })
-
-      socket.on('finish doing', function (data) {
-        if (data) {
-          let index = studentIndex(self.students, data)
-          if (data && index > -1) {
-            let student = self.students[index]
-            student['status'] = 'finish'
-            self.updateQuickquizStudent(index, student)
-          }
-        }
-        console.log('student ' + data + ' just finished the quiz')
-      })
-    },
-    checkSamples: function () {
-      if (this.samples.length > 0) {
-        this.setQuickquizStudents(zipSampleToStudent(this.samples, this.students))
-        this.setQuickquizID(this.quickquiz._id)
-        this.setQuickquizStudents(this.students)
-        this.drawCharts()
-      }
-    },
-    analysisSample: function (student_index, option) {
-      let sample = this.students[student_index].sample
-
-      if (option === 'score') {
-        let rightCount = sample.results.right.length
-        let total = sample.results.right.length + sample.results.blank.length + sample.results.wrong.length
-        return rightCount + '/' + total
-      } else if (option === 'time') {
-        let start = sample.startTime
-        let finish = sample.finishTime
-        return this.timeDifference(Math.abs(new Date(start) - new Date(finish)), 'simple')
-      } else if (option === 'rightCount') {
-        let rightCount = sample.results.right.length
-        return rightCount
-      } else if (option === 'timeInMilliSec') {
-        let start = sample.startTime
-        let finish = sample.finishTime
-        return Math.abs(new Date(start) - new Date(finish))
-      }
-    },
-    analysis: function (option) {
-      if (option === 'average_score') {
-        return (this.quickquiz.analysis.aveRight * 100 / (this.quickquiz.questions - this.quickquiz.exception)).toFixed(2)
-      } else if (option === 'average_time') {
-        return this.timeDifference(this.quickquiz.analysis.aveTime)
-      } else if (option === 'average_right_count') {
-        return (this.quickquiz.analysis.aveRight.toFixed(2)) / 1
-      } else if (option === 'count_exception') {
-        var exception_count = 0
-        let question_analysis = this.quickquiz.analysis.questions
-        _.forEach(question_analysis, function (array) {
-          if (array[0] === 0 && array[1] === 0 && array[2] === 0 && array[3] > 0) {
-            exception_count++
+              self.updateQuizDashboardStudent({id: student_id, student: student})
+            })
           }
         })
-        this.quickquiz['exception'] = exception_count
-        this.checkSamples()
-      } else {
-        return false
+        this.socket.on('studentAnswerReport', function (data) {
+          if (data.student && data.report) {
+            var student = JSON.parse(JSON.stringify(self.students[data.student]))
+            let scoreResult = data.report
+            student.correct = scoreResult.correct
+            student.incorrect = scoreResult.incorrect
+            student.unstarted = scoreResult.unstarted
+            student.started = scoreResult.correct + scoreResult.incorrect
+            self.updateQuizDashboardStudent({id: data.student, student: student})
+            self.throttledDrawRealtimeChart()
+          }
+        })
+        this.socket.on('reconnecting', function () {
+          console.log('reconnecting')
+        })
+        this.socket.on('authenticated', function () {
+          self.socket.emit('user join', { quickquizId: self.$route.params.quickquiz_id })
+          // console.log('socket auth success' + new Date())
+        })
+        this.socket.on('unauthorized', function (error) {
+          if (error.data.type === 'UnauthorizedError' || error.data.code === 'invalid_token') {
+            self.$showToast('登入憑證過期，重新驗證身份')
+            this.showLoginModal()
+          } else {
+            console.log('unauthorized: ' + JSON.stringify(error.data))
+            self.$showToast('Error:' + error.data)
+          }
+        })
       }
     },
-    timeDifference: function (millisecound, option) {
-      var ms = millisecound
-      var min = (ms / 1000 / 60) << 0
-      var sec = (ms / 1000) % 60 << 0
-      if (option === 'simple') {
-        return (min + ':' + sec)
+    drawRealtimeChart (options) {
+      var self = this
+      if (self.realtimeChart !== null) {
+        Object.keys(self.students).forEach(function (id, index) {
+          let student = self.students[id]
+          if (!isNaN(self.realtimeChartDic[id])) {
+            let index = self.realtimeChartDic[id]
+            self.realtimeChart.data.datasets[index].data[0].x = student.started
+            self.realtimeChart.data.datasets[index].data[0].y = student.correct
+          } else {
+            self.realtimeChart.data.datasets.push({
+              data: [{
+                x: student.started,
+                y: student.correct,
+                r: 15
+              }]
+            })
+          }
+        })
+        self.realtimeChart.update()
+        console.log(self.realtimeChart.data)
       } else {
-        return (min + '分' + sec + '秒')
+        let dataSets = Object.keys(self.students).map(function (id, index) {
+          let student = self.students[id]
+          self.realtimeChartDic[id] = index
+          var obj = {}
+          obj.label = student.name
+          obj.data = []
+          obj.data.push({
+            x: student.started,
+            y: student.correct,
+            r: 15
+          })
+          return obj
+        })
+        let ctx = this.$refs.realtimeChart
+        var data = {
+          datasets: dataSets
+        }
+        self.realtimeChart = new Chart(ctx, {
+          type: 'bubble',
+          data: data,
+          options: {
+            autoSkip: false,
+            elements: {
+              points: {
+                borderWidth: 1,
+                borderColor: 'rgb(0, 0, 0)'
+              }
+            },
+            scales: {
+              yAxes: [{
+                display: true,
+                ticks: {
+                  min: 0,
+                  max: self.quickquiz.questions.length,
+                  stepSize: 1
+                }
+              }],
+              xAxes: [{
+                display: true,
+                ticks: {
+                  min: 0,
+                  max: self.quickquiz.questions.length,
+                  stepSize: 1
+                }
+              }]
+            }
+          }
+        })
+        self.realtimeChart.render(500, false)
       }
     },
     drawCharts: function () {
@@ -509,23 +478,8 @@ export default {
     //   }
     //   self.updateQuickquizStudent(0, student)
     // },
-    checkQuizPaper: function (student) {
-      if (student) {
-        if (_.has(student, 'sample._id')) {
-          this.$router.push({
-            name: 'quiz-paper',
-            params: { quickquiz_id: this.$route.params.quickquiz_id, quizsample_id: student.sample._id }
-          })
-        }
-      } else {
-        this.$router.push({
-          name: 'quiz-paper',
-          params: { quickquiz_id: this.$route.params.quickquiz_id, quizsample_id: 0 }
-        })
-      }
-    },
     deleteQuiz: function () {
-      if (this.quickquiz.finished) {
+      if (this.finished) {
         let data = {
           quickquiz_id: this.quickquiz._id
         }
@@ -539,36 +493,21 @@ export default {
       }
     },
     ...mapActions({
-      setQuickquizID: 'setQuickquizID',
-      setQuickquizStudents: 'setQuickquizStudents',
-      updateQuickquizStudent: 'updateQuickquizStudent'
+      showLoginModal: 'showLoginModal',
+      setQuizDashboardQuiz: 'setQuizDashboardQuiz',
+      setQuizDashboardStudents: 'setQuizDashboardStudents',
+      updateQuizDashboardStudent: 'updateQuizDashboardStudent'
     })
   },
-  data () {
-    return {
-      socket: {
-        joined: false,
-        authenticated: false
-      },
-      statisticShow: false,
-      validateURL: false,
-      quickquiz: {},
-      charts: {
-        sp: {
-          time: 0,
-          correct: 0
-        },
-        qa: {
-          correct: 0,
-          wrong: 0
-        }
-      }
-    }
-  },
-  computed: mapGetters({
-    getQuickquizID: 'getQuickquizID',
-    students: 'getQuickquizStudents'
-  })
+  computed: {
+    throttledDrawRealtimeChart: function () {
+      return _.throttle(this.drawRealtimeChart, 1000)
+    },
+    ...mapGetters({
+      quickquiz: 'quizDashboardQuiz',
+      students: 'quizDashboardStudents'
+    })
+  }
 }
 </script>
 <style scoped>

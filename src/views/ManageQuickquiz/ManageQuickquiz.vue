@@ -9,9 +9,9 @@
         <mu-row>
           <mu-col width="100" tablet="50" desktop="50">
             <div v-if="quickquizzes[0]" class="flex-column">
-              <h4 class="title">{{quickquizzes[0].title}}</h4>
-              <h6 class="time flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">timer</i>{{quickquizzes[0].time}}分鐘</h6>
-              <h6 class="finished flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">create</i>{{quickquizzes[0].finished | finished}}</h6>
+              <h1 class="title">{{quickquizzes[0].title}}</h1>
+              <h3 class="time flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">timer</i>{{quickquizzes[0].time}}分鐘</h3>
+              <h3 class="finished flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">create</i>{{quickquizzes[0].endAt ? '已結束' : '進行中'}}</h3>
               <span class="startTime">開始於: {{quickquizzes[0].startTime | date('YYYY[年]M[月]DD[日] h:mm a')}}</span>
               <span class="finishTime" v-if="quickquizzes[0].finishTime">結束于: {{quickquizzes[0].finishTime | date('YYYY[年]M[月]DD[日], h:mm, a')}}</span>
               <div class="flex-column flex-start" style="margin:16px 0 16px 16px">

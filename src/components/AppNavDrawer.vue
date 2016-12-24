@@ -15,6 +15,9 @@
       <div v-if="userRole === 'admin'">
         <mu-list-item value="admin" title="Admin Panel"/>
       </div>
+      <div v-if="userRole === 'student'">
+        <mu-list-item value="student-quizzes" title="我的小測"/>
+      </div>
     </mu-list>
     <mu-divider/>
   </mu-drawer>

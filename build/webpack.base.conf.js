@@ -46,7 +46,10 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel',
         include: projectRoot,
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        'query': {
+          'plugins': ['lodash']
+        }
       },
       {
         test: /\.json$/,

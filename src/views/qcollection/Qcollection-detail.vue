@@ -116,7 +116,6 @@
 
 <script>
 import _ from 'lodash'
-import Card from '../../components/reuseable/Card.vue'
 import QuestionCard from '../../components/QuestionCard/QuestionCard'
 import deltaRender from '../../modules/delta-render.js'
 
@@ -127,7 +126,6 @@ export default {
     })
   },
   components: {
-    Card,
     'question-card': QuestionCard
   },
   methods: {

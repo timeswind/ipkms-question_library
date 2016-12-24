@@ -3,7 +3,7 @@
     <router-link tag="div" :to="{ name: 'quiz-detail', params: { quickquiz_id: quickquiz._id }}">
       <div class="flex-row flex-baseline">
         <span class="title">{{quickquiz.title}}</span>
-        <span class="finished">{{quickquiz.finished | finished}}</span>
+        <span class="finished">{{quickquiz.endAt ? '已結束' : '進行中'}}</span>
       </div>
       <span class="time">{{quickquiz.time}}分鐘</span>
 

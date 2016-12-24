@@ -9,6 +9,8 @@ export const setUserLanguage = function ({ commit, state }, language) {
 }
 
 export const showLoginModal = function ({ commit, state }) {
+  window.sessionStorage.removeItem('token')
+  window.sessionStorage.removeItem('role')
   commit(types.SHOW_LOGIN_MODAL)
 }
 
@@ -29,16 +31,4 @@ export const showToast = function ({ commit, state }, text) {
   setTimeout(() => {
     commit(types.HIDE_TOAST)
   }, 2500)
-}
-
-export const setQuickquizID = function ({ commit, state }, quiz_id) {
-  commit(types.SET_QUICKQUIZ_ID, quiz_id)
-}
-
-export const setQuickquizStudents = function ({ commit, state }, students) {
-  commit(types.SET_QUICKQUIZ_STUDENTS, students)
-}
-
-export const updateQuickquizStudent = function ({ commit, state }, index, student) {
-  commit(types.UPDATE_QUICKQUIZ_STUDENT, index, student)
 }

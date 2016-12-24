@@ -20,11 +20,16 @@
     <mu-dialog :open="loginModalShow" title="重新登入">
       <div class="flex-column">
         <span style="color: #E91E63; margin-top: 4px; margin-bottom: 8px;">登入信息过期</span>
+        <div class="flex-row" style="margin-bottom:16px">
+          <mu-radio label="教師" name="qcollectiontype" nativeValue="teacher" v-model="reLogin.role"/>
+          <mu-radio label="學生" name="qcollectiontype" nativeValue="student" v-model="reLogin.role" style="margin-left: 16px"/>
+        </div>
         <mu-text-field label="學校" hintText="學校" v-model="reLogin.school" type="email"/>
-        <mu-text-field label="郵箱" hintText="郵箱" v-model="reLogin.email" type="email"/>
+        <mu-text-field label="郵箱" hintText="郵箱" v-model="reLogin.email" type="email" v-if="reLogin.role === 'teacher'"/>
+        <mu-text-field label="學號" hintText="學號" v-model="reLogin.schoolId" type="text" v-if="reLogin.role === 'student'"/>
         <mu-text-field label="密碼" hintText="密碼" v-model="reLogin.password" type="password"/>
         <span style="color: #F44336;text-align: center;">{{reLogin.warn}}</span>
-        <mu-raised-button label="登入" slot="actions" primary @click.native="login()"/>
+        <mu-raised-button label="登入" slot="actions" primary @click.native="auth()"/>
       </div>
     </mu-dialog>
     <qcollection-selector-dialog/>
@@ -43,6 +48,7 @@ export default {
     const desktop = isDesktop()
     return {
       reLogin: {
+        role: 'teacher',
         school: '',
         email: '',
         password: '',
@@ -69,38 +75,46 @@ export default {
     'app-nav': AppNavDrawer
   },
   methods: {
-    login: function () {
-      var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-      if (re.test(this.reLogin.email)) {
-        let data = {
+    auth: function () {
+      var data = {}
+      if (this.reLogin.role === 'teacher') {
+        data = {
           school: this.reLogin.school,
           email: this.reLogin.email,
           password: this.reLogin.password
         }
-        this.$http.post('/api/login', data).then(function (response) {
-          if (response.status === 200 && response.data && response.data.token) {
-            window.sessionStorage.token = response.data.token
-            window.sessionStorage.role = response.data.role
-            this.setUserRole(response.data.role)
-            this.hideLoginModal()
-            this.reLogin.email = ''
-            this.reLogin.password = ''
-            this.reLogin.warn = ''
-            if (response.data.role === 'admin') {
-              this.$router.push({name: 'admin'})
-            } else {
-              this.$router.push({name: 'entry'})
-            }
-          }
-        }, function (response) {
-          if (response.status === 401 && response.data === 'fail') {
-            this.reLogin.password = ''
-            this.reLogin.warn = '登入失败'
-          }
-        })
-      } else {
-        this.reLogin.warn = '請輸入正確的郵箱地址'
+        var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+        if (re.test(this.reLogin.email)) {
+          this.postLogin(data)
+        } else {
+          this.reLogin.warn = '請輸入正確的郵箱地址'
+        }
+      } else if (this.reLogin.role === 'student') {
+        data = {
+          school: this.reLogin.school,
+          schoolId: this.reLogin.schoolId,
+          password: this.reLogin.password
+        }
+        this.postLogin(data)
       }
+    },
+    postLogin (data) {
+      this.$http.post('/api/login', data).then(function (response) {
+        if (response.status === 200 && response.data && response.data.token) {
+          window.sessionStorage.token = response.data.token
+          window.sessionStorage.role = response.data.role
+          this.setUserRole(response.data.role)
+          this.reLogin.email = ''
+          this.reLogin.password = ''
+          this.reLogin.warn = ''
+          window.location.reload()
+        }
+      }, function (response) {
+        if (response.status === 400) {
+          this.reLogin.password = ''
+          this.reLogin.warn = '登入失败'
+        }
+      })
     },
     changeNav () {
       const desktop = isDesktop()
