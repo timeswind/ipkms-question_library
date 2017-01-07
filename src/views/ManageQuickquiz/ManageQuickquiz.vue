@@ -10,12 +10,12 @@
           <mu-col width="100" tablet="50" desktop="50">
             <div v-if="quickquizzes[0]" class="flex-column">
               <h1 class="title">{{quickquizzes[0].title}}</h1>
-              <h3 class="time flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">timer</i>{{quickquizzes[0].time}}分鐘</h3>
+              <h3 class="time flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">timer</i>{{quickquizzes[0].duration}}分鐘</h3>
               <h3 class="finished flex-row" style="align-items:center"><i class="material-icons" style="margin-right:8px;font-size:20px">create</i>{{quickquizzes[0].endAt ? '已結束' : '進行中'}}</h3>
               <span class="startTime">開始於: {{quickquizzes[0].startTime | date('YYYY[年]M[月]DD[日] h:mm a')}}</span>
               <span class="finishTime" v-if="quickquizzes[0].finishTime">結束于: {{quickquizzes[0].finishTime | date('YYYY[年]M[月]DD[日], h:mm, a')}}</span>
               <div class="flex-column flex-start" style="margin:16px 0 16px 16px">
-                <mu-raised-button label="結束測驗" primary style="margin-bottom:8px" @click="endLatestQuickQuiz()" v-show="!quickquizzes[0].finished"/>
+                <mu-raised-button label="結束測驗" primary style="margin-bottom:8px" @click="endLatestQuickQuiz()" v-show="!quickquizzes[0].endAt"/>
                 <mu-raised-button label="查看詳情" primary raised @click="$router.push({ name: 'quiz-detail', params: { quickquiz_id: quickquizzes[0]._id }})" />
               </div>
             </div>
@@ -245,7 +245,7 @@ export default {
 <style scoped>
 .latest-quiz {
   max-width: 800px;
-  margin: 8px auto
+  margin: 0 auto 8px auto
 }
 .latest-quiz .title {
   color: #3F51B5;

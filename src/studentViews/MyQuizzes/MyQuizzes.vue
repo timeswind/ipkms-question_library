@@ -7,7 +7,7 @@
     <div v-if="activeTab === 'all-quizzes'">
       <mu-row>
         <mu-col width="100" tablet="50" desktop="33" v-for="(sample, index) in quizsamples" :key="sample._id">
-          <!-- <quickquiz-card :quickquiz="quickquiz" style="margin: 8px"/> -->
+          <quizsample-card :quizsample="sample" style="margin: 8px"/>
         </mu-col>
       </mu-row>
     </div>
@@ -19,10 +19,10 @@
 
 <script>
 // import qrcode from 'qrcode-canvas'
-// import QuickquizCard from '../../components/QuickquizCard/QuickquizCard'
+import QuizsampleCard from '../../components/QuizsampleCard/QuizsampleCard'
 export default {
   components: {
-    // 'quickquiz-card': QuickquizCard
+    'quizsample-card': QuizsampleCard
   },
   mounted: function () {
     this.$nextTick(function () {
@@ -37,9 +37,21 @@ export default {
   },
   methods: {
     getMyQuickquizzes () {
-      this.$http.get('/api/manage-quickquiz/student/quickquizs').then(function (response) {
+      this.$http.get('/api/quizsamples').then(function (response) {
         if (response.data.success && response.data.quizsamples) {
-          this.quizsamples = response.data.quizsamples
+          this.quizsamples = response.data.quizsamples.map((sample) => {
+            if (sample.quickquiz && sample.quickquiz.endAt && new Date() > new Date(sample.quickquiz.endAt)) {
+              sample.quickquiz.finished = true
+              if (sample.finishAt && new Date(sample.finishAt) > new Date(sample.quickquiz.endAt)) {
+                sample.overtime = true
+              } else {
+                sample.overtime = false
+              }
+            } else {
+              sample.quickquiz.finished = false
+            }
+            return sample
+          })
         }
       }, function (response) {
         console.log(response)

@@ -1,6 +1,6 @@
 <template>
   <div id="qcollection-detail">
-    <card style="margin: 16px auto 0 auto;max-width: 600px">
+    <div style="margin: 16px auto 0 auto;max-width: 600px" class="light-card">
       <div slot="content" style="padding: 16px" class="flex-column">
         <div class="flex-row flex-center" style="padding-bottom: 8px; border-bottom: 1px solid #eee">
           <span style="font-size: 20px">題集信息</span>
@@ -97,7 +97,7 @@
         </div>
 
       </div>
-    </card>
+    </div>
     <div style="text-align: center;margin-top: 16px;font-size: 16px;color: #9E9E9E;">
       共 {{questions.length}} 題
     </div>

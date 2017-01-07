@@ -12,6 +12,15 @@ import store from './vuex/store'
 
 import App from './App'
 import auth from './auth'
+
+// import Raven from 'raven-js';
+// import RavenVue from 'raven-js/plugins/vue';
+//
+// Raven
+//     .config('https://d6a9c457a2f4466ca5093fb9f9526587@sentry.io/122291')
+//     .addPlugin(RavenVue, Vue)
+//     .install();
+
 Vue.use(MuseUI)
 Vue.use(VueRouter)
 Vue.use(VueResource)
@@ -47,6 +56,10 @@ Vue.prototype.$showToast = function (message) {
   hideToastTimer = setTimeout(hideToast, 1500)
 }
 
+Vue.prototype.$error = function (err) {
+
+}
+
 Vue.prototype.$goBack = function () {
   window.history.back()
 }
@@ -76,9 +89,9 @@ const CreateQuestionView = resolve => require(['./views/create-question/Create-m
 const AdminPanelView = r => require.ensure([], () => r(require('./views/AdminPanel/AdminPanel.vue')), 'admin-panel')
 const AdminPanelUserDetailView = r => require.ensure([], () => r(require('./views/AdminPanel/UserDetail.vue')), 'admin-panel')
 const ManageQcollectionView = r => require.ensure([], () => r(require('./views/ManageQcollection/ManageQcollection.vue')), 'manage-qcollection')
-const QcollectionDetailView = r => require.ensure([], () => r(require('./views/qcollection/Qcollection-detail.vue')), 'manage-qcollection')
+const QcollectionDetailView = r => require.ensure([], () => r(require('./views/ManageQcollection/QcollectionDetail.vue')), 'manage-qcollection')
 const ManageQuestionView = r => require.ensure([], () => r(require('./views/ManageQuestion/ManageQuestion.vue')), 'manage-question')
-const QuestionDetailView = r => require.ensure([], () => r(require('./views/questions/Question-detail.vue')), 'manage-question')
+const QuestionDetailView = r => require.ensure([], () => r(require('./views/ManageQuestion/QuestionDetail.vue')), 'manage-question')
 
 const StudentQuizView = r => require.ensure([], () => r(require('./studentViews/Quiz/Quiz.vue')), 'student-quiz')
 const StudentManageQuizView = r => require.ensure([], () => r(require('./studentViews/MyQuizzes/MyQuizzes.vue')), 'student-quiz')
@@ -93,13 +106,9 @@ var router = new VueRouter({
     { path: '/manage-question', component: ManageQuestionView, name: 'manage-question', meta: { title: '管理題目'}, beforeEnter: requireAuthTeacher},
     { path: '/manage-question/detail/:question_id', component: QuestionDetailView, name: 'question-detail', meta: { title: '題目詳情'}, beforeEnter: requireAuthTeacher},
     { path: '/manage-quiz', component: resolve => require(['./views/ManageQuickquiz/ManageQuickquiz.vue'], resolve), name: 'manage-quiz', meta: { title: '管理小測'}, beforeEnter: requireAuthTeacher},
-    { path: '/quick-quiz', component: resolve => require(['./views/quickquiz/Quick-quiz.vue'], resolve), name: 'quick-quiz', meta: { title: 'Quick Quiz'}, children: [
-      { path: 'prepare', name: 'prepare-quiz', component: resolve => require(['./views/quickquiz/Prepare-quiz.vue'], resolve), meta: { title: '準備小測'} },
-      { path: 'results', name: 'quiz-results', component: resolve => require(['./views/quickquiz/Quiz-results.vue'], resolve), meta: { title: '數據統計'} },
-    ], beforeEnter: requireAuthTeacher},
-    { path: '/quick-quiz/detail/:quickquiz_id', component: resolve => require(['./views/quickquiz/Quiz-detail.vue'], resolve), name: 'quiz-detail', meta: { title: 'Quiz Detail'}},
-    { path: '/quick-quiz/detail/:quickquiz_id/paper', component: resolve => require(['./views/quickquiz/Quiz-detail.vue'], resolve), name: 'quiz-detail-paper', meta: { title: 'Paper'}},
-    { path: '/quick-quiz/paper/:quickquiz_id/:quizsample_id', component: resolve => require(['./views/quickquiz/Quiz-paper.vue'], resolve), name: 'quiz-paper', meta: { title: 'Quiz Paper'}, beforeEnter: requireAuthTeacher},
+    { path: '/quick-quiz/detail/:quickquiz_id', component: resolve => require(['./views/ManageQuickquiz/QuizDetail.vue'], resolve), name: 'quiz-detail', meta: { title: 'Quiz Detail'}, beforeEnter: requireAuthTeacher},
+    { path: '/quick-quiz/detail/:quickquiz_id/paper', component: resolve => require(['./views/ManageQuickquiz/QuizPaper.vue'], resolve), name: 'quiz-detail-paper', meta: { title: 'Paper' }, beforeEnter: requireAuthTeacher},
+    { path: '/quick-quiz/paper/:quickquiz_id/:quizsample_id', component: resolve => require(['./views/ManageQuickquiz/QuizPaper.vue'], resolve), name: 'quiz-sample-paper', meta: { title: 'Quiz Paper' }, beforeEnter: requireAuthTeacher},
     { path: '/admin', component: AdminPanelView, name: 'admin', meta: { title: 'Admin'}, beforeEnter: requireAuthAdmin},
     { path: '/admin/user/:id', component: AdminPanelUserDetailView, name: 'admin-user-detail', meta: { title: '用戶信息'}, beforeEnter: requireAuthAdmin},
     { path: '/student', redirect: { name: 'student-quizzes' }},

@@ -9,7 +9,7 @@
         <router-link :to="{name:'create-question', activeClass:'active'}">創建題目</router-link>
         <router-link :to="{name:'manage-question', activeClass:'active'}">管理題目</router-link>
         <router-link :to="{name:'manage-qcollection', activeClass:'active'}">管理題集</router-link>
-        <router-link :to="{name:'quick-quiz', activeClass:'active'}">Quick Quiz</router-link>
+        <router-link :to="{name:'manage-quiz', activeClass:'active'}">Quick Quiz</router-link>
       </div>
     </mu-drawer>
     <div class="example-content" :class="{'nav-hide': !navOpen}">

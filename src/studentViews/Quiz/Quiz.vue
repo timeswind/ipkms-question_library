@@ -2,6 +2,9 @@
   <div class="flex-column">
     <div>
       <div class="width-wrapper">
+        <div v-show="quiz.ended" class="light-card default-pending" style="border-left: 4px solid #ff5722;font-size: 16px;margin-top: 16px; margin-bottom: 16px; font-weight: bold">
+          該小測已經結束
+        </div>
         <div>
           <div class="quiz-title-wrapper light-card flex-row flex-baseline">
             <h2 style="padding: 0 16px">{{quiz.title}}</h2>
@@ -11,13 +14,39 @@
             </div>
           </div>
         </div>
+
+        <div class="flex-column light-card" v-if="handin" style="margin-bottom: 16px">
+          <quiz-report :report="quizsample.report" :score="quizsample.score" :finishAt="quizsample.finishAt"/>
+        </div>
+
         <div class="light-card">
+          <div class="flex-column default-pending slim-border-bottom" v-if="handin">
+            <div class="flex-row">
+              <div class="flex-row flex-center" style="margin-right: 16px">
+                <mu-icon value="check_circle" color="#009688" style="margin-right: 4px"/><span>正確選項</span>
+              </div>
+              <div class="flex-row flex-center">
+                <mu-icon value="cancel" color="#f44336" style="margin-right: 4px"/><span>錯誤選項</span>
+              </div>
+            </div>
+          </div>
           <div v-for="(question, index) in quiz.questions" :key="question._id" class="slim-border-bottom">
-            <quiz-paper-question :index="index + 1" :id="question._id" :type="question.type" :content="question.content" :choices="question.choices" :randomize="question.randomize" :meta="question.meta"/>
+            <quiz-paper-question
+            :index="index + 1"
+            :id="question._id"
+            :type="question.type"
+            :content="question.content"
+            :choices="question.choices"
+            :randomize="question.randomize"
+            :meta="question.meta"
+            :role="role"
+            :showCorrectAnswer="handin"
+            :showCorrectiveness="handin"
+            :disabled="handin || quiz.ended"/>
           </div>
         </div>
         <div class="flex-row actions-wrapper">
-          <mu-raised-button label="上交" primary @click="handIn" style="margin-left: auto"/>
+          <mu-raised-button label="上交" primary @click="handIn" style="margin-left: auto;margin-right: 8px" v-show="!quiz.ended && !handin"/>
         </div>
       </div>
     </div>
@@ -28,12 +57,14 @@
 import _ from 'lodash'
 import io from 'socket.io-client'
 import QuizPaperQuestion from '../../components/QuizPaperQuestion/QuizPaperQuestion'
+import QuizReport from '../../components/QuickquizComponents/QuizReport'
 import { mapActions, mapGetters } from 'vuex'
 import scoreQuiz from '../../modules/score-quiz'
 
 export default {
   components: {
-    'quiz-paper-question': QuizPaperQuestion
+    'quiz-paper-question': QuizPaperQuestion,
+    'quiz-report': QuizReport
   },
   mounted: function () {
     this.$nextTick(function () {
@@ -42,26 +73,37 @@ export default {
   },
   destroyed: function () {
     this.$nextTick(function () {
-      this.socket.io.disconnect()
-      // console.log('emit socket disconnect')
+      if (this.socket) {
+        this.setQuiz({})
+        this.setQuizSample({})
+        this.setQuizAnswers([])
+        this.socket.io.disconnect()
+      }
     })
   },
   data () {
     return {
       socket: null,
-      quiz: {},
-      seeds: null
+      seeds: null,
+      handin: false
     }
   },
   methods: {
     handIn () {
+      var self = this
       console.log(this.allAnswers)
       let data = {
         id: this.$route.params.quiz_id,
         answers: this.allAnswers
       }
-      this.$http.post(`/api/manage-quickquiz/quickquiz`, data).then(function (response) {
-        console.log(response.data)
+      this.$http.post(`/api/manage-quickquiz/student/handin`, data).then(function (response) {
+        if (response.data.success && response.data.quizsample) {
+          self.socket.emit('student handin', response.data.quizsample)
+          this.setQuizAnswers(response.data.quizsample.answers).then(function () {
+            self.handin = true
+            self.setQuizSample(response.data.quizsample)
+          })
+        }
       }, function (response) {
         console.log(response)
       })
@@ -71,8 +113,21 @@ export default {
         let quiz_id = this.$route.params.quiz_id
         this.$http.get(`/api/manage-quickquiz/quickquiz?id=${quiz_id}`).then(function (response) {
           if (response.data.success && response.data.quickquiz) {
-            this.quiz = response.data.quickquiz
-            this.setQuizId(response.data.quickquiz._id)
+            if (response.data.quickquiz.endAt && new Date() > new Date(response.data.quickquiz.endAt)) {
+              response.data.quickquiz.ended = true
+            } else {
+              response.data.quickquiz.ended = false
+            }
+            if (response.data.handin) {
+              this.handin = true
+              if (response.data.quizsample && response.data.quizsample.answers) {
+                this.setQuizSample(response.data.quizsample)
+                this.setQuizAnswers(response.data.quizsample.answers)
+              } else {
+                console.error('exception')
+              }
+            }
+            this.setQuiz(response.data.quickquiz)
             this.listenForSocket()
           } else {
             this.$showToast('Error Occur')
@@ -98,6 +153,7 @@ export default {
         })
         this.socket.on('seeds', function (data) {
           let parsedData = JSON.parse(data)
+          console.log(parsedData)
           var mapQuestions = {}
           parsedData.forEach((question) => {
             if (question && question._id) {
@@ -127,20 +183,24 @@ export default {
       }
     },
     ...mapActions({
-      setQuizId: 'setQuizId'
+      setQuiz: 'setQuiz',
+      setQuizSample: 'setQuizSample',
+      setQuizAnswers: 'setQuizAnswers'
     })
   },
   computed: {
     throttleEmitReport: function (report) {
       var self = this
       return _.throttle(function (report) {
-        console.log(report)
         self.socket.emit('student answer update', report)
       }, 1000)
     },
     ...mapGetters({
+      role: 'getUserRole',
       subjects: 'getSubjects',
-      allAnswers: 'quizAnswers'
+      allAnswers: 'quizAnswers',
+      quiz: 'quizInfo',
+      quizsample: 'quizSample'
     })
   },
   watch: {
@@ -161,7 +221,6 @@ export default {
 </script>
 <style scoped>
 .quiz-title-wrapper {
-  margin-top: 16px;
   margin-bottom: 16px
 }
 .width-wrapper {

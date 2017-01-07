@@ -37,7 +37,7 @@
           <router-link tag="div" :to="{name: 'manage-qcollection'}" class="flex-column flex-50 flex-center nav-card" style="border-right:1px solid #eee">
             <span>管理題集</span>
           </router-link>
-          <router-link tag="div" :to="{name: 'quick-quiz'}" class="flex-column flex-50 flex-center nav-card">
+          <router-link tag="div" :to="{name: 'manage-quiz'}" class="flex-column flex-50 flex-center nav-card">
             <span>Quick Quiz</span>
           </router-link>
         </div>

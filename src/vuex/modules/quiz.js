@@ -1,54 +1,49 @@
 // vuex/modules/quickquiz.js
 import Vue from 'vue'
 import {
-  SET_QUIZ_ID,
-  SET_QUIZ_START_TIME,
-  SET_QUIZ_END_TIME,
-  ADD_QUIZ_ANSWER
+  SET_QUIZ,
+  SET_QUIZ_SAMPLE,
+  ADD_QUIZ_ANSWER,
+  SET_QUIZ_ANSWERS
 } from '../mutation-types'
 
 // initial state
 const state = {
-  quiz_id: '',
-  answers: [],
-  startAt: null,
-  finishAt: null
+  quiz: {},
+  sample: {},
+  answers: []
 }
 
 // getters
 const getters = {
-  quizId: state => state.show,
-  quizStartTime: state => state.startAt,
-  quizEndTime: state => state.finishAt,
+  quizInfo: state => state.quiz,
+  quizSample: state => state.sample,
   quizAnswers: state => state.answers
 }
 
 // actions
 const actions = {
-  setQuizId ({ commit }, id) {
-    commit(SET_QUIZ_ID, id)
+  setQuiz ({ commit }, quiz) {
+    commit(SET_QUIZ, quiz)
   },
-  setQuizStartTime ({ commit }, time) {
-    commit(SET_QUIZ_START_TIME, time)
-  },
-  setQuizEndTime ({ commit }, time) {
-    commit(SET_QUIZ_END_TIME, time)
+  setQuizSample ({ commit }, sample) {
+    commit(SET_QUIZ_SAMPLE, sample)
   },
   updateQuizAnswer ({ commit }, payload) {
     commit(ADD_QUIZ_ANSWER, payload)
+  },
+  setQuizAnswers ({ commit }, answers) {
+    commit(SET_QUIZ_ANSWERS, answers)
   }
 }
 
 // mutations
 const mutations = {
-  [SET_QUIZ_ID] (state, id) {
-    state.quiz_id = id
+  [SET_QUIZ] (state, quiz) {
+    state.quiz = quiz
   },
-  [SET_QUIZ_START_TIME] (state, time) {
-    state.startAt = time
-  },
-  [SET_QUIZ_END_TIME] (state, time) {
-    state.finishAt = time
+  [SET_QUIZ_SAMPLE] (state, sample) {
+    state.sample = sample
   },
   [ADD_QUIZ_ANSWER] (state, payload) {
     let key = payload.key
@@ -68,6 +63,9 @@ const mutations = {
         data: payload.answer
       })
     }
+  },
+  [SET_QUIZ_ANSWERS] (state, answers) {
+    state.answers = answers
   }
 }
 

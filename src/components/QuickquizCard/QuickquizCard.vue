@@ -3,11 +3,11 @@
     <router-link tag="div" :to="{ name: 'quiz-detail', params: { quickquiz_id: quickquiz._id }}">
       <div class="flex-row flex-baseline">
         <span class="title">{{quickquiz.title}}</span>
-        <span class="finished">{{quickquiz.endAt ? '已結束' : '進行中'}}</span>
+        <span :class="quickquiz.endAt ? 'finished' : 'undergoing'">{{quickquiz.endAt ? '已結束' : '進行中'}}</span>
       </div>
-      <span class="time">{{quickquiz.time}}分鐘</span>
+      <span class="time">{{quickquiz.duration}}分鐘</span>
 
-      <span class="date">{{quickquiz.startTime | date('YY[年]M[月]DD[日]')}}</span>
+      <span class="date">{{quickquiz.startAt | date('YY[年]M[月]DD[日]')}}</span>
     </router-link>
   </div>
 </template>
@@ -46,6 +46,12 @@ export default {
 }
 
 .finished {
+  color: #009688;
+  font-size: 13px;
+  padding-left: 8px
+}
+
+.undergoing {  
   color: #FF9800;
   font-size: 13px;
   padding-left: 8px
